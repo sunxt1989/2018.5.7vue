@@ -47,12 +47,11 @@
                 msg: 'Hello Vuex'
             }
         },
-
         store
     }
 </script>
 
-<style>
+<style scoped>
     .el-col{
         padding: 10px;
     }
