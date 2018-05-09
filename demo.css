@@ -1,0 +1,110 @@
+body, p, img, dl, dt, dd, ul, ol, h1, h2, h3, h4, h5, h6 { margin: 0; padding: 0; }
+body { position: relative; font: 12px/24px "思源黑体", Arial; min-width: 960px; }
+ul, ol { list-style: none; }
+img { border: 0 none; }
+input, select { vertical-align: middle; }
+table { border-collapse: collapse; }
+s, em, i { font-style: normal; text-decoration: none; }
+.cf { *zoom: 1; }
+.cf:after { clear: both; content: "."; display: block; height: 0; overflow: hidden; visibility: hidden; zoom: 1; }
+.w{
+    width:1200px;
+    margin: 0 auto;
+}
+.header .bgColor{
+    width:100%;
+    height:40px;
+    background-color: #1a96d4;
+}
+.header .bgColor .companyName{
+    width:300px;
+    height:40px;
+    line-height: 40px;
+    display: inline-block;
+    position: relative;
+    font-size:18px;
+}
+.header .bgColor .companyName .dropdown-menu {
+    width:100%;
+    height:200px;
+    background-color: #fff;
+    position: absolute;
+    top:40px;
+    overflow-y: auto;
+    box-shadow: 10px 16px 20px 1px #ccc;
+    display: none;
+}
+.header .bgColor .dropdown-toggle{
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.header .bgColor .companyName .dropdown-toggle{
+    display: inline-block;
+    max-width:270px;
+    text-decoration: none;
+    float: left;
+}
+.header .bgColor .iconfont{
+    color: #fff;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.header .bgColor .userName{
+    width:300px;
+    height:40px;
+    line-height: 40px;
+    display: inline-block;
+    float: right;
+    font-size:18px;
+    text-align: right;
+    position: relative;
+}
+.header .bgColor .userName .dropdown-menu{
+    width:100%;
+    background-color: #fff;
+    position: absolute;
+    top:40px;
+    right: 0px;
+    overflow-y: auto;
+    box-shadow: 10px 16px 20px 1px #ccc;
+    text-align: center;
+    display: none;
+}
+.header .bgColor .userName .dropdown-toggle{
+    display: inline-block;
+    max-width:200px;
+    text-decoration: none;
+    float: right;
+}
+.header .bgColor .userName .iconfont{
+    float: right;
+
+}
+
+.header .bgColor .userName .headPortrait{
+    width:25px;
+    vertical-align: sub;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.header .bgColor .userName ul li{
+    border-bottom: 1px solid #ccc;
+}
+ul li {
+    height:30px;
+    line-height: 30px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px 10px;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow: ellipsis;
+    font-size:16px;
+}
+ul li:hover{
+    background-color: #eaf6ff;
+}
+
