@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import topHeader from '@/components/common/header'
+    import topHeader from '@/components/common/topHeader'
 export default {
   name: 'App',
     components:{
@@ -25,6 +25,9 @@ export default {
     s, em, i { font-style: normal; text-decoration: none; }
     .cf { *zoom: 1; }
     .cf:after { clear: both; content: "."; display: block; height: 0; overflow: hidden; visibility: hidden; zoom: 1; }
+    html,body{
+        height:100%;
+    }
     #app{
         background-color: #e3f1f4;
         height:100%;
