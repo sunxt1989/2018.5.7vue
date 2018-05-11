@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-      <topHeader></topHeader>
+      <topH></topH>
       <router-view/>
   </div>
 </template>
 
 <script>
-    import topHeader from '@/components/common/topHeader'
+    import topH from '@/components/common/topH'
 export default {
   name: 'App',
     components:{
-        topHeader
+        topH
     }
 }
 </script>
@@ -35,5 +35,9 @@ export default {
     .w{
         width:1200px;
         margin: 0 auto;
+    }
+    .el-table th{
+        color: #fff;
+        background-color: #1c96d3;
     }
 </style>
