@@ -25,12 +25,13 @@ export default {
     s, em, i { font-style: normal; text-decoration: none; }
     .cf { *zoom: 1; }
     .cf:after { clear: both; content: "."; display: block; height: 0; overflow: hidden; visibility: hidden; zoom: 1; }
-    html,body{
+
+    html，body{
         height:100%;
     }
     #app{
-        background-color: #e3f1f4;
         height:100%;
+        background-color: #e3f1f4;
     }
     .w{
         width:1200px;

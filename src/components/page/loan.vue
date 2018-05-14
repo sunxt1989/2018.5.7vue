@@ -1,17 +1,17 @@
 <template>
-    <div class="w">
+    <div class="w cf">
         <div class="top">
             <h2>借款单</h2>
-            <el-button class="add" type="primary" size="small">新增</el-button>
+            <router-link to="/loan/newLoan" class="addLink">新增</router-link>
         </div>
         <div class="left">
-
             <span class="record">记录日期：</span>
             <el-date-picker
                 v-model="timeInterval"
                 type="daterange"
                 align="right"
                 unlink-panels
+                @blur="blurTime"
                 range-separator="至"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
@@ -33,7 +33,7 @@
             </el-select>
 
             <el-button size="small" type="primary" @click="axios()">查询</el-button>
-            <el-table :data="tableData" >
+            <el-table :data="tableData" show-summary :summary-method="getTotal">
                 <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
                 <el-table-column prop="departmentName" label="借款部门" sortable align="center" ></el-table-column>
                 <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center" ></el-table-column>
@@ -54,21 +54,28 @@
                 </el-table-column>
                 <el-table-column label="还款" width="80px" align="center">
                     <template slot-scope="scope">
-                        <span class="repayment black" v-if="scope.row.unCreditMoney == 0" >还款</span>
+                        <span class="black" v-if="scope.row.unCreditMoney == 0" ><router-link to="">还款</router-link></span>
                         <span class="repayment red" v-else>还款</span>
                     </template>
                 </el-table-column>
                 <el-table-column  label="操作" width="80px" align="center">
                     <template slot-scope="scope" >
-                        <span class="operation"><i class="icon iconfont icon-kanguo blue"></i></span>
-                        <span class="operation"><i class="icon iconfont icon-shanchu red" @click="open2(scope.row.idString)"></i></span>
+                        <span class="operation"><router-link to="loan/seeLoan" class="see"><i class="icon iconfont icon-kanguo blue"></i></router-link></span>
+                        <span class="operation"><i class="icon iconfont icon-shanchu red" @click="delete(scope.row.idString)"></i></span>
                     </template>
                 </el-table-column>
             </el-table>
+
+            <el-pagination
+                @current-change="changePage"
+                background
+                layout="prev, pager, next"
+                :total='count'>
+            </el-pagination>
         </div>
 
         <div class="right">
-
+            右边栏
         </div>
     </div>
 </template>
@@ -123,6 +130,10 @@
                     label: '未提交'
                 }],//借款单状态筛选功能
                 tableData: [],//借款单列表数据
+                creditMoney:'',//还款合计
+                debitMoney:'',//借款合计
+                count:0,//总条目数
+                currentPage:1,//当前页数
             }
         },
         methods:{
@@ -137,6 +148,7 @@
             },
             //执行ajax重新获取借款单列表数据
             axios(){
+
                 var params = new URLSearchParams();
                 var $auditFlg = '';
                 for(var i = 0; i < this.auditFlg.length; i++){
@@ -150,17 +162,25 @@
                 params.append('auditFlg',$auditFlg);
                 params.append('startDate',this.startDate);
                 params.append('endDate',this.endDate);
-
+                params.append('pageNo',this.currentPage);
+                console.log(this.startDate);
+                console.log(this.endDate);
                 axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',params)
                     .then(response=> {
                         console.log(response);
-                        var data = response.data.value;
+                        var data = response.data.value.list;//借款单列表数据
+                        var $creditMoney = response.data.value.creditMoney;//还款
+                        var $debitMoney = response.data.value.debitMoney;//借款
+                        var $count = response.data.value.count;//总条目数
                         let tableDataarr =[];
                         console.log(data);
                         for(var i =0; i < data.length; i++){
                             tableDataarr.push(data[i])
                         }
+                        this.count = $count
                         this.tableData = tableDataarr
+                        this.creditMoney = $creditMoney
+                        this.debitMoney = $debitMoney
                     })
                     .catch(error=> {
                         console.log(error);
@@ -188,8 +208,8 @@
                         alert('网络错误，不能访问');
                     })
             },
-            open2(id) {
-                console.log(id);
+            //删除提示模态框
+            delete(id) {
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -202,6 +222,16 @@
                         message: '已取消删除'
                     });
                 });
+            },
+            //自定义合计列
+            getTotal(param){
+                const sums = ['合计','','借款：',(this.debitMoney + '元'),'','还款：',(this.creditMoney + '元')]
+                return sums
+            },
+            //分页器
+            changePage(val){
+                this.currentPage = val;
+                this.axios()
             }
         },
         created(){
@@ -210,17 +240,24 @@
             params.append('auditFlg',this.auditFlg);
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
+            params.append('pageNo',this.currentPage);
 
             axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',params)
                 .then(response=> {
                     console.log(response);
-                    var data = response.data.value;
+                    var data = response.data.value.list;//借款单列表数据
+                    var $creditMoney = response.data.value.creditMoney;//还款
+                    var $debitMoney = response.data.value.debitMoney;//借款
+                    var $count = response.data.value.count;//总条目数
                     let tableDataarr =[];
                     console.log(data);
                     for(var i =0; i < data.length; i++){
                         tableDataarr.push(data[i])
                     }
-                     this.tableData = tableDataarr
+                    this.count = $count;
+                    this.tableData = tableDataarr;
+                    this.creditMoney = $creditMoney;
+                    this.debitMoney = $debitMoney
                 })
                 .catch(error=> {
                     console.log(error);
@@ -231,44 +268,64 @@
 </script>
 
 <style scoped>
-    .top{
+    .w{
+        height:100%;
+    }
+    .top {
         margin: 20px 0;
         text-align: center;
+        position: relative;
     }
-    h2{
+
+    h2 {
         display: inline-block;
     }
-    .add{
-        float: right;
+    .addLink{
+        display: inline-block;
+        width: 56px;
+        height:32px;
+        color: #fff;
+        background-color: #409EFF;
+        border-radius: 3px;
+        line-height: 32px;
+        position: absolute;
+        right:20px;
+        text-decoration: none;
     }
-    .left{
+
+    .left {
         width: 80%;
         float: left;
         background-color: #fff;
+        padding: 20px 20px;
     }
-    .right{
-        width:20%;
-        float: left;
-        background-color: #fff;
+
+    .right {
+        width: 15%;
+        float: right;
+        background-color: #ff2630;
     }
-    .record{
-        font-size:18px;
-        color:#333;
-        margin-right: 30px;
-    }
-    .repayment{
-        cursor: pointer;
-    }
-    .black{
+
+    .record {
+        font-size: 18px;
         color: #333;
+        margin-right: 20px;
     }
-    .red{
-        color: #fe614d;
-    }
-    .blue{
-        color: #8ad9d9;
-    }
-    .operation{
+
+    .repayment {
         cursor: pointer;
     }
+    .operation {
+        cursor: pointer;
+    }
+    .el-table {
+        margin: 30px 0;
+    }
+    .el-select {
+        margin: 0 20px;
+    }
+    .see{
+        text-decoration: none;
+    }
+
 </style>

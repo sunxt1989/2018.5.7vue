@@ -94,5 +94,13 @@
         margin-right: 10px;
         cursor: pointer;
     }
-
+    .black {
+        color: #333;
+    }
+    .red {
+        color: #fe614d;
+    }
+    .blue {
+        color: #8ad9d9;
+    }
 </style>
