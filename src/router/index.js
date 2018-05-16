@@ -4,6 +4,7 @@ import homePage from '@/components/page/homePage'
 import loan from '@/components/page/loan'
 import newLoan from '@/components/page/newLoan'
 import seeLoan from '@/components/page/seeLoan'
+import repayment from '@/components/page/repayment'
 
 Vue.use(Router)
 
@@ -25,9 +26,14 @@ export default new Router({
             component:newLoan
         },
         {
-            path:'/loan/seeLoan',
+            path:'/loan/seeLoan/',
             name:'seeLoan',
             component:seeLoan
+        },
+        {
+            path:'/loan/repayment',
+            name:'repayment',
+            component:repayment
         }
     ]
 })
