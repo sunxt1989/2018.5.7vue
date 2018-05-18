@@ -177,14 +177,6 @@
         font-size:18px;
         display: inline-block;
     }
-    .line{
-        text-align: left;
-        color: #1c96d3;
-        border-bottom: 2px solid #1c96d3;
-    }
-    .line span{
-        font-size:16px;
-    }
     .back{
         position: absolute;
         right:20px;

@@ -13,7 +13,9 @@
                     <el-row class="mesa">
                         <div class="item">
                             <div class="item-content">
-
+                                <router-link class="itemLink" to="/loan">
+                                    借款单
+                                </router-link>
                             </div>
                         </div>
                     </el-row>
@@ -115,9 +117,13 @@
         height: 100%;
         text-align: center;
         background: red;
-        font-size: 20px;
+        font-size: 12px;
         color: white;
         cursor: pointer;
+    }
+    .itemLink{
+        width:100%;
+        height:100%;
     }
     .item.muuri-item-dragging .item-content {
         background: blue;
