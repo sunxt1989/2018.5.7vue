@@ -39,8 +39,9 @@
                         <li>
                             <el-date-picker
                                 class="data"
-                                v-model="debitDate"
+                                v-model="nowdata"
                                 type="date"
+                                @change="changeTime"
                                 placeholder="选择日期">
                             </el-date-picker>
                         </li>
@@ -59,16 +60,19 @@
                         </li>
                         <li class="upload">
                             <el-upload
-                                action="http://192.168.2.190:8080/web/upload2.html"
+                                action="http://192.168.2.192:8080/web/upload2.html"
                                 list-type="picture-card"
                                 ref="upload"
+                                :show-file-list=true
                                 :limit = 'limit'
-                                :multiple="multiple"
                                 :http-request="myUpload"
                                 :on-preview="handlePictureCardPreview"
                                 :before-upload = 'beforeAvatarUpload'
                                 :on-exceed ="onExceed"
                                 :on-error ="onError"
+                                :on-change = 'onChange'
+                                :on-remove = 'onRemove'
+                                :file-list="fileList"
                                 :auto-upload="false">
                                 <i class="el-icon-plus"></i>
                             </el-upload>
@@ -91,19 +95,33 @@
         data(){
             return{
                 money:0,//金额
-                debitDate:'',//日期
+                nowdata:'',//当前日期
+                debitDate:'',//上传日期（格式修改后的）
                 departmentId:'',//部门
                 options:[],//部门详情
                 discription:'',//借款事由
                 dialogImageUrl: '',//展示图片URL
                 dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
-                multiple:true,//上传是否多文件上传
                 limit:4,//上传图片最大张数
-                fileUid:[],//uid顺序数组
+                fileUid:0,//uid顺序数组
                 fileUri:[],//上传插件后台返回url地址
                 num:0,//判断uid返回数量
                 newFilUri:'',//临时uri容器
+                newFileList:'',//临时fileList容器
+                punch:0,//打点器,判断是否有图片上传
+                fileList:[],//上传成功展示图片参数
+                nowFileList:[],//当前上传图片返回的参数
+
+                imgUrl1:'',//上传图片url
+                imgName1:'',//上传图片name
+                imgUrl2:'',
+                imgName2:'',
+                imgUrl3:'',
+                imgName3:'',
+                imgUrl4:'',
+                imgName4:'',
+
                 loading:true,
             }
         },
@@ -120,12 +138,31 @@
 
                     });
                 }else{
+//                    if(this.money <= 0){
+//                        this.$message.error('请正确输入金额');
+//                        this.loading = false;
+//                        return
+//                    }else if(this.debitDate == ''){
+//                        this.$message.error('请正确输入借款日期');
+//                        this.loading = false;
+//                        return
+//                    }else if(this.departmentId == ''){
+//                        this.$message.error('请正确输入借款部门');
+//                        this.loading = false;
+//                        return
+//                    }
+
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        this.submitUpload();
+//                        console.log(this.punch);
+                        if(this.punch != 0){
+                            this.submitUpload();
+                        }else{
+                            this.submit()
+                        }
                     }).catch(() => {
                         this.$message({
                             type: 'info',
@@ -156,16 +193,30 @@
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
             },
             onError(){
+                this.loading = false
                 this.$message.error('图片上传失败，请重试！');
+            },
+            onChange(file,fileList){
+                this.punch++;
+//                console.log(file);
+//                console.log(fileList);
+            },
+            onRemove(file,fileList){
+//                console.log(file);
+//                console.log(fileList);
+                this.punch--;
+//                this.fileList = fileList
             },
             myUpload(content){
 //                console.log(content);
                 var formData = new FormData();
+                this.fileUid++;
                 var file = content.file;
-                this.fileUid.push(file.uid);
-//                console.log(this.fileUid);
+                console.log(this.fileUid);
+
                 formData.append('file',file);
-                formData.append('uid',file.uid);
+                formData.append('uid2',this.fileUid);
+
                 axios({
                     method:'post',
                     url:content.action,
@@ -175,79 +226,71 @@
                     var value = res.data.value;
                     var n = 0;
                     this.num++;
-//                    if(res.data.status == 201){
-//
-//                    }else{
-//
-//                    }
-                    //后台在传递参数时有时会发生uid为空，为了fileUri顺序正确添加if判断
-                    if(value.uid == ''){
-                        this.newFilUri = value.uri;
+
+                    if(res.data.status == 400 && this.num != this.fileUid){
+                        this.onError();
+                        return
                     }else{
-                        for(var i = 0; i < this.fileUid.length; i++){
-                            if(value.uid == this.fileUid[i]){
-                                n = i;
-                            }
+                        //后台在传递参数时有时会发生uid为空，为了fileUri顺序正确添加if判断
+                        if(value.uid2 != ''){
+                            this.nowFileList[value.uid2] = value
+                        }else{
+                            this.newFileList = value;
                         }
-                        this.fileUri[n] = value.uri;
-                    }
-                    if(this.num == this.fileUid.length){
-                        this.loading = false;
-                        //判断是否出现了uid为空
-                        if(this.newFilUri != ''){
-                            //uid出现为空时，找出数组fileUri为空的位置，把newFilUri添加进去
-                            for(var ii = 0; ii < this.fileUri.length; ii++){
-                                if(this.fileUri[ii] == ''){//if空的位置不在最后一位的时候
-                                    this.fileUri[ii] = this.newFilUri
-                                }else{//else空的位置在最后一位的时候
-                                    this.fileUri.push(this.newFilUri)
+
+                        if(this.num == this.fileUid.length){
+                            this.loading = false;
+                            //判断是否出现了uid为空
+                            if(this.newFileList.uid == ''){
+                                console.log(this.nowFileList);
+                                //uid出现为空时，找出数组newFileList为空的位置，把newFileList添加进去
+                                for(var ii = 0; ii < this.nowFileList.length; ii++){
+                                    console.log(this.nowFileList[ii]);
+                                    if(this.nowFileList[ii] == ''){//if空的位置不在最后一位的时候
+                                        this.nowFileList[ii] = this.newFileList
+                                    }else{//else空的位置在最后一位的时候
+                                        this.nowFileList.push(this.newFileList)
+                                    }
                                 }
                             }
+                            this.fileList = this.nowFileList;
+                            console.log(this.fileList);
+//                        this.submit()
                         }
-                        console.log(this.fileUri);
-                        this.submit()
                     }
-
                 })
             },
             submit(){
                 this.loading = true;
-                if(this.money <= 0){
-                    this.$message.error('请正确输入金额');
-                    this.loading = false;
-                    this.fileUid = [];
-                    this.fileUri = [];
-                    this.num = 0;
-                    this.newFilUri = '' ;
-                    return
-                }else if(this.debitDate == ''){
-                    this.$message.error('请正确输入借款日期');
-                    this.loading = false;
-                    this.fileUid = [];
-                    this.fileUri = [];
-                    this.num = 0;
-                    this.newFilUri = '' ;
-                    return
-                }else if(this.departmentId == ''){
-                    this.$message.error('请正确输入借款部门');
-                    this.loading = false;
-                    this.fileUid = [];
-                    this.fileUri = [];
-                    this.num = 0;
-                    this.newFilUri = '' ;
-                    return
-                }
-
                 var params = new URLSearchParams();
-                var fileUrl = this.fileUri.join(';');
-                console.log(this.money);
+                console.log(this.nowFileList);
+                var list = this.nowFileList;
+                for(var i = 0; i < list.length; i++ ){
+                    this.imgUrl1 = list[0].url;
+                    this.imgName1 = list[0].name
+                    this.imgUrl2 = list[1].url;
+                    this.imgName2 = list[1].name
+                    this.imgUrl3 = list[2].url;
+                    this.imgName3 = list[2].name
+                    this.imgUrl4 = list[3].url;
+                    this.imgName4 = list[3].name
+
+                }
                 params.append('debitId',0);
                 params.append('title',this.discription);
                 params.append('money',this.money);
                 params.append('debitDate',this.debitDate);
                 params.append('discription',this.discription);
                 params.append('departmentId',this.departmentId);
-                params.append('imgUrls',fileUrl);
+
+                params.append('imgUrl1',this.imgUrl1);
+                params.append('imgName1',this.imgName1);
+                params.append('imgUrl2',this.imgUrl2);
+                params.append('imgName2',this.imgName2);
+                params.append('imgUrl3',this.imgUrl3);
+                params.append('imgName3',this.imgName3);
+                params.append('imgUrl4',this.imgUrl4);
+                params.append('imgName4',this.imgName4);
 
                 axios.post('http://192.168.2.192:8080/web/vue/debit/edit/debit/submit.html',params)
                     .then(response=> {
@@ -270,6 +313,13 @@
                 this.dialogImageUrl = file.url;
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
+            },
+            //选择记录日期事件
+            changeTime(){
+                //设置记录日期的起始日期和终止日期
+                const date = this.nowdata;
+                this.debitDate = date.getFullYear()+'-'+((date.getMonth()+1) > 9 ?(date.getMonth()+1):'0'+(date.getMonth()+1))+'-'+ (date.getDate()>9 ? date.getDate():'0'+date.getDate())
+                console.log(this.debitDate);
             },
         },
         created(){

@@ -19,23 +19,30 @@
                         </li>
                         <li class="sm">
                             <span class="tit">已还金额</span>
-                            <input class="ipt" type="text" v-model="Amoney" readonly>
+                            <input class="ipt" type="text" v-model="creditMoney" readonly>
                         </li>
                         <li class="sm">
                             <span class="tit">未还金额</span>
-                            <input class="ipt" type="text" v-model="Umoney" readonly>
+                            <input class="ipt" type="text" v-model="unCreditMoney" readonly>
                         </li>
                         <li class="sm">
                             <span class="tit">时间</span>
-                            <input class="ipt" type="text" v-model="data" readonly>
+                            <input class="ipt" type="text" v-model="debitDateYMD" readonly>
                         </li>
                         <li class="sm">
                             <span class="tit">借款人</span>
-                            <input class="ipt" type="text" v-model="name" readonly>
+                            <input class="ipt" type="text" v-model="userName" readonly>
                         </li>
                         <li class="sm">
                             <span class="tit">状态</span>
-                            <input class="ipt" type="text" v-model="auditFlg" readonly>
+                            <input class="ipt" type="text" value="未提交" v-if="auditFlg == 0" readonly>
+                            <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
+                            <input class="ipt" type="text" value="审批中" v-if="auditFlg == 2" readonly>
+                            <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
+                            <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
+                            <input class="ipt" type="text" value="待财务负责人审批" v-if="auditFlg == 5" readonly>
+                            <input class="ipt" type="text" value="待企业负责人审批" v-if="auditFlg == 6" readonly>
+                            <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
                         </li>
                         <li class="pt cf">
                             <span class="tit2">状态</span>
@@ -45,16 +52,18 @@
                         <li class="pt cf">
                             <span class="tit2">附件</span>
                             <div class="uploadBox">
-                                <!--<el-upload-->
-                                    <!--action="https://jsonplaceholder.typicode.com/posts/"-->
-                                    <!--list-type="picture-card"-->
-                                    <!--:on-preview="handlePictureCardPreview"-->
-                                    <!--:on-remove="handleRemove">-->
-                                    <!--<i class="el-icon-plus"></i>-->
-                                <!--</el-upload>-->
-                                <!--<el-dialog :visible.sync="dialogVisible">-->
-                                    <!--<img width="100%" :src="dialogImageUrl" alt="">-->
-                                <!--</el-dialog>-->
+                                <el-upload
+                                    action="https://jsonplaceholder.typicode.com/posts/"
+                                    list-type="picture-card"
+                                    :file-list="fileList"
+                                    :on-preview="handlePictureCardPreview"
+                                    disabled>
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+                                <el-dialog :visible.sync="dialogVisible">
+                                    <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                    <img width="100%" :src="dialogImageUrl" alt="">
+                                </el-dialog>
                             </div>
                         </li>
                     </ul>
@@ -66,22 +75,15 @@
                             <img :src="item.auditUserFaceUri" alt="">
                             <div class="listHeader">
                                 <span class="listName">{{item.auditUserName}}</span>
-                                ———
+                                ——
                                 <span class="listDepartment">{{item.auditDepartmentName}}</span>
                                 <span class="listData">{{item.auditTimeYMDHM}}</span>
                             </div>
                             <div class="listFooter">
-                                <span class="listState" v-if="item.auditStatus = 0">未提交：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 1">驳回：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 2">审批中：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 3">待出纳确认：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 4">通过：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 5">待财务负责人审批：</span>
-                                <span class="listState" v-else-if="item.auditStatus = 5">待企业负责人审批：</span>
+                                <span class="listState">意见：</span>
                                 <span class="listContent">{{item.discription}}</span>
                             </div>
                         </li>
-
                     </ul>
                 </div>
             </div>
@@ -96,16 +98,28 @@
         name:'seeLoan',
         data(){
             return{
-                money:'100',
-                Amoney:'50',
-                Umoney:'50',
-                data:'2018-01-01',
-                name:'借款人',
-                auditFlg:'待审核',
-                discription:'事由',
+                money:'',//借款金额
+                creditMoney:'',//已还金额
+                unCreditMoney:'',//待还款金额
+                debitDateYMD:'',//借款日期
+                userName:'',//借款人
+                auditFlg:'',//0 仅保存；1 驳回；2等待审核；3 等待出纳确认；4 通过；5 等待财务负责人审核；6 等待企业负责人审核；7 已对冲
+                discription:'',//事由
                 debitId:this.$route.params.debitId,
                 userDebitAuditRecordList:[],
+                fileList:[],//上传图片展示
+                dialogVisible: false,//dialog是否打开状态
+                dialogImageName:'',//展示图片名称
+                dialogImageUrl:'',//展示图片URL
                 loading:true,
+            }
+        },
+        methods:{
+            //上传图片缩略图信息赋值
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogImageName = file.name;
+                this.dialogVisible = true;
             }
         },
         created(){
@@ -117,8 +131,16 @@
                     var data = response.data.value;
                     console.log(data);
                     this.userDebitAuditRecordList = data.userDebitAuditRecordList;
-                    this.money = data.
+                    this.discription = data.userDebitItem.discription;
+                    this.money = data.userDebitItem.money;
+                    this.creditMoney = data.userDebitItem.creditMoney;
+                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
+                    this.debitDateYMD = data.userDebitItem.debitDateYMD;
+                    this.userName = data.userDebitItem.userName;
+                    this.auditFlg = data.userDebitItem.auditFlg;
+                    this.fileList = data.userDebitItem.fileList;
                     this.loading = false;
+                    console.log(this.discription);
                 })
                 .catch(error=> {
                     this.loading = false;
@@ -269,6 +291,9 @@
         float: left;
         height:50px;
         overflow: hidden;
+    }
+    .dialogImageName{
+        font-size:16px;
     }
 
 </style>
