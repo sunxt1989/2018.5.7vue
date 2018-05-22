@@ -4,6 +4,7 @@
             <div class="top">
                 <h2>查看借款单</h2>
                 <router-link to="/loan" class="back">返回</router-link>
+                <el-button v-if="auditFlg == 1" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
             </div>
         </div>
         <div class="ww">
@@ -55,7 +56,17 @@
                                 <el-upload
                                     action="https://jsonplaceholder.typicode.com/posts/"
                                     list-type="picture-card"
-                                    :file-list="fileList"
+                                    :file-list="attachUrlJson"
+                                    :on-preview="handlePictureCardPreview"
+                                    disabled>
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+
+                                <el-upload
+                                    v-if="auditFlg == 1"
+                                    action="https://jsonplaceholder.typicode.com/posts/"
+                                    list-type="picture-card"
+                                    :file-list="attachUrlJson"
                                     :on-preview="handlePictureCardPreview"
                                     disabled>
                                     <i class="el-icon-plus"></i>
@@ -107,7 +118,7 @@
                 discription:'',//事由
                 debitId:this.$route.params.debitId,
                 userDebitAuditRecordList:[],
-                fileList:[],//上传图片展示
+                attachUrlJson:[],//上传图片展示
                 dialogVisible: false,//dialog是否打开状态
                 dialogImageName:'',//展示图片名称
                 dialogImageUrl:'',//展示图片URL
@@ -139,6 +150,7 @@
                     this.userName = data.userDebitItem.userName;
                     this.auditFlg = data.userDebitItem.auditFlg;
                     this.fileList = data.userDebitItem.fileList;
+                    this.attachUrlJson = data.userDebitItem.attachUrlJson;
                     this.loading = false;
                     console.log(this.discription);
                 })
@@ -239,6 +251,11 @@
         display: inline-block;
         width:76.7%;
         padding: 3px 10px;
+    }
+    .sub{
+        position: absolute;
+        right:110px;
+        font-size:12px;
     }
     .approval{
         width:100%;
