@@ -155,7 +155,7 @@
         methods:{
             //选择记录日期事件
             changeTime(){
-                console.log('changeTime');
+//                console.log('changeTime');
                 //设置记录日期的起始日期和终止日期
                 const date = this.timeInterval;
                 if(date){

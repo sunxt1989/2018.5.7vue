@@ -13,7 +13,7 @@
                     <el-row class="mesa">
                         <div class="item">
                             <div class="item-content">
-                                <router-link class="itemLink" to="/loan">
+                                <router-link class="itemLink" to="/loan/loan">
                                     借款单
                                 </router-link>
                             </div>

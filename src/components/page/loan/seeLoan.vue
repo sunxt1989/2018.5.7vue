@@ -46,7 +46,7 @@
                             <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
                         </li>
                         <li class="pt cf">
-                            <span class="tit2">状态</span>
+                            <span class="tit2">事由</span>
                             <textarea class="tex" v-model="discription" name="" id=""  readonly>
                             </textarea>
                         </li>
