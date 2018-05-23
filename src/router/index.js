@@ -5,6 +5,8 @@ import loan from '@/components/page/loan'
 import newLoan from '@/components/page/newLoan'
 import seeLoan from '@/components/page/seeLoan'
 import repayment from '@/components/page/repayment'
+import payroll from '@/components/page/Payroll/payroll'
+import reimbursement from '@/components/page/Reimbursement/reimbursement'
 
 Vue.use(Router)
 
@@ -34,6 +36,16 @@ export default new Router({
             path:'/loan/repayment',
             name:'repayment',
             component:repayment
+        },
+        {
+            path:'/Reimbursement/reimbursement',
+            name:'reimbursement',
+            component:reimbursement
+        },
+        {
+            path:'/Payroll/payroll',
+            name:'payroll',
+            component:payroll
         }
     ]
 })

@@ -44,14 +44,13 @@
         width:1200px;
         margin: 0 auto;
     }
-    .ww{
-        width:1350px;
-        margin: 0 auto 30px;
-        padding: 10px 0 50px;
-        background-color: #fff;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+    .el-header{
+        padding: 0;
     }
-    .el-table th{
+    .el-table thead tr{
+        background-color: #1c96d3;
+    }
+    .el-table thead th{
         color: #fff;
         background-color: #1c96d3;
         height:42px;
@@ -79,5 +78,8 @@
     .line span{
         font-family: '思源黑体';
         font-size:16px;
+    }
+    .el-input__inner{
+        height:36px;
     }
 </style>

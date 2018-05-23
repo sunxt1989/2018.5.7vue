@@ -7,8 +7,8 @@
                 <el-button  @click="model(1)" size="small" type="danger" class="sub" >提交审批</el-button>
             </div>
         </div>
-        <div class="ww cf">
-            <div class="w">
+        <div class="w">
+            <div class="bgbox">
                 <div class="left">
                     <ul>
                         <li>
@@ -64,14 +64,14 @@
                                 list-type="picture-card"
                                 ref="upload"
                                 :show-file-list=true
-                                :limit = 'limit'
+                                :limit='limit'
                                 :http-request="myUpload"
                                 :on-preview="handlePictureCardPreview"
-                                :before-upload = 'beforeAvatarUpload'
-                                :on-exceed ="onExceed"
-                                :on-error ="onError"
-                                :on-change = 'onChange'
-                                :on-remove = 'onRemove'
+                                :before-upload='beforeAvatarUpload'
+                                :on-exceed="onExceed"
+                                :on-error="onError"
+                                :on-change='onChange'
+                                :on-remove='onRemove'
                                 :file-list="fileList"
                                 :auto-upload="false">
                                 <i class="el-icon-plus"></i>
@@ -84,6 +84,7 @@
                     </ul>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -105,7 +106,6 @@
                 dialogVisible: false,//dialog是否打开状态
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
-                punch2:0,//打点器
                 fileList:[],//上传成功展示图片参数
 
                 allBase:[],//所有base64格式的地址
@@ -203,6 +203,7 @@
             },
             //url转换base方法
             readBlobAsDataURL(blob, callback) {
+//                console.log(blob);
                 var fileReader = new FileReader();
                 fileReader.onload = function(e){
                     callback(e.target.result);
@@ -301,9 +302,7 @@
             axios.post('http://192.168.2.192:8080/web/vue/debit/department.html')
                 .then(response=> {
                     var data = response.data.value;
-                    var newOptions = [];
                     this.options = data;
-//                    console.log(this.options);
                     this.loading = false
                 })
                 .catch(error=> {
@@ -339,6 +338,11 @@
         position: absolute;
         right:110px;
         font-size:12px;
+    }
+    .bgbox{
+        width:100%;
+        padding: 20px 20px;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .left{
         display: inline-block;
