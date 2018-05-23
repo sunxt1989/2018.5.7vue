@@ -7,67 +7,65 @@
                 <el-button @click.native="model(1)" size="small" type="danger" class="sub" >提交</el-button>
             </div>
         </div>
-        <div class="ww">
-            <div class="w cf">
-                <div class="line">
-                    <span>还款单</span>
-                </div>
-                <div class="left">
-                    <ul>
-                        <li>待还款</li>
-                        <li>本次还款</li>
-                        <li>还款日期</li>
-                    </ul>
-                </div>
-                <div class="right cf">
-                    <ul>
-                        <li>
-                            <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney">
-                        </li>
-                        <li>
-                            <input type="text" class="hk" name="hk" id="hk" v-model="money">
-                        </li>
-                        <li>
-                            <el-date-picker
-                                class="data"
-                                v-model="nowdata"
-                                type="date"
-                                @change="changeTime"
-                                placeholder="选择日期">
-                            </el-date-picker>
-                        </li>
-                    </ul>
-                </div>
-                <div class="line">
-                    <span>还款明细</span>
-                </div>
-                <el-table class="hkTable" :data="tableData" style="width: 60%">
-                    <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
-                    <el-table-column prop="payType"  label="还款方式" sortable width="180">
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.payType == 0" ></span>
-                            <span v-if="scope.row.payType == 1" >现金支付</span>
-                            <span v-if="scope.row.payType == 2" >银行支付</span>
-                            <span v-if="scope.row.payType == 3" >暂不支付</span>
-                            <span v-if="scope.row.payType == 4" >冲抵个人借款</span>
-                            <span v-if="scope.row.payType == 99" >其他货币资金</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
-                    <el-table-column prop="auditFlg" label="还款状态" sortable>
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.auditFlg == 0" >未提交</span>
-                            <span v-if="scope.row.auditFlg == 1" >驳回</span>
-                            <span v-if="scope.row.auditFlg == 2" >审批中</span>
-                            <span v-if="scope.row.auditFlg == 3" >待出纳确认</span>
-                            <span v-if="scope.row.auditFlg == 4" >待还款</span>
-                            <span v-if="scope.row.auditFlg == 5" >待财务负责人审批</span>
-                            <span v-if="scope.row.auditFlg == 6" >待企业负责人审批</span>
-                            <span v-if="scope.row.auditFlg == 7" >已红冲</span>
-                        </template>
-                    </el-table-column>
-                </el-table>
+        <div class="w cf">
+            <div class="line">
+                <span>还款单</span>
             </div>
+            <div class="left">
+                <ul>
+                    <li>待还款</li>
+                    <li>本次还款</li>
+                    <li>还款日期</li>
+                </ul>
+            </div>
+            <div class="right cf">
+                <ul>
+                    <li>
+                        <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney">
+                    </li>
+                    <li>
+                        <input type="text" class="hk" name="hk" id="hk" v-model="money">
+                    </li>
+                    <li>
+                        <el-date-picker
+                            class="data"
+                            v-model="nowdata"
+                            type="date"
+                            @change="changeTime"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                    </li>
+                </ul>
+            </div>
+            <div class="line">
+                <span>还款明细</span>
+            </div>
+            <el-table class="hkTable" :data="tableData" style="width: 60%">
+                <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
+                <el-table-column prop="payType" label="还款方式" sortable width="180">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.payType == 0"></span>
+                        <span v-if="scope.row.payType == 1">现金支付</span>
+                        <span v-if="scope.row.payType == 2">银行支付</span>
+                        <span v-if="scope.row.payType == 3">暂不支付</span>
+                        <span v-if="scope.row.payType == 4">冲抵个人借款</span>
+                        <span v-if="scope.row.payType == 99">其他货币资金</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="money" label="还款金额" sortable></el-table-column>
+                <el-table-column prop="auditFlg" label="还款状态" sortable>
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.auditFlg == 0">未提交</span>
+                        <span v-if="scope.row.auditFlg == 1">驳回</span>
+                        <span v-if="scope.row.auditFlg == 2">审批中</span>
+                        <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
+                        <span v-if="scope.row.auditFlg == 4">待还款</span>
+                        <span v-if="scope.row.auditFlg == 5">待财务负责人审批</span>
+                        <span v-if="scope.row.auditFlg == 6">待企业负责人审批</span>
+                        <span v-if="scope.row.auditFlg == 7">已红冲</span>
+                    </template>
+                </el-table-column>
+            </el-table>
         </div>
     </div>
 </template>

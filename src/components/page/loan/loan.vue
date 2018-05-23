@@ -3,93 +3,88 @@
         <div class="w cf">
             <div class="top">
                 <h2>借款单</h2>
+                <el-select v-model="choice" class='choice' placeholder="请选择" @change="changeChoice">
+                    <el-option
+                        v-for="item in options2"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.choice">
+                    </el-option>
+                </el-select>
                 <router-link to="/loan/newLoan" class="addLink">新增</router-link>
             </div>
         </div>
-        <div class="ww cf">
-            <div class="w">
-                <div class="left">
-                    <span class="record">记录日期：</span>
-                    <el-date-picker
-                        v-model="timeInterval"
-                        type="daterange"
-                        align="right"
-                        unlink-panels
-                        @change="changeTime"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
-                        :picker-options="pickerOptions2">
-                    </el-date-picker>
+        <div class="w">
+            <div class="left">
+                <span class="record">记录日期：</span>
+                <el-date-picker
+                    v-model="timeInterval"
+                    type="daterange"
+                    align="right"
+                    unlink-panels
+                    @change="changeTime"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    :picker-options="pickerOptions2">
+                </el-date-picker>
 
-                    <el-select
-                        v-model="auditFlg"
-                        multiple
-                        allow-create
-                        default-first-option
-                        placeholder="状态筛选">
-                        <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
+                <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
 
-                    <el-button size="small" type="primary" @click="axios">查询</el-button>
-                    <el-table :data="tableData" show-summary :summary-method="getTotal">
-                        <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
-                        <el-table-column prop="departmentName" label="借款部门" sortable align="center" ></el-table-column>
-                        <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center" ></el-table-column>
-                        <el-table-column prop="money" label="借款金额" sortable align="center" ></el-table-column>
-                        <el-table-column prop="creditMoney" label="已还金额" sortable align="center" ></el-table-column>
-                        <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center" ></el-table-column>
-                        <el-table-column prop="auditFlg" label="状态" sortable align="center" width="100px">
-                            <template slot-scope="scope">
-                                <span v-if="scope.row.auditFlg == 0" >未提交</span>
-                                <span v-else-if="scope.row.auditFlg == 1">驳回</span>
-                                <span v-else-if="scope.row.auditFlg == 2">审批中</span>
-                                <span v-else-if="scope.row.auditFlg == 3">待出纳确认</span>
-                                <span v-else-if="scope.row.auditFlg == 4">通过</span>
-                                <span v-else-if="scope.row.auditFlg == 5">待财务负责人审批</span>
-                                <span v-else-if="scope.row.auditFlg == 6">待企业责人审批</span>
-                                <span v-else-if="scope.row.auditFlg == 7">已红冲</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="还款" width="80px" align="center">
-                            <template slot-scope="scope">
-                                <span class="black" v-if="scope.row.unCreditMoney == 0" >还款</span>
-                                <router-link v-else class="repayment red"   :to="{name:'repayment',params:{debitId:scope.row.idString}}">还款</router-link>
-                            </template>
-                        </el-table-column>
-                        <el-table-column  label="操作" width="80px" align="center">
-                            <template slot-scope="scope">
+                <el-table :data="tableData" show-summary :summary-method="getTotal">
+                    <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
+                    <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
+                    <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="借款金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="auditFlg" label="状态" sortable align="center" width="100px">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.auditFlg == 0">未提交</span>
+                            <span v-else-if="scope.row.auditFlg == 1">驳回</span>
+                            <span v-else-if="scope.row.auditFlg == 2">审批中</span>
+                            <span v-else-if="scope.row.auditFlg == 3">待出纳确认</span>
+                            <span v-else-if="scope.row.auditFlg == 4">待还款</span>
+                            <span v-else-if="scope.row.auditFlg == 5">待财务负责人审批</span>
+                            <span v-else-if="scope.row.auditFlg == 6">待企业责人审批</span>
+                            <span v-else-if="scope.row.auditFlg == 7">已红冲</span>
+                            <span v-else-if="scope.row.auditFlg == 8">已还款</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="还款" width="80px" align="center">
+                        <template slot-scope="scope">
+                            <span class="black" v-if="scope.row.unCreditMoney == 0 || scope.row.auditFlg != 4">还款</span>
+                            <router-link v-else class="repayment red"
+                                         :to="{name:'repayment',params:{debitId:scope.row.idString}}">还款
+                            </router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="80px" align="center">
+                        <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString}}" class="see"><i class="icon iconfont icon-kanguo blue"></i></router-link>
+                                    <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString}}" class="see">
+                                        <i class="icon iconfont icon-kanguo blue"></i></router-link>
                                 </span>
 
                                 <span class="operation">
-                                    <i v-if='scope.row.auditFlg == 0' @click='deleteModel(scope.row.idString)' class="icon iconfont icon-shanchu red"></i>
-                                    <i v-else-if='scope.row.auditFlg == 1' @click='deleteModel(scope.row.idString)' class="icon iconfont icon-shanchu red"></i>
+                                    <i v-if='scope.row.auditFlg == 0' @click='deleteModel(scope.row.idString)'
+                                       class="icon iconfont icon-shanchu red"></i>
+                                    <i v-else-if='scope.row.auditFlg == 1' @click='deleteModel(scope.row.idString)'
+                                       class="icon iconfont icon-shanchu red"></i>
                                     <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
                                 </span>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                        </template>
+                    </el-table-column>
+                </el-table>
 
-                    <el-pagination
-                        @current-change="changePage"
-                        background
-                        layout="prev, pager, next"
-                        :total='count'>
-                    </el-pagination>
+                <el-pagination
+                    @current-change="changePage"
+                    background
+                    layout="prev, pager, next"
+                    :total='count'>
+                </el-pagination>
 
-                </div>
-                <div class="right">
-                    右边栏
-                </div>
             </div>
-
         </div>
     </div>
 
@@ -144,6 +139,14 @@
                     value: 0,
                     label: '未提交'
                 }],//借款单状态筛选功能
+                options2: [{
+                    choice: '1,7,8',
+                    label: '已完成列表'
+                }, {
+                    choice: '0,2,3,4,5,6',
+                    label: '未完成列表'
+                }],
+                choice:'0,2,3,5,6',
                 tableData: [],//借款单列表数据
                 creditMoney:'',//还款合计
                 debitMoney:'',//借款合计
@@ -153,6 +156,9 @@
             }
         },
         methods:{
+            changeChoice(){
+                this.axios()
+            },
             //选择记录日期事件
             changeTime(){
 //                console.log('changeTime');
@@ -168,18 +174,13 @@
             },
             //执行ajax重新获取借款单列表数据
             axios(){
+                console.log(this.auditFlg);
                 this.loading = true;
                 var Params = new URLSearchParams();
-                var $auditFlg = '';
-                for(var i = 0; i < this.auditFlg.length; i++){
-                    if( i == 0){
-                        $auditFlg += this.auditFlg[i]
-                    }else{
-                        $auditFlg += ','+this.auditFlg[i]
-                    }
-                }
+
+                console.log(this.choice);
                 Params.append('periodType',this.periodType);
-                Params.append('auditFlg',$auditFlg);
+                Params.append('auditFlg',this.choice);
                 Params.append('startDate',this.startDate);
                 Params.append('endDate',this.endDate);
                 Params.append('pageNo',this.currentPage);
@@ -263,11 +264,10 @@
         created(){
             var params = new URLSearchParams();
             params.append('periodType',this.periodType);
-            params.append('auditFlg',this.auditFlg);
+            params.append('auditFlg',this.choice);
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
             params.append('pageNo',this.currentPage);
-
             axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',params)
                 .then(response=> {
                     console.log(response);
@@ -317,24 +317,27 @@
         border-radius: 3px;
         line-height: 32px;
         position: absolute;
-        right:20px;
+        right:40px;
         text-decoration: none;
     }
-
+    .choice {
+        width:120px;
+        display: inline-block;
+        position: absolute;
+        left:20px;
+        text-decoration: none;
+    }
+    .query{
+        margin-left: 30px;
+    }
     .left {
-        width: 80%;
+        width: 1120px;
         float: left;
         background-color: #fff;
-        padding: 20px 20px;
+        padding: 20px 40px;
         text-align: center;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
-
-    .right {
-        width: 15%;
-        float: right;
-        background-color: #ff2630;
-    }
-
     .record {
         font-size: 18px;
         color: #333;

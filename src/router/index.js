@@ -1,13 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import homePage from '@/components/page/homePage'
-import loan from '@/components/page/loan/loan'
-import newLoan from '@/components/page/loan/newLoan'
-import seeLoan from '@/components/page/loan/seeLoan'
-import repayment from '@/components/page/loan/repayment'
-import loanSheetApproval from '@/components/page/loan/loanSheetApproval'
-import loanConfirmation from '@/components/page/loan/loanConfirmation'
-import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'
+import loan from '@/components/page/loan'
+import newLoan from '@/components/page/newLoan'
+import seeLoan from '@/components/page/seeLoan'
+import repayment from '@/components/page/repayment'
+import payroll from '@/components/page/Payroll/payroll'
+import reimbursement from '@/components/page/Reimbursement/reimbursement'
 
 Vue.use(Router)
 
@@ -19,7 +18,7 @@ export default new Router({
             component:homePage
         },
         {
-            path:'/loan/loan',
+            path:'/loan',
             name:'loan',
             component:loan
         },
@@ -29,7 +28,7 @@ export default new Router({
             component:newLoan
         },
         {
-            path:'/loan/seeLoan',
+            path:'/loan/seeLoan/',
             name:'seeLoan',
             component:seeLoan
         },
@@ -39,19 +38,14 @@ export default new Router({
             component:repayment
         },
         {
-            path:'/loan/loanSheetApproval',
-            name:'loanSheetApproval',
-            component:loanSheetApproval
+            path:'/Reimbursement/reimbursement',
+            name:'reimbursement',
+            component:reimbursement
         },
         {
-            path:'/loan/repaymentConfirmation',
-            name:'repaymentConfirmation',
-            component:repaymentConfirmation
-        },
-        {
-            path:'/loan/loanConfirmation',
-            name:'loanConfirmation',
-            component:loanConfirmation
+            path:'/Payroll/payroll',
+            name:'payroll',
+            component:payroll
         }
     ]
 })
