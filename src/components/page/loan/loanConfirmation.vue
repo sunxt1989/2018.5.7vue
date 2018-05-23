@@ -2,7 +2,7 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w">
             <div class="top">
-                <h2>借款单确认</h2>
+                <h2>借款单确认单</h2>
                 <router-link to="/loan" class="back">返回</router-link>
                 <el-button  size="small" type="danger" class="sub1">驳回</el-button>
                 <el-button  size="small" type="primary" class="sub2">同意</el-button>
