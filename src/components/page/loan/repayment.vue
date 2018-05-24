@@ -8,64 +8,66 @@
             </div>
         </div>
         <div class="w cf">
-            <div class="line">
-                <span>还款单</span>
+            <div class="content">
+                <div class="line">
+                    <span>还款单</span>
+                </div>
+                <div class="left">
+                    <ul>
+                        <li>待还款</li>
+                        <li>本次还款</li>
+                        <li>还款日期</li>
+                    </ul>
+                </div>
+                <div class="right cf">
+                    <ul>
+                        <li>
+                            <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney" readonly>
+                        </li>
+                        <li>
+                            <input type="text" class="hk" name="hk" id="hk" v-model="money">
+                        </li>
+                        <li>
+                            <el-date-picker
+                                class="data"
+                                v-model="nowdata"
+                                type="date"
+                                @change="changeTime"
+                                placeholder="选择日期">
+                            </el-date-picker>
+                        </li>
+                    </ul>
+                </div>
+                <div class="line">
+                    <span>还款明细</span>
+                </div>
+                <el-table class="hkTable" :data="tableData" style="width: 60%">
+                    <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
+                    <el-table-column prop="payType" label="还款方式" sortable width="180">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.payType == 0"></span>
+                            <span v-if="scope.row.payType == 1">现金支付</span>
+                            <span v-if="scope.row.payType == 2">银行支付</span>
+                            <span v-if="scope.row.payType == 3">暂不支付</span>
+                            <span v-if="scope.row.payType == 4">冲抵个人借款</span>
+                            <span v-if="scope.row.payType == 99">其他货币资金</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
+                    <el-table-column prop="auditFlg" label="还款状态" sortable>
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.auditFlg == 0">未提交</span>
+                            <span v-if="scope.row.auditFlg == 1">驳回</span>
+                            <span v-if="scope.row.auditFlg == 2">审批中</span>
+                            <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
+                            <span v-if="scope.row.auditFlg == 4">待还款</span>
+                            <span v-if="scope.row.auditFlg == 5">待财务负责人审批</span>
+                            <span v-if="scope.row.auditFlg == 6">待企业负责人审批</span>
+                            <span v-if="scope.row.auditFlg == 7">已红冲</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
-            <div class="left">
-                <ul>
-                    <li>待还款</li>
-                    <li>本次还款</li>
-                    <li>还款日期</li>
-                </ul>
-            </div>
-            <div class="right cf">
-                <ul>
-                    <li>
-                        <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney">
-                    </li>
-                    <li>
-                        <input type="text" class="hk" name="hk" id="hk" v-model="money">
-                    </li>
-                    <li>
-                        <el-date-picker
-                            class="data"
-                            v-model="nowdata"
-                            type="date"
-                            @change="changeTime"
-                            placeholder="选择日期">
-                        </el-date-picker>
-                    </li>
-                </ul>
-            </div>
-            <div class="line">
-                <span>还款明细</span>
-            </div>
-            <el-table class="hkTable" :data="tableData" style="width: 60%">
-                <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
-                <el-table-column prop="payType" label="还款方式" sortable width="180">
-                    <template slot-scope="scope">
-                        <span v-if="scope.row.payType == 0"></span>
-                        <span v-if="scope.row.payType == 1">现金支付</span>
-                        <span v-if="scope.row.payType == 2">银行支付</span>
-                        <span v-if="scope.row.payType == 3">暂不支付</span>
-                        <span v-if="scope.row.payType == 4">冲抵个人借款</span>
-                        <span v-if="scope.row.payType == 99">其他货币资金</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="money" label="还款金额" sortable></el-table-column>
-                <el-table-column prop="auditFlg" label="还款状态" sortable>
-                    <template slot-scope="scope">
-                        <span v-if="scope.row.auditFlg == 0">未提交</span>
-                        <span v-if="scope.row.auditFlg == 1">驳回</span>
-                        <span v-if="scope.row.auditFlg == 2">审批中</span>
-                        <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
-                        <span v-if="scope.row.auditFlg == 4">待还款</span>
-                        <span v-if="scope.row.auditFlg == 5">待财务负责人审批</span>
-                        <span v-if="scope.row.auditFlg == 6">待企业负责人审批</span>
-                        <span v-if="scope.row.auditFlg == 7">已红冲</span>
-                    </template>
-                </el-table-column>
-            </el-table>
         </div>
     </div>
 </template>
@@ -74,12 +76,12 @@
     export default{
         data(){
             return{
-                debitId:this.$route.params.debitId,
-                unCreditMoney:'',
-                money:'',
-                debitDate:'',
-                nowdata:'',
-                tableData: [],
+                debitId:this.$route.params.debitId,//单据ID
+                unCreditMoney:'',//待还款
+                money:'',//本次还款
+                debitDate:'',//上传日期
+                nowdata:'',//当前日期
+                tableData: [],//还款明细
                 loading:false,
             }
         },
@@ -144,7 +146,7 @@
         created(){
             var params = new URLSearchParams();
             params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/edit/credit/show.html',params)
+            axios.post('http://192.168.2.192:8080/web/vue/debit/credit/create.html',params)
                 .then(response=> {
                     console.log(response);
                     var data = response.data.value
@@ -184,6 +186,13 @@
         position: absolute;
         right:110px;
         font-size:12px;
+    }
+    .content{
+        width: 1120px;
+        background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .left{
         display: inline-block;

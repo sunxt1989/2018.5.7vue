@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="w">
-            <div class="bgbox">
+            <div class="content cf">
                 <div class="left">
                     <ul>
                         <li>
@@ -339,9 +339,11 @@
         right:110px;
         font-size:12px;
     }
-    .bgbox{
-        width:100%;
-        padding: 20px 20px;
+    .content{
+        width: 1120px;
+        background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .left{

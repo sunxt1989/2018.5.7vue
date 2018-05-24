@@ -2,150 +2,302 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w">
             <div class="top">
-                <h2>借款单确认单</h2>
-                <router-link to="/loan" class="back">返回</router-link>
-                <el-button  size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button  size="small" type="primary" class="sub2">同意</el-button>
+                <h2>借款单确认</h2>
+                <el-button @click="model(0)" size="small" class="back">返回</el-button>
+                <el-button @click="model(1)" size="small" type="danger" class="sub1">驳回</el-button>
+                <el-button @click="model(2)" size="small" type="primary" class="sub2">同意</el-button>
             </div>
         </div>
-        <div class="ww">
-            <div class="w">
-                <div class="content">
-                    <div class="line">
-                        <span>借款单</span>
-                    </div>
-                    <ul class="list">
-                        <li class="sm">
-                            <span class="tit">金额</span>
-                            <input class="ipt" type="text" v-model="money" readonly>
-                        </li>
-                        <li class="sm">
-                            <span class="tit">已还金额</span>
-                            <input class="ipt" type="text" v-model="creditMoney" readonly>
-                        </li>
-                        <li class="sm">
-                            <span class="tit">未还金额</span>
-                            <input class="ipt" type="text" v-model="unCreditMoney" readonly>
-                        </li>
-                        <li class="sm">
-                            <span class="tit">时间</span>
-                            <input class="ipt" type="text" v-model="debitDateYMD" readonly>
-                        </li>
-                        <li class="sm">
-                            <span class="tit">借款人</span>
-                            <input class="ipt" type="text" v-model="userName" readonly>
-                        </li>
-                        <li class="sm">
-                            <span class="tit">状态</span>
-                            <input class="ipt" type="text" value="未提交" v-if="auditFlg == 0" readonly>
-                            <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
-                            <input class="ipt" type="text" value="审批中" v-if="auditFlg == 2" readonly>
-                            <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
-                            <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
-                            <input class="ipt" type="text" value="待财务负责人审批" v-if="auditFlg == 5" readonly>
-                            <input class="ipt" type="text" value="待企业负责人审批" v-if="auditFlg == 6" readonly>
-                            <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
-                        </li>
-                        <li class="pt cf">
-                            <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" name="" id=""  readonly>
-                            </textarea>
-                        </li>
-                        <li class="pt cf">
-                            <span class="tit2">附件</span>
-                            <div class="uploadBox">
-                                <el-upload
-                                    action="https://jsonplaceholder.typicode.com/posts/"
-                                    list-type="picture-card"
-                                    :file-list="attachUrlJson"
-                                    :on-preview="handlePictureCardPreview"
-                                    disabled>
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-
-                                <el-upload
-                                    v-if="auditFlg == 1"
-                                    action="https://jsonplaceholder.typicode.com/posts/"
-                                    list-type="picture-card"
-                                    :file-list="attachUrlJson"
-                                    :on-preview="handlePictureCardPreview"
-                                    disabled>
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-                                <el-dialog :visible.sync="dialogVisible">
-                                    <h2 class="dialogImageName">{{dialogImageName}}</h2>
-                                    <img width="100%" :src="dialogImageUrl" alt="">
-                                </el-dialog>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="line">
-                        <span>审批记录</span>
-                    </div>
-                    <ul class="approval">
-                        <li class="cf" v-for="item in userDebitAuditRecordList">
-                            <img :src="item.auditUserFaceUri" alt="">
-                            <div class="listHeader">
-                                <span class="listName">{{item.auditUserName}}</span>
-                                ——
-                                <span class="listDepartment">{{item.auditDepartmentName}}</span>
-                                <span class="listData">{{item.auditTimeYMDHM}}</span>
-                            </div>
-                            <div class="listFooter">
-                                <span class="listState">意见：</span>
-                                <span class="listContent">{{item.discription}}</span>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="line">
-                        <span>审批意见</span>
-                    </div>
-                    <ul class="approval-opinion">
-                        <li>
-                            <span>结算方式</span>
-                            <select name="opinion" id="method">
-                                <option value="0">同意</option>
-                                <option value="1">驳回</option>
-                            </select>
-                        </li>
-                        <li>
-                            <span>银行账户</span>
-                            <select name="opinion" id="bank">
-                                <option value="0">同意</option>
-                                <option value="1">驳回</option>
-                            </select>
-                        </li>
-                        <li>
-                            <span>日期</span>
-                            <select name="opinion" id="opinionData">
-                                <option value="0">同意</option>
-                                <option value="1">驳回</option>
-                            </select>
-                        </li>
-                        <li>
-                            <span>可选审批意见</span>
-                            <select name="opinion" id="opinion">
-                                <option value="0">同意</option>
-                                <option value="1">驳回</option>
-                            </select>
-                        </li>
-                        <li class="opinionItem">
-                            <span>审批意见</span>
-                            <textarea name="opinionItem" id="opinionItem" cols="30" rows="10">
-                            </textarea>
-                        </li>
-                    </ul>
+        <div class="w">
+            <div class="content">
+                <div class="line">
+                    <span>借款单</span>
                 </div>
+                <ul class="list">
+                    <li class="sm">
+                        <span class="tit">金额</span>
+                        <input class="ipt" type="text" v-model="money" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">已还金额</span>
+                        <input class="ipt" type="text" v-model="creditMoney" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">未还金额</span>
+                        <input class="ipt" type="text" v-model="unCreditMoney" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">时间</span>
+                        <input class="ipt" type="text" v-model="nowdata" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">借款人</span>
+                        <input class="ipt" type="text" v-model="userName" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">状态</span>
+                        <input class="ipt" type="text" value="未提交" v-if="auditFlg == 0" readonly>
+                        <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
+                        <input class="ipt" type="text" value="审批中" v-if="auditFlg == 2" readonly>
+                        <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
+                        <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
+                        <input class="ipt" type="text" value="待财务负责人审批" v-if="auditFlg == 5" readonly>
+                        <input class="ipt" type="text" value="待企业负责人审批" v-if="auditFlg == 6" readonly>
+                        <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
+                    </li>
+                    <li class="pt cf">
+                        <span class="tit2">事由</span>
+                            <textarea class="tex" v-model="discription" name="" id="" readonly>
+                            </textarea>
+                    </li>
+                    <li class="pt cf">
+                        <span class="tit2">附件</span>
+                        <div class="uploadBox">
+                            <el-upload
+                                action="https://jsonplaceholder.typicode.com/posts/"
+                                list-type="picture-card"
+                                :file-list="attachUrlJson"
+                                :on-preview="handlePictureCardPreview"
+                                disabled>
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                                <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </div>
+                    </li>
+                </ul>
+                <div class="line">
+                    <span>审批记录</span>
+                </div>
+                <ul class="approval">
+                    <li class="cf" v-for="item in userDebitAuditRecordList">
+                        <img :src="item.auditUserFaceUri" alt="">
+                        <div class="listHeader">
+                            <span class="listName">{{item.auditUserName}}</span>
+                            ——
+                            <span class="listDepartment">{{item.auditDepartmentName}}</span>
+                            <span class="listData">{{item.auditTimeYMDHM}}</span>
+                        </div>
+                        <div class="listFooter">
+                            <span class="listState">意见：</span>
+                            <span class="listContent">{{item.discription}}</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="line">
+                    <span>审批意见</span>
+                </div>
+                <ul class="approval-opinion">
+                    <li>
+                        <span>结算方式</span>
+                        <el-select class="bankCode" v-model="payType" placeholder="请选择" @change="payTypeChange">
+                            <el-option
+                                v-for="item in payTypeList"
+                                :key="item.value"
+                                :label="item.payTypeItem"
+                                :value="item.value"
+                                :disabled="item.disabled">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li>
+                        <span>银行账户</span>
+                        <el-select class="bankCode" v-model="bankCode" placeholder="请选择" :disabled="isTrue">
+                            <el-option
+                                v-for="item in bankAccountList"
+                                :key="item.value"
+                                :label="item.bankNameShow"
+                                :value="item.bankCode">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li>
+                        <span>日期</span>
+                        <el-date-picker
+                            @change="changeTime"
+                            class="bankCode"
+                            v-model="debitDate"
+                            type="date"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                    </li>
+                    <li>
+                        <span>可选审批意见</span>
+                        <el-select class="bankCode" v-model="opinion" placeholder="请选择" @change="opinionChange">
+                            <el-option
+                                v-for="item in opinionList"
+                                :key="item.value"
+                                :label="item.opinionItem"
+                                :value="item.value"
+                                :disabled="item.disabled">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li class="opinionItem">
+                        <span>审批意见</span>
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10">
+                            </textarea>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </template>
-
-<script>
+<script type="text/ecmascript-6">
+    import axios from 'axios'
     export default {
         data () {
-            return {}
-        }
+            return {
+                money:'',//借款金额
+                creditMoney:'',//已还金额
+                unCreditMoney:'',//待还款金额
+                nowdata:'',//当前借款日期
+                debitDate:'',//上传日期（格式修改后的）
+                userName:'',//借款人
+                auditFlg:'',//0 仅保存；1 驳回；2等待审核；3 等待出纳确认；4 通过；5 等待财务负责人审核；6 等待企业负责人审核；7 已对冲
+                departmentId:'',//部门
+                options:[],//部门详情
+                discription:'',//事由
+                discription2:'同意',//审批意见
+                opinion:'同意',//select框
+                debitId:this.$route.params.debitId,
+                userDebitAuditRecordList:[],
+                attachUrlJson:[],//上传图片展示
+                dialogVisible: false,//dialog是否打开状态
+                dialogImageName:'',//展示图片名称
+                dialogImageUrl:'',//展示图片URL
+                bankAccountList:[],//银行账户信息
+                bankCode:'',//银行账户
+                payType:'',//付款类型
+                payTypeList:[
+                    {value:'1',payTypeItem:'现金支付'},{value:'2',payTypeItem:'银行支付'}
+                ],//付款类型
+                opinionList:[
+                    {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
+                ],//可选审批意见
+                isTrue:true,
+                loading:true,
+            }
+        },
+        methods:{
+            model(n){
+                if(n == 0){
+                    this.$confirm('是否返回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$router.go(-1)
+                    }).catch(() => {});
+                }else{
+                    this.$confirm('确定是否提交？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.axios(n)
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                }
+            },
+            //上传图片缩略图信息赋值
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogImageName = file.name;
+                this.dialogVisible = true;
+            },
+            //选择记录日期事件
+            changeTime(){
+                //设置记录日期的起始日期和终止日期
+                const date = this.debitDate;
+                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
+                console.log(this.debitDate);
+            },
+            //selsect框change事件
+            opinionChange(){
+                this.discription2 = this.opinion
+            },
+            axios(n){
+                this.loading = false
+                var url = '';
+                var params = new URLSearchParams();
+                console.log(this.payType);
+                console.log(this.discription2);
+                console.log(this.bankCode);
+                console.log(this.debitDate);
+                params.append('debitId', this.debitId);
+                params.append('payType', this.payType);
+                params.append('discription', this.discription2);
+                params.append('bankCode', this.bankCode);
+                params.append('confirmDate', this.debitDate);
+                //判断n=1时为驳回，n=2时为同意
+                if (n == 1) {
+                    url = 'refuse'
+                } else if (n == 2) {
+                    url = 'agree'
+                }
+                axios.post('http://192.168.2.192:8080/web/payment/vue/item/cashier/' + url + '.html', params)
+                    .then(response=> {
+                        this.loading = true;
+                        console.log(response);
+                        if (response.data.status == 200) {
+                            this.$router.go(-1);
+                            this.$message({
+                                type: 'success',
+                                message: '提交成功'
+                            });
+                        } else if (response.data.status == 400) {
+                            var msg = response.data.msg;
+                            this.$message.error(msg);
+                        }
+                    })
+            },
+            //判断支付方式，如果选择银行支付，银行账户才能使用
+            payTypeChange(){
+                if(this.payType == 1){
+                    this.isTrue = true
+                }else if(this.payType == 2){
+                    this.isTrue = false
+                }
+            },
+            //selsect框change事件
+            opinionChange(){
+                this.discription2 = this.opinion
+            },
+        },
+        created(){
+            var params = new URLSearchParams();
+            params.append('debitId',this.debitId);
+            axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/show.html',params)
+                .then(response=> {
+                    console.log(response);
+                    var data = response.data.value;
+                    console.log(data);
+                    this.options = data.departmentList;
+                    this.userDebitAuditRecordList = data.userDebitAuditRecordList;
+                    this.discription = data.userDebitItem.discription;
+                    this.money = data.userDebitItem.money;
+                    this.creditMoney = data.userDebitItem.creditMoney;
+                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
+                    this.nowdata = data.userDebitItem.debitDateYMD;
+                    this.userName = data.userDebitItem.userName;
+                    this.auditFlg = data.userDebitItem.auditFlg;
+                    this.attachUrlJson = data.userDebitItem.attachUrlJson;
+                    this.departmentId = data.userDebitItem.departmentIdStr;
+                    this.bankAccountList = data.bankAccountList;
+                    this.loading = false;
+
+                    for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
+                        this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0,10)
+                    }
+                })
+        },
     }
 </script>
 
@@ -164,23 +316,16 @@
         display: inline-block;
     }
     .back{
-        display: inline-block;
-        width:56px;
-        height:32px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        line-height: 32px;
-        text-align: center;
-        font-size:14px;
-        text-decoration: none;
-        color: #333;
         position: absolute;
-        right: 30px;
+        right:30px;
+        font-size:12px;
     }
     .content{
-        width:100%;
+        width: 1120px;
         background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .list{
         width:100%;
@@ -210,7 +355,7 @@
     .list li .tit{
         font-size:14px;
         display: inline-block;
-        width:200px;
+        width:150px;
         text-align: right;
         margin-right: 20px;
         vertical-align: middle;
@@ -218,13 +363,13 @@
     .list li .tit2{
         font-size:14px;
         display: inline-block;
-        width:200px;
+        width:150px;
         text-align: right;
         margin-right: 20px;
         vertical-align: top;
     }
     .list li .tex{
-        width:76.7%;
+        width:78.7%;
         height:60px;
         resize: none;
         border: 1px solid #ccc;
@@ -233,7 +378,7 @@
     }
     .list li .uploadBox{
         display: inline-block;
-        width:76.7%;
+        width:78.7%;
         padding: 3px 10px;
     }
     .sub1{
@@ -307,6 +452,7 @@
     }
     .approval-opinion li{
         margin-top: 30px;
+        text-align: center;
     }
     .approval-opinion li span{
         display: inline-block;
@@ -323,13 +469,20 @@
         border: none;
         border-bottom: 1px solid #ccc;
     }
+    .approval-opinion li .bankCode{
+        width:700px;
+        height:30px;
+        text-align: center;
+        border: none;
+    }
 
     .opinionItem #opinionItem{
         display: inline-block;
-        width:80%;
+        width:680px;
         height:50px;
         padding: 5px 10px;
         resize: none;
         font-size:14px;
+        border-radius: 3px;
     }
 </style>

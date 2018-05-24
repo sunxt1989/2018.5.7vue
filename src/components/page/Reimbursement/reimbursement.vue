@@ -6,8 +6,8 @@
                 <router-link to="/loan/newLoan" class="addLink">新增</router-link>
             </div>
         </div>
-        <div class="ww">
-            <div class="w cf">
+        <div class="w cf">
+            <div class="content">
                 <span class="record">记录日期：</span>
                 <el-date-picker
                     v-model="timeInterval"
@@ -21,6 +21,9 @@
                     :picker-options="pickerOptions2">
                 </el-date-picker>
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
+                <div class="costList">
+                    <h2><img src="" alt="">差旅费</h2>
+                </div>
             </div>
         </div>
     </div>
@@ -138,6 +141,13 @@
 
     h2 {
         display: inline-block;
+    }
+    .content{
+        width: 1120px;
+        background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .addLink{
         display: inline-block;

@@ -420,8 +420,10 @@
         font-size:12px;
     }
     .content{
-        width:100%;
+        width: 1120px;
         background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
 
@@ -458,7 +460,7 @@
     .list li .tit{
         font-size:14px;
         display: inline-block;
-        width:200px;
+        width:150px;
         text-align: right;
         margin-right: 20px;
         vertical-align: middle;
@@ -466,7 +468,7 @@
     .list li .tit2{
         font-size:14px;
         display: inline-block;
-        width:200px;
+        width:150px;
         text-align: right;
         margin-right: 20px;
         vertical-align: top;

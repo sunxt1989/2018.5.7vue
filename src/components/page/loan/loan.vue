@@ -3,7 +3,7 @@
         <div class="w cf">
             <div class="top">
                 <h2>借款单</h2>
-                <el-select v-model="choice" class='choice' placeholder="请选择" @change="changeChoice">
+                <el-select v-model="choice" class='choice' placeholder="未完成列表" @change="changeChoice">
                     <el-option
                         v-for="item in options2"
                         :key="item.value"
@@ -12,6 +12,7 @@
                     </el-option>
                 </el-select>
                 <router-link to="/loan/newLoan" class="addLink">新增</router-link>
+
             </div>
         </div>
         <div class="w">
@@ -44,11 +45,11 @@
                             <span v-else-if="scope.row.auditFlg == 1">驳回</span>
                             <span v-else-if="scope.row.auditFlg == 2">审批中</span>
                             <span v-else-if="scope.row.auditFlg == 3">待出纳确认</span>
-                            <span v-else-if="scope.row.auditFlg == 4">待还款</span>
+                            <span v-else-if="scope.row.auditFlg == 4 && scope.row.unCreditMoney != 0">待还款</span>
+                            <span v-else-if="scope.row.auditFlg == 4 && scope.row.unCreditMoney == 0">已还款</span>
                             <span v-else-if="scope.row.auditFlg == 5">待财务负责人审批</span>
                             <span v-else-if="scope.row.auditFlg == 6">待企业责人审批</span>
                             <span v-else-if="scope.row.auditFlg == 7">已红冲</span>
-                            <span v-else-if="scope.row.auditFlg == 8">已还款</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="还款" width="80px" align="center">
@@ -146,10 +147,8 @@
                     choice: '0,2,3,4,5,6',
                     label: '未完成列表'
                 }],
-                choice:'0,2,3,5,6',
+                choice:'',
                 tableData: [],//借款单列表数据
-                creditMoney:'',//还款合计
-                debitMoney:'',//借款合计
                 count:0,//总条目数
                 currentPage:1,//当前页数
                 loading:true,
@@ -179,7 +178,7 @@
                 var Params = new URLSearchParams();
 
                 console.log(this.choice);
-                Params.append('periodType',this.periodType);
+                Params.append('periodType','');
                 Params.append('auditFlg',this.choice);
                 Params.append('startDate',this.startDate);
                 Params.append('endDate',this.endDate);
@@ -187,19 +186,15 @@
 
                 axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',Params)
                     .then(response=> {
+                        console.log(response);
                         var data = response.data.value.list;//借款单列表数据
-                        var $creditMoney = response.data.value.creditMoney;//还款
-                        var $debitMoney = response.data.value.debitMoney;//借款
-                        var $count = response.data.value.count;//总条目数
+                        this.count = response.data.value.count;//总条目数
                         let tableDataarr =[];
                         console.log(data);
                         for(var i =0; i < data.length; i++){
                             tableDataarr.push(data[i])
                         }
-                        this.count = $count;
                         this.tableData = tableDataarr;
-                        this.creditMoney = $creditMoney;
-                        this.debitMoney = $debitMoney;
                         this.loading = false;
                     })
                     .catch(error=> {
@@ -251,7 +246,14 @@
 
             //自定义合计列
             getTotal(param){
-                const sums = ['合计','','借款：',(this.debitMoney + '元'),'','还款：',(this.creditMoney + '元')]
+                var jk = 0;
+                var hk = 0;
+                var tol = this.tableData;
+                for(var i = 0; i < tol.length; i++){
+                    jk += tol[i].money;
+                    hk += tol[i].creditMoney;
+                }
+                const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')]
                 return sums
             },
             //分页器
@@ -263,8 +265,8 @@
         },
         created(){
             var params = new URLSearchParams();
-            params.append('periodType',this.periodType);
-            params.append('auditFlg',this.choice);
+            params.append('periodType','');
+            params.append('auditFlg','0,2,3,4,5,6');
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
             params.append('pageNo',this.currentPage);
@@ -335,7 +337,8 @@
         float: left;
         background-color: #fff;
         padding: 20px 40px;
-        text-align: center;
+        text-align: left;
+        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .record {
