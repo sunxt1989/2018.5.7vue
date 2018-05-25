@@ -82,4 +82,37 @@
     .el-input__inner{
         height:36px;
     }
+    .checkboxAll{
+        margin-top: 30px;
+    }
+    .checkboxAll .el-checkbox__input{
+
+    }
+    .checkboxAll .el-checkbox__input .el-checkbox__inner{
+        -webkit-transform:scale(1.6);
+        transform:scale(1.6);
+        margin-left: 5px;
+    }
+    .checkboxList .el-checkbox__input{
+        display: inline-block;
+        width:4%;
+        height:100%;
+        margin: 0;
+        padding: 0;
+        float: left;
+        line-height: 100px;
+    }
+    .checkboxList .el-checkbox__input .el-checkbox__inner{
+        -webkit-transform:scale(1.6);
+        transform:scale(1.6);
+        margin-left: 5px;
+    }
+    .checkboxList .el-checkbox__label{
+        display: inline-block;
+        width:96%;
+        margin: 0;
+        padding: 0;
+        float: left;
+    }
+
 </style>

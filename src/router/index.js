@@ -15,7 +15,7 @@ import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'
 //工资单
 import payroll from '@/components/page/Payroll/payroll'
 //报销
-import reimbursement from '@/components/page/Reimbursement/reimbursement'
+import costSheet from '@/components/page/Reimbursement/costSheet'//费用单列表
 
 Vue.use(Router)
 
@@ -77,9 +77,9 @@ export default new Router({
             component:repaymentConfirmation
         },
         {
-            path:'/Reimbursement/reimbursement',
-            name:'reimbursement',
-            component:reimbursement
+            path:'/Reimbursement/costSheet',
+            name:'costSheet',
+            component:costSheet
         },
         {
             path:'/Payroll/payroll',

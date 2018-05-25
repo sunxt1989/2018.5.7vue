@@ -16,14 +16,25 @@
                                 <router-link class="itemLink" to="/loan/loan">
                                     借款单
                                 </router-link>
+                            </div>
+                            <div class="item-content">
                                 <router-link class="itemLink" to="/loan/loanApprovalList">
                                     借款单审批列表
                                 </router-link>
+                            </div>
+                            <div class="item-content">
                                 <router-link class="itemLink" to="/loan/loanConfirmationList">
                                     借款单确认列表
                                 </router-link>
+                            </div>
+                            <div class="item-content">
                                 <router-link class="itemLink" to="/loan/repaymentConfirmationList">
                                     还款单确认列表
+                                </router-link>
+                            </div>
+                            <div class="item-content">
+                                <router-link class="itemLink" to="/Reimbursement/costSheet">
+                                    费用单
                                 </router-link>
                             </div>
                         </div>
