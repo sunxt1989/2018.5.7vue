@@ -2,7 +2,7 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>新建借款单</h2>
+                <h2>新建费用单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
                 <el-button  @click="model(1)" size="small" type="danger" class="sub" >提交审批</el-button>
             </div>

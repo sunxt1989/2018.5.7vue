@@ -38,11 +38,11 @@
                         <span class="tit">状态</span>
                         <input class="ipt" type="text" value="未提交" v-if="auditFlg == 0" readonly>
                         <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
-                        <input class="ipt" type="text" value="审批中" v-if="auditFlg == 2" readonly>
+                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 2" readonly>
                         <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
                         <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
-                        <input class="ipt" type="text" value="待财务负责人审批" v-if="auditFlg == 5" readonly>
-                        <input class="ipt" type="text" value="待企业负责人审批" v-if="auditFlg == 6" readonly>
+                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 5" readonly>
+                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 6" readonly>
                         <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
                     </li>
                     <li class="pt cf">

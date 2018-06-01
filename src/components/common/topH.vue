@@ -15,7 +15,7 @@
             <div class="userName dropdown">
                 <el-dropdown>
                     <div>
-                        <img class="headPortrait img-circle" src="../../images/gongjuxiang.png" alt="" >
+                        <img class="headPortrait img-circle" src="../../../static/images/gongjuxiang.png" alt="" >
                         <i class="icon iconfont icon-fanhui4"></i>
                         <span class="dropdown-toggle">用户名称</span>
                     </div>

@@ -37,6 +37,16 @@
                                     费用单
                                 </router-link>
                             </div>
+                            <div class="item-content">
+                                <router-link class="itemLink" to="/Reimbursement/ReimbursementList">
+                                    报销单列表
+                                </router-link>
+                            </div>
+                            <div class="item-content">
+                                <router-link class="itemLink" to="/Payroll/payroll">
+                                    工资单
+                                </router-link>
+                            </div>
                         </div>
                     </el-row>
                 </div>

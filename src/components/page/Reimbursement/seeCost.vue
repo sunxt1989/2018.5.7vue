@@ -1,120 +1,110 @@
 <template>
     <div v-loading.fullscreen.lock="loading">
-        <div class="w">
+        <div class="w cf">
             <div class="top">
-                <h2>查看借款单</h2>
+                <h2>查看费用单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button v-if="auditFlg == 1" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
+                <el-button  @click="model(1)" size="small" type="danger" class="sub" >保存</el-button>
             </div>
         </div>
         <div class="w">
-            <div class="content">
-                <div class="line">
-                    <span>借款单</span>
-                </div>
-                <ul class="list">
-                    <li class="sm">
-                        <span class="tit">金额</span>
-                        <input class="ipt" type="text" v-model="money" :readonly="isReject">
-                    </li>
-                    <li class="sm">
-                        <span class="tit">已还金额</span>
-                        <input class="ipt" type="text" v-model="creditMoney" readonly>
-                    </li>
-                    <li class="sm">
-                        <span class="tit">未还金额</span>
-                        <input class="ipt" type="text" v-model="unCreditMoney" readonly>
-                    </li>
-                    <li class="sm">
-                        <span class="tit">时间</span>
-                        <el-date-picker
-                            class="iptData"
-                            v-model="nowdata"
-                            type="date"
-                            @change="changeTime"
-                            placeholder="选择日期"
-                            :disabled="isReject">
-                        </el-date-picker>
-                    </li>
-                    <li class="sm">
-                        <span class="tit">借款人</span>
-                        <input class="ipt" type="text" v-model="userName" readonly>
-                    </li>
-                    <li class="sm">
-                        <span class="tit">状态</span>
-                        <input class="ipt" type="text" value="未提交" v-if="auditFlg == 0" readonly>
-                        <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
-                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 2" readonly>
-                        <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
-                        <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
-                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 5" readonly>
-                        <input class="ipt" type="text" value="待审核" v-if="auditFlg == 6" readonly>
-                        <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
-                        <input class="ipt" type="text" value="已还款" v-if="auditFlg == 8" readonly>
-                    </li>
-                    <li class="pt">
-                        <span class="tit">借款部门</span>
-                        <el-select class="department" v-model="departmentId" placeholder="请选择" :disabled="isReject">
-                            <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.departmentName"
-                                :value="item.idStr">
-                            </el-option>
-                        </el-select>
-                    </li>
-                    <li class="pt cf">
-                        <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" name="" id="" :readonly="isReject">
+            <div class="w">
+                <div class="content">
+                    <div class="line">
+                        <span>查看费用单</span>
+                    </div>
+                    <ul class="list cf">
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用类别</span>
+                            <el-select class="sel" v-model="type" placeholder="请选择" @change="typeChange">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item[1]"
+                                    :label="item[1]"
+                                    :value="item[0]">
+                                </el-option>
+                            </el-select>
+                        </li>
+
+                        <li class="sm" v-show="typeShow">
+                            <span class="tit"><span class="red">*</span>费用类别</span>
+                            <el-select class="sel" v-model="childType1" placeholder="请选择" >
+                                <el-option
+                                    v-for="item in optionsSmall"
+                                    :key="item.value"
+                                    :label="item[1]"
+                                    :value="item[0]">
+                                </el-option>
+                            </el-select>
+                        </li>
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用金额</span>
+                            <input class="ipt" type="text" v-model="money" >
+                        </li>
+                        <li class="sm">
+                            <span class="tit">增值税专用发票税额</span>
+                            <input class="ipt" type="text" v-model="taxMoney" >
+                        </li>
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用发生日期</span>
+                            <el-date-picker
+                                class="iptData"
+                                v-model="debitDate"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="选择日期">
+                            </el-date-picker>
+                        </li>
+                        <li class="sm" v-show="destination">
+                            <span class="tit"><span class="red">*</span>出差目的</span>
+                            <el-select class="sel" v-model="aimType" placeholder="请选择" >
+                                <el-option
+                                    v-for="item in objective"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </li>
+                        <li class="sm">
+                            <span class="tit">发票张数</span>
+                            <input class="ipt" type="text" v-model="receiptCount">
+                        </li>
+                        <li class="pt cf">
+                            <span class="tit2">费用描述</span>
+                            <textarea class="tex" v-model="discription" name="" id="">
                             </textarea>
-                    </li>
-                    <li class="pt cf">
-                        <span class="tit2">附件</span>
-                        <div class="uploadBox">
-                            <el-upload
-                                action="http://192.168.2.192:8080/web/upload2.html"
-                                list-type="picture-card"
-                                ref="upload"
-                                :show-file-list=true
-                                :limit='limit'
-                                :http-request="myUpload"
-                                :on-preview="handlePictureCardPreview"
-                                :before-upload='beforeAvatarUpload'
-                                :on-exceed="onExceed"
-                                :on-error="onError"
-                                :on-change='onChange'
-                                :on-remove='onRemove'
-                                :file-list="attachUrlJson"
-                                :auto-upload="false"
-                                :disabled="isReject">
-                                <i class="el-icon-plus"></i>
-                            </el-upload>
-                            <el-dialog :visible.sync="dialogVisible">
-                                <h2 class="dialogImageName">{{dialogImageName}}</h2>
-                                <img width="100%" :src="dialogImageUrl" alt="">
-                            </el-dialog>
-                        </div>
-                    </li>
-                </ul>
-                <div class="line">
-                    <span>审批记录</span>
+                        </li>
+                        <li class="ptx cf">
+                            <span class="tit2">附件</span>
+                            <div class="uploadBox">
+                                <el-upload
+                                    action="http://192.168.2.192:8080/web/upload2.html"
+                                    list-type="picture-card"
+                                    ref="upload"
+                                    :show-file-list=true
+                                    :limit='limit'
+                                    :http-request="myUpload"
+                                    :on-preview="handlePictureCardPreview"
+                                    :before-upload='beforeAvatarUpload'
+                                    :on-exceed="onExceed"
+                                    :on-error="onError"
+                                    :on-change='onChange'
+                                    :on-remove='onRemove'
+                                    :file-list="attachUrlJson"
+                                    :auto-upload="false">
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+                                <el-dialog :visible.sync="dialogVisible">
+                                    <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                    <img width="100%" :src="dialogImageUrl" alt="">
+                                </el-dialog>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="approval">
-                    <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
-                        <div class="listHeader">
-                            <span class="listName">{{item.auditUserName}}</span>
-                            ——
-                            <span class="listDepartment">{{item.auditDepartmentName}}</span>
-                            <span class="listData">{{item.auditTimeYMDHM}}</span>
-                        </div>
-                        <div class="listFooter">
-                            <span class="listState">意见：</span>
-                            <span class="listContent">{{item.discription}}</span>
-                        </div>
-                    </li>
-                </ul>
             </div>
+
         </div>
     </div>
 
@@ -123,29 +113,34 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     export default{
-        name:'seeLoan',
         data(){
             return{
-                money:'',//借款金额
-                creditMoney:'',//已还金额
-                unCreditMoney:'',//待还款金额
-                nowdata:'',//当前借款日期
-                debitDate:'',//上传日期（格式修改后的）
-                userName:'',//借款人
-                auditFlg:'',//0 仅保存；1 驳回；2待审核；3 等待出纳确认；4 通过；5 待审核；6 待审核；7 已对冲
-                departmentId:'',//部门
-                options:[],//部门详情
-                discription:'',//事由
-                debitId:this.$route.params.debitId,
-                userDebitAuditRecordList:[],
+                options:[],//费用大类列表
+                optionsSmall:[],//费用小类列表
+                id:this.$route.params.id,
+                type:'',//费用大类
+                childType1:'',//费用小类
+                typeShow:false,//是否显示费用小类
+                destination:false,//是否显示目的地
+                money:0,//金额
+                taxMoney:0,//税额
+                debitDate:'',//费用发生日期
+                aimType:'',//出差目的
+                receiptCount:'',//票据张数
+                discription:'',//借款事由
+                objective:[//出差目的
+                    {value:1,label:'工作出差'},
+                    {value:2,label:'参加会议'},
+                    {value:3,label:'参加培训'}
+                ],
                 attachUrlJson:[],//上传图片展示
+                dialogImageUrl: '',//展示图片URL
+                dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
-                dialogImageName:'',//展示图片名称
-                dialogImageUrl:'',//展示图片URL
-                isReject:true,//是否是驳回状态 true为否 false为是
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
                 punch2:0,//打点器
+                fileList:[],//上传成功展示图片参数
 
                 allBase:[],//所有base64格式的地址
                 allName:[],//所有namen名称
@@ -157,13 +152,31 @@
                 imgName3:'',
                 imgUrl4:'',
                 imgName4:'',
+
                 loading:true,
             }
         },
-        methods:{
+        methods: {
+            //费用大类typeChange事件
+            typeChange(){
+                var index= this.type;
+                if(index == 2 || index == 3){
+                    this.optionList(index)
+                    this.typeShow = true
+                    this.destination = false
+                }else if(index == 1){
+                    this.optionList(index);
+                    this.typeShow = true;
+                    this.destination = true
+                }
+                else{
+                    this.typeShow = false
+                    this.destination = false
+                }
+            },
             model(n){
                 if(n == 0){
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                    this.$confirm('修改的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -178,11 +191,15 @@
                         this.loading = false;
                         return
                     }else if(this.debitDate == ''){
-                        this.$message.error('请正确输入借款日期');
+                        this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
-                    }else if(this.departmentId == ''){
-                        this.$message.error('请正确输入借款部门');
+                    }else if(this.type == '' || this.childType1 == ''){
+                        this.$message.error('请正确输入费用类别');
+                        this.loading = false;
+                        return
+                    }else if(this.aimType == ''&& this.type == 1){
+                        this.$message.error('请正确输入出差目的');
                         this.loading = false;
                         return
                     }
@@ -192,7 +209,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        var index = this.punch + this.punch2;
+                        var index = this.punch + this.punch2
                         console.log(index);
                         if(index !=0 ){
                             this.submitUpload();
@@ -236,6 +253,7 @@
             },
             onChange(file,fileList){
                 this.punch++;
+                console.log(this.punch);
             },
             onRemove(file){
                 var removeUrl = file.url;//在删除图片时进行一个判断，根据url看删除的是否是已经上传的图片
@@ -250,6 +268,8 @@
                     }
                 }
                 this.punch--;
+                console.log(this.punch);
+                console.log(this.punch2);
             },
             //url转换base方法
             readBlobAsDataURL(blob, callback) {
@@ -261,7 +281,6 @@
             },
 
             myUpload(content){
-                console.log(content);
                 var file = content.file;
                 var _this = this;
                 console.log(file);
@@ -275,7 +294,6 @@
                 this.allName.push(file.name);
             },
             submit(){
-                console.log('4');
                 this.loading = false;
                 var params = new URLSearchParams();
 
@@ -307,12 +325,15 @@
                 this.imgName3 = finalName[2] ? finalName[2] : '';
                 this.imgName4 = finalName[3] ? finalName[3] : '';
 
-                params.append('debitId',this.debitId);
-                params.append('title',this.discription);
+                params.append('receiptId',this.id);
+                params.append('type',this.type);
+                params.append('childType1',this.childType1);
                 params.append('money',this.money);
-                params.append('debitDate',this.debitDate);
-                params.append('discription',this.discription);
-                params.append('departmentId',this.departmentId);
+                params.append('taxMoney',this.taxMoney);
+                params.append('aimType',this.aimType);
+                params.append('discription ',this.discription);
+                params.append('receiptCount',this.receiptCount);
+                params.append('receiptDate',this.debitDate);
 
                 params.append('imgUrl1',this.imgUrl1);
                 params.append('imgName1',this.imgName1);
@@ -325,7 +346,7 @@
 
                 axios({
                     method:'post',
-                    url:'http://192.168.2.192:8080/web/vue/debit/edit/debit/submit.html',
+                    url:'http://192.168.2.192:8080/web/vue/expense/save.html',
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
@@ -353,47 +374,64 @@
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
             },
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.nowdata;
-                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
-            },
+
+            //获得费用小类
+            optionList(index){
+                var params = new URLSearchParams();
+                params.append('type',index);
+                axios.post('http://192.168.2.192:8080/web/vue/accountSubject/optionList.html',params)
+                    .then(response=> {
+                        console.log(response);
+                        var data = response.data.value;
+                        this.optionsSmall = data;
+                        this.loading = false
+                    })
+                    .catch(error=> {
+                        this.loading = false
+                        console.log(error);
+                        alert('网络错误，不能访问');
+                    });
+            }
         },
         created(){
             var params = new URLSearchParams();
-            params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/show.html',params)
+            params.append('id',this.id);
+            axios.post('http://192.168.2.192:8080/web/vue/expense/edit.html',params)
                 .then(response=> {
                     console.log(response);
                     var data = response.data.value;
-                    console.log(data);
-                    this.options = data.departmentList;
-                    this.userDebitAuditRecordList = data.userDebitAuditRecordList;
-                    this.discription = data.userDebitItem.discription;
-                    this.money = data.userDebitItem.money;
-                    this.creditMoney = data.userDebitItem.creditMoney;
-                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
-                    this.nowdata = data.userDebitItem.debitDateYMD;
-                    this.debitDate = data.userDebitItem.debitDateYMD;
-                    this.userName = data.userDebitItem.userName;
-                    this.auditFlg = data.userDebitItem.auditFlg;
-                    this.attachUrlJson = data.userDebitItem.attachUrlJson;
-                    this.departmentId = data.userDebitItem.departmentIdStr;
+                    this.options = data.list;
+                    this.optionsSmall= data.optionList;
+                    this.childType1 = String(data.originalReceipt.childType1);
+                    this.money = data.originalReceipt.money;
+                    this.taxMoney = data.originalReceipt.taxMoney;
+                    this.aimType = data.originalReceipt.aimType;
+                    this.discription = data.originalReceipt.discription;
+                    this.receiptCount = data.originalReceipt.receiptCount;
+                    this.debitDate = data.originalReceipt.simpleReceiptDate;
+                    this.attachUrlJson = data.originalReceipt.attachUrlJson;
+                    this.type = String(data.originalReceipt.type);
                     this.loading = false;
-                    console.log(this.options);
-                    console.log(this.departmentId);
-                    if(this.auditFlg == 1){
-                        this.isReject = false;
+
+                    var index= this.type;
+                    if(index == 2 || index == 3){
+                        this.optionList(index)
+                        this.typeShow = true
+                        this.destination = false
+                    }else if(index == 1){
+                        this.optionList(index);
+                        this.typeShow = true;
+                        this.destination = true
                     }
-                    for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
-                        this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0,10)
+                    else{
+                        this.typeShow = false
+                        this.destination = false
                     }
+
                 })
         },
-    }
 
+    }
 </script>
 
 <style scoped>
@@ -417,12 +455,13 @@
     }
     .content{
         width: 1120px;
+        height:100%;
         background-color: #fff;
         padding: 20px 40px;
         margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
-
     .list{
         width:100%;
     }
@@ -432,16 +471,22 @@
         text-align: left;
         line-height: 36px;
         margin-top: 20px;
+        float: left;
     }
     .list .sm{
         width:50%;
     }
     .list .pt{
         width:100%;
+        height:80px;
+    }
+    .list .ptx{
+        width:100%;
+        height:170px;
     }
     .list li .ipt{
         display: inline-block;
-        width:320px;
+        width:300px;
         height:28px;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -449,10 +494,13 @@
         padding: 3px 10px;
     }
     .list li .iptData{
-        width:342px;
+        width:322px;
         height:36px;
     }
-
+    .list li .sel{
+        width:322px;
+        height:36px;
+    }
     .list li .tit{
         font-size:14px;
         display: inline-block;

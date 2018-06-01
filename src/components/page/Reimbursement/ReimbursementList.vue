@@ -2,16 +2,15 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>借款单</h2>
+                <h2>报销单列表</h2>
                 <el-select v-model="choice" class='choice' placeholder="未完成列表" @change="changeChoice">
                     <el-option
-                        v-for="item in options2"
+                        v-for="item in options"
                         :key="item.value"
                         :label="item.label"
                         :value="item.choice">
                     </el-option>
                 </el-select>
-                <router-link to="/loan/newLoan" class="addLink">新增</router-link>
             </div>
         </div>
         <div class="w">
@@ -32,38 +31,33 @@
 
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
 
-                <el-table :data="tableData" class="blueList" show-summary :summary-method="getTotal">
-                    <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
-                    <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
-                    <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="借款金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center"></el-table-column>
+                <el-table :data="tableData" class="blueList">
+                    <el-table-column prop="originalTypeName" label="类别" sortable align="center">
+                        <template slot-scope="scope">
+                            <img src="" alt="">
+                            <span>{{scope.row.originalTypeName}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="simpleConfirmDate" label="借款日期" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="名称" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="receiptCount" label="票据" sortable align="center"></el-table-column>
                     <el-table-column prop="auditFlg" label="状态" sortable align="center" width="100px">
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
                             <span v-else-if="scope.row.auditFlg == 1">驳回</span>
                             <span v-else-if="scope.row.auditFlg == 2">待审核</span>
                             <span v-else-if="scope.row.auditFlg == 3">待出纳确认</span>
-                            <span v-else-if="scope.row.auditFlg == 4 && scope.row.unCreditMoney != 0">待还款</span>
-                            <span v-else-if="scope.row.auditFlg == 4 && scope.row.unCreditMoney == 0">已还款</span>
+                            <span v-else-if="scope.row.auditFlg == 4">通过</span>
                             <span v-else-if="scope.row.auditFlg == 5">待审核</span>
                             <span v-else-if="scope.row.auditFlg == 6">待审核</span>
                             <span v-else-if="scope.row.auditFlg == 7">已红冲</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="还款" width="80px" align="center">
-                        <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unCreditMoney == 0 || scope.row.auditFlg != 4">还款</span>
-                            <router-link v-else class="repayment red"
-                                         :to="{name:'repayment',params:{debitId:scope.row.idString}}">还款
-                            </router-link>
-                        </template>
-                    </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString}}" class="see">
+                                    <router-link :to="{name:'seeReimbursement',params:{debitId:scope.row.idString}}" class="see">
                                         <i class="icon iconfont icon-kanguo blue"></i></router-link>
                                 </span>
 
@@ -126,25 +120,12 @@
                 timeInterval:'',//用户选中时间
                 startDate:'',//开始时间
                 endDate:'',//结束时间
-                auditFlg:'',//借款单状态： 1 驳回；2 待审核； 4 通过； 0 未提交
+                auditFlg:'',//报销单状态： 0 未提交 1 驳回；2/5/6 待审核； 3 待出纳确认；4 通过；7 已红冲；
                 options: [{
-                    value: 1,
-                    label: '驳回'
-                }, {
-                    value: 2,
-                    label: '待审核'
-                }, {
-                    value: 4,
-                    label: '通过'
-                }, {
-                    value: 0,
-                    label: '未提交'
-                }],//借款单状态筛选功能
-                options2: [{
-                    choice: '1,7,8',
+                    choice: '1,4,7',
                     label: '已完成列表'
                 }, {
-                    choice: '0,2,3,4,5,6',
+                    choice: '0,2,3,5,6',
                     label: '未完成列表'
                 }],
                 choice:'',
@@ -155,21 +136,12 @@
             }
         },
         methods:{
-            //cookies
-            getCookie: function (cname, cvalue, exdays) {
-                var d = new Date();
-                d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-                var expires = "expires=" + d.toUTCString();
-                console.log(cname + "=" + cvalue + "; " + expires);
-                document.cookie = cname + "=" + cvalue + "; " + expires;
-                console.log(document.cookie);
-            },
             changeChoice(){
                 this.axios()
             },
             //选择记录日期事件
             changeTime(){
-//                console.log('changeTime');
+                console.log(this.timeInterval);
                 //设置记录日期的起始日期和终止日期
                 const date = this.timeInterval;
                 if(date){
@@ -188,12 +160,12 @@
 
                 console.log(this.choice);
                 Params.append('periodType','');
-                Params.append('auditFlg',this.choice);
+                Params.append('status',this.choice);
                 Params.append('startDate',this.startDate);
                 Params.append('endDate',this.endDate);
                 Params.append('pageNo',this.currentPage);
 
-                axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',Params)
+                axios.post('http://192.168.2.192:8080/web/vue/application/list.html',Params)
                     .then(response=> {
                         console.log(response);
                         var data = response.data.value.list;//借款单列表数据
@@ -253,18 +225,6 @@
                     })
             },
 
-            //自定义合计列
-            getTotal(param){
-                var jk = 0;
-                var hk = 0;
-                var tol = this.tableData;
-                for(var i = 0; i < tol.length; i++){
-                    jk += tol[i].money;
-                    hk += tol[i].creditMoney;
-                }
-                const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')]
-                return sums
-            },
             //分页器
             changePage(val){
                 this.currentPage = val;
@@ -275,11 +235,11 @@
         created(){
             var params = new URLSearchParams();
             params.append('periodType','');
-            params.append('auditFlg','0,2,3,4,5,6');
+            params.append('status','0,2,3,5,6');
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
             params.append('pageNo',this.currentPage);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',params)
+            axios.post('http://192.168.2.192:8080/web/vue/application/list.html',params)
                 .then(response=> {
                     console.log(response);
                     var data = response.data.value.list;//借款单列表数据

@@ -16,7 +16,13 @@ import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'
 import payroll from '@/components/page/Payroll/payroll'
 //报销
 import costSheet from '@/components/page/Reimbursement/costSheet'//费用单列表
+import newCost from '@/components/page/Reimbursement/newCost'//新建费用单
+import seeCost from '@/components/page/Reimbursement/seeCost'//查看费用单
+import ReimbursementList from '@/components/page/Reimbursement/ReimbursementList'//报销单列表
+import seeReimbursement from '@/components/page/Reimbursement/seeReimbursement'//查看报销单
+import newReimbursement from '@/components/page/Reimbursement/newReimbursement'//新建报销单
 
+import demo from '@/components/page/Reimbursement/demo'//demo
 Vue.use(Router)
 
 export default new Router({
@@ -80,6 +86,37 @@ export default new Router({
             path:'/Reimbursement/costSheet',
             name:'costSheet',
             component:costSheet
+        },
+        {
+            path:'/Reimbursement/newCost',
+            name:'newCost',
+            component:newCost
+        },
+        {
+            path:'/Reimbursement/ReimbursementList',
+            name:'ReimbursementList',
+            component:ReimbursementList
+        },
+        {
+            path:'/Reimbursement/seeCost',
+            name:'seeCost',
+            component:seeCost
+        },
+        {
+            path:'/Reimbursement/seeReimbursement',
+            name:'seeReimbursement',
+            component:seeReimbursement
+        },
+        {
+            path:'/Reimbursement/newReimbursement',
+            name:'newReimbursement',
+            component:newReimbursement
+        },
+
+        {
+            path:'/Reimbursement/demo',
+            name:'demo',
+            component:demo
         },
         {
             path:'/Payroll/payroll',

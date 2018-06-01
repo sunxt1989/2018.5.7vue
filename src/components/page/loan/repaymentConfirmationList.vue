@@ -8,7 +8,7 @@
         </div>
         <div class="w">
             <div class="left">
-                <el-table :data="tableData">
+                <el-table :data="tableData" class="blueList">
                     <el-table-column prop="userName" label="还款人" sortable align="center"></el-table-column>
                     <el-table-column prop="debitDateYMD" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="money" label="还款金额" sortable align="center"></el-table-column>

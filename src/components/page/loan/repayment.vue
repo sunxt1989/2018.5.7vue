@@ -41,7 +41,7 @@
                 <div class="line">
                     <span>还款明细</span>
                 </div>
-                <el-table class="hkTable" :data="tableData" style="width: 60%">
+                <el-table class="hkTable grayList" :data="tableData" style="width: 60%">
                     <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
                     <el-table-column prop="payType" label="还款方式" sortable width="180">
                         <template slot-scope="scope">
@@ -58,11 +58,11 @@
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
                             <span v-if="scope.row.auditFlg == 1">驳回</span>
-                            <span v-if="scope.row.auditFlg == 2">审批中</span>
+                            <span v-if="scope.row.auditFlg == 2">待审核</span>
                             <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
                             <span v-if="scope.row.auditFlg == 4">待还款</span>
-                            <span v-if="scope.row.auditFlg == 5">待财务负责人审批</span>
-                            <span v-if="scope.row.auditFlg == 6">待企业负责人审批</span>
+                            <span v-if="scope.row.auditFlg == 5">待审核</span>
+                            <span v-if="scope.row.auditFlg == 6">待审核</span>
                             <span v-if="scope.row.auditFlg == 7">已红冲</span>
                         </template>
                     </el-table-column>

@@ -1,0 +1,546 @@
+<template>
+    <div v-loading.fullscreen.lock="loading">
+        <div class="w cf">
+            <div class="top">
+                <h2>新建费用单</h2>
+                <el-button @click="model(0)" size="small" class="back">返回</el-button>
+                <el-button  @click="model(1)" size="small" type="danger" class="sub" >保存</el-button>
+            </div>
+        </div>
+        <div class="w">
+                <div class="content">
+                    <div class="line">
+                        <span>新建费用单</span>
+                    </div>
+                    <ul class="list cf">
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用类别</span>
+                            <el-select class="sel" v-model="type" placeholder="请选择" @change="typeChange">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item[1]"
+                                    :value="item[0]">
+                                </el-option>
+                            </el-select>
+                        </li>
+
+                        <li class="sm" v-show="typeShow">
+                            <span class="tit"><span class="red">*</span>费用类别</span>
+                            <el-select class="sel" v-model="childType1" placeholder="请选择" >
+                                <el-option
+                                    v-for="item in optionsSmall"
+                                    :key="item.value"
+                                    :label="item[1]"
+                                    :value="item[0]">
+                                </el-option>
+                            </el-select>
+                        </li>
+
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用金额</span>
+                            <input class="ipt" type="text" v-model="money" >
+                        </li>
+                        <li class="sm">
+                            <span class="tit">增值税专用发票税额</span>
+                            <input class="ipt" type="text" v-model="taxMoney" >
+                        </li>
+                        <li class="sm">
+                            <span class="tit"><span class="red">*</span>费用发生日期</span>
+                            <el-date-picker
+                                class="iptData"
+                                v-model="debitDate"
+                                type="date"
+                                value-format="yyyy-MM-dd"
+                                placeholder="选择日期">
+                            </el-date-picker>
+                        </li>
+                        <li class="sm" v-show="destination">
+                            <span class="tit"><span class="red">*</span>出差目的</span>
+                            <el-select class="sel" v-model="aimType" placeholder="请选择" >
+                                <el-option
+                                    v-for="item in objective"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </li>
+                        <li class="sm">
+                            <span class="tit">发票张数</span>
+                            <input class="ipt" type="text" v-model="receiptCount">
+                        </li>
+                        <li class="pt cf">
+                            <span class="tit2">费用描述</span>
+                            <textarea class="tex" v-model="discription" name="" id="">
+                            </textarea>
+                        </li>
+                        <li class="ptx cf">
+                            <span class="tit2">附件</span>
+                            <div class="uploadBox">
+                                <el-upload
+                                    action="http://192.168.2.192:8080/web/upload2.html"
+                                    list-type="picture-card"
+                                    ref="upload"
+                                    :show-file-list=true
+                                    :limit='limit'
+                                    :http-request="myUpload"
+                                    :on-preview="handlePictureCardPreview"
+                                    :before-upload='beforeAvatarUpload'
+                                    :on-exceed="onExceed"
+                                    :on-error="onError"
+                                    :on-change='onChange'
+                                    :on-remove='onRemove'
+                                    :auto-upload="false">
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+                                <el-dialog :visible.sync="dialogVisible">
+                                    <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                    <img width="100%" :src="dialogImageUrl" alt="">
+                                </el-dialog>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    </div>
+
+</template>
+
+<script type="text/ecmascript-6">
+    import axios from 'axios'
+    export default{
+        data(){
+            return{
+                type:'',//费用大类
+                childType1:'',//费用小类
+                typeShow:false,//是否显示费用小类
+                destination:false,//是否显示目的地
+                money:0,//金额
+                taxMoney:0,//税额
+                debitDate:'',//上传日期（格式修改后的）
+                aimType:'',//出差目的
+                receiptCount:'',//票据张数
+                discription:'',//借款事由
+                options:[],//费用大类列表
+                optionsSmall:[],//费用小类列表
+                objective:[//出差目的
+                    {value:1,label:'工作出差'},
+                    {value:2,label:'参加会议'},
+                    {value:3,label:'参加培训'}
+                ],
+                dialogImageUrl: '',//展示图片URL
+                dialogImageName: '',//展示图片名称
+                dialogVisible: false,//dialog是否打开状态
+                limit:4,//上传图片最大张数
+                punch:0,//打点器,判断是否有图片上传
+                fileList:[],//上传成功展示图片参数
+
+                allBase:[],//所有base64格式的地址
+                allName:[],//所有namen名称
+                imgUrl1:'',//上传图片url
+                imgName1:'',//上传图片name
+                imgUrl2:'',
+                imgName2:'',
+                imgUrl3:'',
+                imgName3:'',
+                imgUrl4:'',
+                imgName4:'',
+                loading:true,
+            }
+        },
+        methods: {
+            //费用大类typeChange事件
+            typeChange(){
+                var index= this.type;
+                if(index == 2 || index == 3){
+                    this.optionList(index)
+                    this.typeShow = true
+                    this.destination = false
+                }else if(index == 1){
+                    this.optionList(index);
+                    this.typeShow = true;
+                    this.destination = true
+                }
+                else{
+                    this.typeShow = false
+                    this.destination = false
+                }
+            },
+            model(n){
+                if(n == 0){
+                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$router.go(-1)
+                    }).catch(() => {
+
+                    });
+                }else{
+                    if(this.money <= 0){
+                        this.$message.error('请正确输入金额');
+                        this.loading = false;
+                        return
+                    }else if(this.debitDate == ''){
+                        this.$message.error('请正确输入日期');
+                        this.loading = false;
+                        return
+                    }else if(this.type == '' || this.childType1 == ''){
+                        this.$message.error('请正确输入费用类别');
+                        this.loading = false;
+                        return
+                    }else if(this.aimType == ''&& this.type == 1){
+                    this.$message.error('请正确输入出差目的');
+                    this.loading = false;
+                    return
+                }
+                    this.$confirm('确定是否提交？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+//                        console.log(this.punch);
+                        if(this.punch != 0){
+                            this.submitUpload();
+                        }else{
+                            this.submit()
+                        }
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                }
+            },
+            submitUpload(){
+                this.$refs.upload.submit();
+                this.allBase = [];//清空base
+                this.allName = [];//清空name
+            },
+            //限制用户上传图片格式和大小
+            beforeAvatarUpload(file){
+                this.loading = true;
+                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isLt4M = file.size / 1024 / 1024 < 4;
+                if (!isJPG) {
+                    this.loading = false;
+                    this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
+                }
+                if (!isLt4M) {
+                    this.loading = false;
+                    this.$message.error('上传图片大小不能超过 4MB!');
+                }
+                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+            },
+            onExceed(){
+                this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
+            },
+            onError(){
+                this.loading = false
+                this.$message.error('图片上传失败，请重试！');
+            },
+            onChange(){
+                this.punch++;
+            },
+            onRemove(){
+                this.punch--;
+            },
+            //url转换base方法
+            readBlobAsDataURL(blob, callback) {
+//                console.log(blob);
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                    callback(e.target.result);
+                };
+                fileReader.readAsDataURL(blob);
+            },
+
+            myUpload(content){
+//                console.log(content);
+                var file = content.file;
+                var _this = this;
+                this.readBlobAsDataURL(file,function (dataurl){
+                    _this.allBase.push(dataurl);
+                    _this.allName.push(file.name);
+                    if(_this.allBase.length == _this.punch){
+                        _this.submit()
+                    }
+                });
+                this.allName.push(file.name);
+            },
+            submit(){
+                this.loading = true;
+                var params = new URLSearchParams();
+                console.log(this.money);
+                console.log(this.allName);
+
+                this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
+                this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
+                this.imgUrl3 = this.allBase[2] ? this.allBase[2] : '';
+                this.imgUrl4 = this.allBase[3] ? this.allBase[3] : '';
+
+                this.imgName1 = this.allName[0] ? this.allName[0] : '';
+                this.imgName2 = this.allName[1] ? this.allName[1] : '';
+                this.imgName3 = this.allName[2] ? this.allName[2] : '';
+                this.imgName4 = this.allName[3] ? this.allName[3] : '';
+                console.log(this.type,'type');
+                console.log(this.childType1,'childType1');
+                console.log(this.money,'money');
+                console.log(this.taxMoney,'taxMoney');
+                console.log(this.aimType,'aimType');
+                console.log(this.discription,'discription');
+                console.log(this.receiptCount,'receiptCount');
+                console.log(this.debitDate,'debitDate');
+                params.append('debitId',0);
+                params.append('type',this.type);
+                params.append('childType1',this.childType1);
+                params.append('money',this.money);
+                params.append('taxMoney',this.taxMoney);
+                params.append('aimType',this.aimType);
+                params.append('discription',this.discription);
+                params.append('receiptCount',this.receiptCount);
+                params.append('receiptDate',this.debitDate);
+
+                params.append('imgUrl1',this.imgUrl1);
+                params.append('imgName1',this.imgName1);
+                params.append('imgUrl2',this.imgUrl2);
+                params.append('imgName2',this.imgName2);
+                params.append('imgUrl3',this.imgUrl3);
+                params.append('imgName3',this.imgName3);
+                params.append('imgUrl4',this.imgUrl4);
+                params.append('imgName4',this.imgName4);
+
+                axios({
+                    method:'post',
+                    url:'http://192.168.2.192:8080/web/vue/expense/save.html',
+                    data:params,
+                    headers:{
+                        'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+                    }
+                },params)
+                    .then(response=> {
+                        this.loading = false;
+                        console.log(response);
+                        if(response.data.status == 200){
+                            this.$router.go(-1);
+                            this.$message({
+                                type: 'success',
+                                message: '提交成功'
+                            });
+                        }else if(response.data.status == 400){
+                            var msg = response.data.msg;
+                            this.$message.error(msg);
+                        }
+                    })
+                    .catch(error=> {
+                        this.loading = false;
+                        console.log(error);
+                        this.$message.error('提交失败，请重试！');
+                    })
+            },
+            //上传图片缩略图信息赋值
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogImageName = file.name;
+                this.dialogVisible = true;
+            },
+
+            //获得费用小类
+            optionList(index){
+                var params = new URLSearchParams();
+                params.append('type',index);
+                axios.post('http://192.168.2.192:8080/web/vue/accountSubject/optionList.html',params)
+                    .then(response=> {
+                        console.log(response);
+                        var data = response.data.value;
+                        this.optionsSmall = data;
+                        this.loading = false
+                    })
+                    .catch(error=> {
+                        this.loading = false
+                        console.log(error);
+                        alert('网络错误，不能访问');
+                    });
+            }
+        },
+        created(){
+            axios.post('http://192.168.2.192:8080/web/vue/accountSubject/list.html')
+                .then(response=> {
+                    console.log(response);
+                    var data = response.data.value;
+                    this.options = data;
+                    this.loading = false
+                })
+                .catch(error=> {
+                    this.loading = false
+                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
+        },
+
+    }
+</script>
+
+<style scoped>
+    .w{
+        text-align: center;
+        font-size:0px;
+    }
+    .top {
+        margin: 20px 0;
+        text-align: center;
+        position: relative;
+    }
+    h2{
+        font-size:18px;
+        display: inline-block;
+    }
+    .back{
+        position: absolute;
+        right:20px;
+        font-size:12px;
+    }
+    .content{
+        width: 1120px;
+        height:100%;
+        background-color: #fff;
+        padding: 20px 40px;
+        margin-bottom: 50px;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
+    }
+    .list{
+        width:100%;
+    }
+    .list li{
+        display: inline-block;
+        height:36px;
+        text-align: left;
+        line-height: 36px;
+        margin-top: 20px;
+        float: left;
+    }
+    .list .sm{
+        width:50%;
+    }
+    .list .pt{
+        width:100%;
+        height:80px;
+    }
+    .list .ptx{
+        width:100%;
+        height:170px;
+    }
+    .list li .ipt{
+        display: inline-block;
+        width:300px;
+        height:28px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        vertical-align: middle;
+        padding: 3px 10px;
+    }
+    .list li .iptData{
+        width:322px;
+        height:36px;
+    }
+    .list li .sel{
+        width:322px;
+        height:36px;
+    }
+    .list li .tit{
+        font-size:14px;
+        display: inline-block;
+        width:150px;
+        text-align: right;
+        margin-right: 20px;
+        vertical-align: middle;
+    }
+    .list li .tit2{
+        font-size:14px;
+        display: inline-block;
+        width:150px;
+        text-align: right;
+        margin-right: 20px;
+        vertical-align: top;
+    }
+    .list li .tex{
+        width:76.7%;
+        height:60px;
+        resize: none;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 5px 10px;
+    }
+    .list li .uploadBox{
+        display: inline-block;
+        width:76.7%;
+        padding: 3px 10px;
+    }
+    .sub{
+        position: absolute;
+        right:110px;
+        font-size:12px;
+    }
+    .approval{
+        width:100%;
+        margin-top: 20px;
+        font-size:14px;
+    }
+    .approval li{
+        margin-top: 20px;
+        text-align: left;
+    }
+    .approval li img{
+        display: inline-block;
+        width:50px;
+        height:50px;
+        border-radius: 50%;
+        overflow: hidden;
+        float: left;
+        margin-left: 130px;
+        margin-right: 20px;
+    }
+    .approval li .listHeader{
+        display: inline-block;
+        float: left;
+        width:80%;
+    }
+    .approval li .listHeader .listName{
+
+        margin-right: 10px;
+    }
+    .approval li .listHeader .listDepartment{
+        margin-left: 10px;
+    }
+    .approval li .listHeader .listData{
+        float: right;
+    }
+    .approval li .listFooter{
+        display: inline-block;
+        float: left;
+        width:80%;
+        margin-top: 10px;
+    }
+    .approval li .listFooter .listState{
+        display: inline-block;
+        float: left;
+        margin-right: 10px;
+    }
+    .approval li .listFooter .listContent{
+        width:90%;
+        display: inline-block;
+        float: left;
+        height:50px;
+        overflow: hidden;
+    }
+    .dialogImageName{
+        font-size:16px;
+    }
+    .department{
+        width:342px;
+    }
+</style>

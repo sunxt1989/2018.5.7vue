@@ -47,26 +47,26 @@
     .el-header{
         padding: 0;
     }
-    .el-table thead tr{
-        background-color: #1c96d3;
-    }
     .el-table thead th{
-        color: #fff;
-        background-color: #1c96d3;
         height:42px;
         font-family: '思源黑体';
         padding: 0;
         font-weight:500;
+        text-align: center;
+    }
+    .blueList thead th{
+        color: #fff;
+        background-color: #1c96d3;
+    }
+    .grayList thead th{
+        color: #333;
+        background-color: #f4f4f4;
     }
     .el-table tr td{
         height:42px;
         padding: 0;
     }
-    .hkTable th{
-        color: #333;
-        background-color: #f4f4f4;
-        text-align: center;
-    }
+
     h2{
         font-family: '思源黑体';
     }

@@ -8,7 +8,7 @@
         </div>
         <div class="w">
             <div class="left">
-                <el-table :data="tableData">
+                <el-table :data="tableData" class="blueList">
                     <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
                     <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
                     <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
@@ -54,6 +54,7 @@
             },
 
             axios(){
+                this.loading = true;
                 var params = new URLSearchParams();
                 params.append('pageNo', this.currentPage);
                 axios.post('http://192.168.2.192:8080/web/vue/debit/audit/debit/list.html', params)
