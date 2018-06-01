@@ -58,6 +58,14 @@
         color: #fff;
         background-color: #1c96d3;
     }
+    .single .el-table__header-wrapper table thead tr th{
+        color: #fff;
+        background-color: #1c96d3;
+    }
+    .single .el-table__fixed-header-wrapper table thead tr th{
+        color: #fff;
+        background-color: #1c96d3;
+    }
     .grayList thead th{
         color: #333;
         background-color: #f4f4f4;
