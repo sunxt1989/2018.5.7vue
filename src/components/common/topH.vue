@@ -86,7 +86,6 @@
     }
     .userName .iconfont{
         float: right;
-
     }
     .userName .headPortrait{
         width:25px;
@@ -95,7 +94,7 @@
         cursor: pointer;
     }
     .black {
-        color: #333;
+        color: #ccc;
     }
     .red {
         color: #fe614d;

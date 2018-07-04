@@ -4,10 +4,11 @@
             <div class="top">
                 <h2>费用单</h2>
                 <router-link to="/Reimbursement/newCost" class="addLink">新增</router-link>
+                <router-link to="/" class="back">返回</router-link>
             </div>
         </div>
         <div class="w cf">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <span class="record">记录日期：</span>
                 <el-date-picker
                     v-model="timeInterval"
@@ -23,47 +24,49 @@
                 </el-date-picker>
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
 
-                <div class="costList" v-for="item in list">
-                    <h2><img class="h2Img" :src="item.url" alt=""><span class="h2Span">{{item.typeName}}</span></h2>
-                    <ul>
-                        <li class="checkboxList" v-for="lis in item.originalReceiptList">
-                            <span class="checkbox">
-                                <input :name=item.checkbox type="checkbox" :value=lis.idString class="inputcheckbox" >
+                <el-table :data="tableList" class="tableList" :show-header=false >
+                    <el-table-column property="" label="" align="center" width="40px">
+                        <template slot-scope="scope">
+                                <span class="checkbox">
+                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox" >
                                 <i class="iconfont icon-31xuanze"></i>
                             </span>
-                            <img class="fl checkboxImg" :src='lis.url||item.url' alt="">
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="childTypeName" label="类型"  align="center" width="230px">
+                        <template slot-scope="scope">
+                            <img class="checkboxImg" :src=scope.row.url alt="">
                             <div class="fl tit">
                                 <span class="titName">
-                                    <span class="titSpan">{{lis.childTypeName}}</span>
-                                    <span class="titSpan">{{lis.simpleReceiptDate}}</span>
+                                    <span class="titSpan">{{scope.row.childTypeName}}</span>
+                                    <span class="titSpan">{{scope.row.simpleReceiptDate}}</span>
                                 </span>
                             </div>
-                            <div class="fl detailed">
-                                <span class="detailedSpan">
-                                    {{lis.discription}}
-                                </span>
-                            </div>
-                            <div class="fl checkboxName">
-                                <span>{{lis.operateUserName}}</span>
-                            </div>
-                            <div class="fl checkboxMoney">
-                                <span>￥：{{lis.money}}</span>
-                            </div>
-                            <div class="fl operation">
-                                <router-link :to="{name:'seeCost',params:{id:lis.idString}}" class="see">
-                                    <i class="icon iconfont icon-kanguo blue"></i></router-link>
-                                <i class="icon iconfont icon-shanchu red" @click="deleteModel(lis.idString)"></i>
-                            </div>
-                        </li>
-                        <li class="checkboxListLast">
-                            <span class="checkbox">
-                                <input :name=item.checkAll @change="checkAllChange(item.type,$event)" type="checkbox" :value=item.type class="inputcheckbox" >
-                                <i class="iconfont icon-31xuanze"></i>
-                            </span>
-                            <span class="all">全选</span>
-                            <div class="create" @click="createClick(item.type)">＋创建报销单</div>
-                        </li>
-                    </ul>
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="discription" label="描述" align="center"></el-table-column>
+                    <el-table-column property="operateUserName" label="姓名" align="center"></el-table-column>
+                    <el-table-column property="money" label="金额" align="center">
+                        <template slot-scope="scope">
+                            <span>￥：{{scope.row.showMoney}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="" label="操作" align="center">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'seeCost',params:{id:scope.row.idString}}" class="see">
+                                <i class="icon iconfont icon-kanguo blue"></i>
+                            </router-link>
+                                <i class="icon iconfont icon-shanchu red" @click="deleteModel(scope.row.idString)"></i>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="checkboxListLast">
+                    <span class="checkbox">
+                        <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox" >
+                        <i class="iconfont icon-31xuanze"></i>
+                    </span>
+                    <span class="all">全选</span>
+                    <div class="create" @click="createClick">＋创建报销单</div>
                 </div>
             </div>
         </div>
@@ -73,11 +76,17 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
             return {
                 //记录日期中快捷选择
                 pickerOptions2: {
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
                     shortcuts: [{
                         text: '最近一个月',
                         onClick(picker) {
@@ -106,17 +115,18 @@
                 },
                 startDate:'',//开始时间
                 endDate:'',//结束时间
-                list:[],//费用列表
+                list:[],
+                tableList:[],//费用列表
                 isIndeterminate: true,
                 timeInterval:'',
-                loading:false,
+                loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
             //创建报销单click事件
-            createClick(type){
-                var name = 'checkbox'+ type;//找出符合name的input标签
-                var checked = $("input[name=" + name + "]:checked")//找出符合name的input标签中已选中的标签
+            createClick(){
+                var checked = $("input[name=checked]:checked")//找出符合name的input标签中已选中的标签
                 var length = checked.length;
                 var str = ''//创建报销单时传入id参数
                 if(length == 0){
@@ -131,21 +141,19 @@
                             str += ','+ checked[i].value
                         }
                     })
+                    console.log(str);
                     this.$router.push({
                         path: '/Reimbursement/newReimbursement',
                         name: 'newReimbursement',
                         params: {
-                            type: type,
                             idStr: str
                         }
                     })
                 }
             },
             //全选按钮change事件
-            checkAllChange(type,e){
-                var name = 'checkbox'+ type;
-                var input = $("input[name=" + name + "]")
-                var length = $("input[name=" + name + "]:checked").length;
+            checkAllChange(e){
+                var input = $("input[name=checked]")
                 if(e.target.checked){
                     input.prop('checked', true);
                 }else{
@@ -173,10 +181,11 @@
                 this.loading = true;
                 var debitId = isId;
                 var params = new URLSearchParams();
-                console.log(debitId);
+                var url = addUrl.addUrl('costSheetDelete')
+//                console.log(debitId);
                 params.append('id',debitId);
 
-                axios.post('http://192.168.2.192:8080/web/vue/expense/delete.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
                         console.log(response);
@@ -204,65 +213,86 @@
                     this.startDate = '';
                     this.endDate = '';
                 }
-                console.log(this.startDate);
-                console.log(this.endDate);
             },
             //执行ajax重新获取借款单列表数据
             axios(){
+                this.loading = true;
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('costSheet')
                 params.append('periodType',this.periodType);
                 params.append('auditFlg',this.auditFlg);
                 params.append('startDate',this.startDate);
                 params.append('endDate',this.endDate);
                 params.append('pageNo',this.currentPage);
 
-                axios.post('http://192.168.2.192:8080/web/vue/expense/list.html',params)
+                axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+                        this.loading = false;
                         var data = response.data.value;//费用列表
                         for(var i = 0; i < data.length; i++){
                             var originalReceiptList = data[i].originalReceiptList;
                             data[i].checkbox = 'checkbox'+ data[i].type;
                             data[i].checkAll = 'checkAll'+ data[i].type;
                             data[i].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '.png'
-                            console.log(originalReceiptList);
                             if(data[i].type <= 3){
                                 for(var ii = 0; ii < originalReceiptList.length; ii++){
                                     originalReceiptList[ii].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '-'+ originalReceiptList[ii].childType1 +'.png'
+                                    originalReceiptList[ii].money = number.number(originalReceiptList[ii].money)
+                                }
+                            }else{
+                                for(var ii = 0; ii < originalReceiptList.length; ii++){
+                                    originalReceiptList[ii].money = number.number(originalReceiptList[ii].money)
                                 }
                             }
                         }
                         this.list = data;
-                        console.log(this.list);
                     })
             },
 
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('costSheet')
             params.append('periodType',this.periodType);
             params.append('auditFlg',this.auditFlg);
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
             params.append('pageNo',this.currentPage);
 
-            axios.post('http://192.168.2.192:8080/web/vue/expense/list.html',params)
+            axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
+                    this.loading = false
                     var data = response.data.value;//费用列表
+//                    console.log(data);
                     for(var i = 0; i < data.length; i++){
-                        var originalReceiptList = data[i].originalReceiptList;
-                        data[i].checkbox = 'checkbox'+ data[i].type;
-                        data[i].checkAll = 'checkAll'+ data[i].type;
-                        data[i].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '.png'
+                        data[i].showMoney = number.number(data[i].money);
                         if(data[i].type <= 3){
-                            for(var ii = 0; ii < originalReceiptList.length; ii++){
-                                originalReceiptList[ii].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '-'+ originalReceiptList[ii].childType1 +'.png'
-                            }
+                            data[i].url = 'static/images/expense/originalReceipt'+ data[i].type + '-'+ data[i].childType1 +'.png'
+                        }else{
+                            data[i].url = 'static/images/expense/originalReceipt'+ data[i].type + '.png';
                         }
                     }
-                    this.list = data;
-                    console.log(this.list);
+//                    console.log(data);
+                    this.tableList = data;
                 })
         },
     }
@@ -283,10 +313,8 @@
     }
     .content{
         width: 1120px;
-        height: 100%;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }
@@ -299,10 +327,24 @@
         border-radius: 3px;
         line-height: 32px;
         position: absolute;
-        right:20px;
+        right:120px;
         text-decoration: none;
     }
-
+    .back{
+        display: inline-block;
+        width:56px;
+        height:32px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        line-height: 32px;
+        text-align: center;
+        font-size:14px;
+        text-decoration: none;
+        color: #333;
+        position: absolute;
+        right: 30px;
+    }
     .query{
         margin-left: 30px;
     }
@@ -312,107 +354,7 @@
         color: #333;
         margin-right: 20px;
     }
-    .costList{
-        margin: 20px 0;
-    }
-    .costList h2{
-        display: block;
-        height:35px;
-        line-height: 35px;
-        padding-bottom: 25px;
-        border-bottom: 1px solid #4e9fd8;
-    }
-    .costList .h2Span{
-        margin-left: 20px;
-        vertical-align: top;
-    }
-    .costList .h2Img{
-        width:35px;
-        height:35px;
-    }
-    .checkboxList{
-        display: block;
-        height:100px;
-        border-bottom: 1px solid #ccc;
-        margin: 0;
-        overflow: hidden;
-    }
-    .checkboxListLast{
-        display: block;
-        height:100px;
-        margin: 0;
-    }
-    .checkboxImg{
-        width:46px;
-        height:46px;
-        padding: 27px 0;
-        margin-left: 25px;
-    }
-    .checkboxList .fl{
-        float: left;
-        white-space:normal;
-    }
-    .checkboxList .tit{
-        width:160px;
-        height:100px;
-        padding: 0 10px;
-        text-align: center;
-        display: table;
-        overflow: hidden;
-        table-layout: fixed;
-    }
-    .checkboxList .tit .titName{
-        display:table-cell;
-        vertical-align:middle;
-        text-align: center; /*设置文本水平居中*/
-        width:100%;
-    }
-    .checkboxList .tit .titSpan{
-        display: inline-block;
-        width:100%;
-        float: left;
-    }
 
-    .checkboxList .detailed{
-        width:360px;
-        height:100px;
-        padding: 0px 10px;
-        text-align: center;
-        display: table;
-        overflow: hidden;
-        table-layout: fixed;
-    }
-    .checkboxList .detailed .detailedSpan{
-        display:table-cell;
-        vertical-align:middle;
-        text-align: center; /*设置文本水平居中*/
-        width:100%;
-    }
-    .checkboxList .checkboxName{
-        width:100px;
-        height:100px;
-        padding: 0px 10px;
-        text-align: center;
-    }
-    .checkboxList .checkboxName span{
-        line-height: 100px;
-    }
-    .checkboxList .checkboxMoney{
-        width:180px;
-        height:100px;
-        padding: 0px 10px;
-        text-align: center;
-    }
-    .checkboxList .checkboxMoney span{
-        line-height: 100px;
-    }
-    .checkboxList .operation{
-        width:100px;
-        height:100px;
-        padding: 0px 10px;
-        text-align: center;
-        line-height: 100px;
-    }
     .create{
         display: inline-block;
         width:90px;
@@ -427,6 +369,38 @@
         margin-top: 30px;
         cursor: pointer;
     }
+    .tableList{
+        margin-top: 30px;
+    }
+    .checkboxImg{
+        display: inline-block;
+        width:46px;
+        height:46px;
+        float: left;
+        padding: 27px 0;
+        white-space:normal;
+    }
+    .tit .titName{
+        display:table-cell;
+        vertical-align:middle;
+        text-align: center; /*设置文本水平居中*/
+        width:100%;
+    }
+    .tit .titSpan{
+        display: inline-block;
+        width:100%;
+        float: left;
+    }
+    .tit{
+        width:160px;
+        height:100px;
+        padding: 0 10px;
+        text-align: center;
+        display: table;
+        overflow: hidden;
+        table-layout: fixed;
+        float: left;
+    }
     .checkbox {
         position: relative;
         display: inline-block;
@@ -440,7 +414,6 @@
         cursor: pointer;
         float: left;
     }
-
     .checkbox i {
         position: absolute;
         left: -10px;
@@ -470,6 +443,9 @@
 
     .checkbox.disabled {
         background-color: #ccc;
+    }
+    .checkboxListLast{
+        padding: 0px 10px;
     }
     .all{
         font-size:16px;

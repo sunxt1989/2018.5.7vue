@@ -2,35 +2,31 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>借款单确认列表</h2>
+                <h2>报销单审批列表</h2>
                 <router-link to="/" class="back">返回</router-link>
             </div>
         </div>
         <div class="w">
             <div class="left" :style="{height:screenHeight}">
                 <el-table :data="tableData" class="blueList">
-                    <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
-                    <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
-                    <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="借款金额" sortable align="center">
+                    <el-table-column prop="originalTypeName" label="类别" sortable align="left">
                         <template slot-scope="scope">
-                            <span>{{ scope.row.showMoney }}</span>
+                            <img class="logoImg" :src=scope.row.url alt="">
+                            <span>费用报销</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center">
+                    <el-table-column prop="simpleConfirmDate" label="日期" sortable align="center"></el-table-column>
+                    <el-table-column prop="applicationUserName" label="姓名" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="金额" sortable align="center">
                         <template slot-scope="scope">
-                            <span>{{ scope.row.showCreditMoney }}</span>
+                                <span>{{ scope.row.showMoney }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center">
-                        <template slot-scope="scope">
-                            <span>{{ scope.row.showUnCreditMoney }}</span>
-                        </template>
-                    </el-table-column>
+                    <el-table-column prop="receiptCount" label="票据张数" sortable align="center"></el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'loanConfirmation',params:{debitId:scope.row.idString}}" class="see">
+                                    <router-link :to="{name:'ReimbursementApproval',params:{debitId:scope.row.idString}}" class="see">
                                         <i class="icon iconfont icon-kanguo blue"></i></router-link>
                                 </span>
                         </template>
@@ -48,6 +44,7 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
     import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
@@ -63,34 +60,30 @@
             //分页器
             changePage(val){
                 this.currentPage = val;
-                this.loading = true;
                 this.axios()
             },
 
             axios(){
+                this.loading = true;
                 var params = new URLSearchParams();
-                var url = addUrl.addUrl('loanConfirmationList')
+                var url = addUrl.addUrl('ReimbursementApprovalList')
                 params.append('pageNo', this.currentPage);
                 axios.post(url, params)
                     .then(response=> {
-                        console.log(response);
                         this.loading = false;
-                        var data = response.data.value;//借款单审批列表数据
-                        let tableDataarr =[];
-                        console.log(data);
-                        if(data){
-                            for(var i =0; i < data.debitList.length; i++){
-                                data.debitList[i].showMoney = number.number(data.debitList[i].money);
-                                data.debitList[i].showCreditMoney = number.number(data.debitList[i].creditMoney);
-                                data.debitList[i].showUnCreditMoney = number.number(data.debitList[i].unCreditMoney);
-                                tableDataarr.push(data.debitList[i])
-                            }
-                            this.tableData = tableDataarr;
-                        }else{
-                            this.tableData = data
-                        }
+                        var data = response.data.value;//报销单审批列表数据
+//                        console.log(data);
                         this.count = data.count;//总条目数
+                        this.tableData = this.addUrl(data.list)
                     })
+            },
+            addUrl(list){
+//                console.log(list);
+                for(var i = 0; i < list.length; i++){
+                    list[i].showMoney = number.number( list[i].money)
+                    list[i].url = 'static/images/expense/feiyongbaoxiao.png'
+                }
+                return list
             }
         },
         mounted(){
@@ -113,27 +106,15 @@
         },
         created(){
             var params = new URLSearchParams();
-            var url = addUrl.addUrl('loanConfirmationList')
+            var url = addUrl.addUrl('ReimbursementApprovalList')
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-//                    console.log(response);
                     this.loading = false;
-                    var data = response.data.value;//借款单审批列表数据
-                    let tableDataarr =[];
+                    var data = response.data.value;//报销单审批列表数据
 //                    console.log(data);
-                    if(data){
-                        for(var i =0; i < data.debitList.length; i++){
-                            data.debitList[i].showMoney = number.number(data.debitList[i].money);
-                            data.debitList[i].showCreditMoney = number.number(data.debitList[i].creditMoney);
-                            data.debitList[i].showUnCreditMoney = number.number(data.debitList[i].unCreditMoney);
-                            tableDataarr.push(data.debitList[i])
-                        }
-                        this.tableData = tableDataarr;
-                    }else{
-                        this.tableData = data
-                    }
                     this.count = data.count;//总条目数
+                    this.tableData = this.addUrl(data.list)
                 })
         },
     }
@@ -156,9 +137,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        text-align: left;
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
     }
     .back{
         display: inline-block;
@@ -186,5 +166,9 @@
     }
     .see{
         text-decoration: none;
+    }
+    .logoImg {
+        width:30px;
+        height:30px;
     }
 </style>

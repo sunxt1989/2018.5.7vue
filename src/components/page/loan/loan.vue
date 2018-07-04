@@ -2,7 +2,7 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>借款单</h2>
+                <h2>借款单列表</h2>
                 <el-select v-model="choice" class='choice' placeholder="未完成列表" @change="changeChoice">
                     <el-option
                         v-for="item in options2"
@@ -12,10 +12,11 @@
                     </el-option>
                 </el-select>
                 <router-link to="/loan/newLoan" class="addLink">新增</router-link>
+                <router-link to="/" class="back">返回</router-link>
             </div>
         </div>
         <div class="w">
-            <div class="left">
+            <div class="left" :style="{height:screenHeight}">
                 <span class="record">记录日期：</span>
                 <el-date-picker
                     v-model="timeInterval"
@@ -32,13 +33,27 @@
 
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
 
-                <el-table :data="tableData" class="blueList" show-summary :summary-method="getTotal">
+                <el-table :data="tableData" class="blueList" show-summary :summary-method="getTotal" >
                     <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
                     <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
                     <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="借款金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center"></el-table-column>
+
+                    <el-table-column prop="money" label="借款金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showMoney }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showCreditMoney }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showUnCreditMoney }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="auditFlg" label="状态" sortable align="center" width="100px">
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
@@ -54,7 +69,7 @@
                     </el-table-column>
                     <el-table-column label="还款" width="80px" align="center">
                         <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unCreditMoney == 0 || scope.row.auditFlg != 4">还款</span>
+                            <span class="black" v-if="scope.row.unCreditMoney == '0.00' || scope.row.auditFlg != 4">还款</span>
                             <router-link v-else class="repayment red"
                                          :to="{name:'repayment',params:{debitId:scope.row.idString}}">还款
                             </router-link>
@@ -92,11 +107,16 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
-
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
             return {
                 pickerOptions2: {
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
                     shortcuts: [{
                         text: '最近一个月',
                         onClick(picker) {
@@ -141,29 +161,21 @@
                     label: '未提交'
                 }],//借款单状态筛选功能
                 options2: [{
-                    choice: '1,7,8',
+                    choice: '7,8',
                     label: '已完成列表'
                 }, {
-                    choice: '0,2,3,4,5,6',
+                    choice: '0,1,2,3,4,5,6',
                     label: '未完成列表'
                 }],
-                choice:'',
+                choice:'0,1,2,3,4,5,6',
                 tableData: [],//借款单列表数据
                 count:0,//总条目数
                 currentPage:1,//当前页数
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
-            //cookies
-            getCookie: function (cname, cvalue, exdays) {
-                var d = new Date();
-                d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-                var expires = "expires=" + d.toUTCString();
-                console.log(cname + "=" + cvalue + "; " + expires);
-                document.cookie = cname + "=" + cvalue + "; " + expires;
-                console.log(document.cookie);
-            },
             changeChoice(){
                 this.axios()
             },
@@ -182,28 +194,33 @@
             },
             //执行ajax重新获取借款单列表数据
             axios(){
-                console.log(this.auditFlg);
                 this.loading = true;
                 var Params = new URLSearchParams();
-
-                console.log(this.choice);
+                var url = addUrl.addUrl('loan')
                 Params.append('periodType','');
                 Params.append('auditFlg',this.choice);
                 Params.append('startDate',this.startDate);
                 Params.append('endDate',this.endDate);
                 Params.append('pageNo',this.currentPage);
 
-                axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',Params)
+                axios.post(url,Params)
                     .then(response=> {
                         console.log(response);
                         var data = response.data.value.list;//借款单列表数据
                         this.count = response.data.value.count;//总条目数
                         let tableDataarr =[];
-                        console.log(data);
-                        for(var i =0; i < data.length; i++){
-                            tableDataarr.push(data[i])
+                        if(data){
+                            for(var i =0; i < data.length; i++){
+                                data[i].showMoney = number.number(data[i].money);
+                                data[i].showCreditMoney = number.number(data[i].creditMoney);
+                                data[i].showUnCreditMoney = number.number(data[i].unCreditMoney);
+                                tableDataarr.push(data[i])
+                            }
+                            this.tableData = tableDataarr;
+                        }else{
+                            this.tableData = data
                         }
-                        this.tableData = tableDataarr;
+
                         this.loading = false;
                     })
                     .catch(error=> {
@@ -214,7 +231,6 @@
             },
             //删除提示模态框
             deleteModel(id){
-                console.log(id);
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -233,10 +249,11 @@
                 this.loading = true;
                 var debitId = isId;
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('loanDelete')
                 console.log(debitId);
                 params.append('debitId',debitId);
 
-                axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/delete.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
                         console.log(response);
@@ -253,48 +270,73 @@
                     })
             },
 
-            //自定义合计列
+//            自定义合计列
             getTotal(param){
                 var jk = 0;
                 var hk = 0;
                 var tol = this.tableData;
                 for(var i = 0; i < tol.length; i++){
                     jk += tol[i].money;
-                    hk += tol[i].creditMoney;
+                    hk += tol[i].creditMoney
                 }
-                const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')]
+                jk = number.number(jk);
+                hk = number.number(hk);
+                const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')];
                 return sums
             },
             //分页器
             changePage(val){
                 this.currentPage = val;
-                this.loading = true;
                 this.axios()
             }
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('loan')
             params.append('periodType','');
-            params.append('auditFlg','0,2,3,4,5,6');
+            params.append('auditFlg',this.choice);
             params.append('startDate',this.startDate);
             params.append('endDate',this.endDate);
             params.append('pageNo',this.currentPage);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/my/list.html',params)
+            axios.post(url,params)
                 .then(response=> {
                     console.log(response);
                     var data = response.data.value.list;//借款单列表数据
-                    var $creditMoney = response.data.value.creditMoney;//还款
-                    var $debitMoney = response.data.value.debitMoney;//借款
-                    var $count = response.data.value.count;//总条目数
-                    let tableDataarr =[];
-                    console.log(data);
-                    for(var i =0; i < data.length; i++){
-                        tableDataarr.push(data[i])
+                    this.creditMoney = response.data.value.creditMoney;//还款
+                    this.debitMoney = response.data.value.debitMoney;//借款
+                    this.count = response.data.value.count;//总条目数
+                    var tableDataarr =[];
+                    if(data){
+                        for(var i =0; i < data.length; i++){
+                            console.log(data[i]);
+                            data[i].showMoney = number.number(data[i].money);
+                            data[i].showCreditMoney = number.number(data[i].creditMoney);
+                            data[i].showUnCreditMoney = number.number(data[i].unCreditMoney);
+                            tableDataarr.push(data[i])
+                        }
+                        this.tableData = tableDataarr;
+                    }else{
+                        this.tableData = data
                     }
-                    this.count = $count;
-                    this.tableData = tableDataarr;
-                    this.creditMoney = $creditMoney;
-                    this.debitMoney = $debitMoney;
+                    console.log(this.tableData);
                     this.loading = false;
                 })
                 .catch(error=> {
@@ -328,8 +370,23 @@
         border-radius: 3px;
         line-height: 32px;
         position: absolute;
-        right:40px;
+        right:120px;
         text-decoration: none;
+    }
+    .back{
+        display: inline-block;
+        width:56px;
+        height:32px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        line-height: 32px;
+        text-align: center;
+        font-size:14px;
+        text-decoration: none;
+        color: #333;
+        position: absolute;
+        right: 30px;
     }
     .choice {
         width:120px;
@@ -343,12 +400,11 @@
     }
     .left {
         width: 1120px;
-        float: left;
         background-color: #fff;
         padding: 20px 40px;
         text-align: left;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .record {
         font-size: 18px;

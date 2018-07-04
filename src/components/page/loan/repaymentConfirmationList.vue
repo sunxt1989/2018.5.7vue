@@ -8,10 +8,14 @@
         </div>
         <div class="w">
             <div class="left">
-                <el-table :data="tableData" class="blueList">
+                <el-table class="blueList" :data="tableData">
                     <el-table-column prop="userName" label="还款人" sortable align="center"></el-table-column>
                     <el-table-column prop="debitDateYMD" label="日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="还款金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showMoney }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
@@ -33,6 +37,8 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
             return {
@@ -52,8 +58,9 @@
 
             axios(){
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('repaymentConfirmationRefuse')
                 params.append('pageNo', this.currentPage);
-                axios.post('http://192.168.2.192:8080/web/payment/vue/audit/credit/list.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
                         var data = response.data.value;//借款单审批列表数据
@@ -65,15 +72,24 @@
         },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('repaymentConfirmationRefuse')
             params.append('pageNo', this.currentPage);
-            axios.post('http://192.168.2.192:8080/web/payment/vue/audit/credit/list.html', params)
+            axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
-                    console.log(data);
                     this.count = data.count;//总条目数
-                    this.tableData = data.debitList;
+                    let tableDataarr =[];
+                    if(data.debitList){
+                        for(var i =0; i < data.debitList.length; i++){
+                            data.debitList[i].showMoney = number.number(data.debitList[i].money);
+                            tableDataarr.push(data.debitList[i])
+                        }
+                        this.tableData = tableDataarr;
+                    }else{
+                        this.tableData = data.debitList
+                    }
                 })
         },
     }

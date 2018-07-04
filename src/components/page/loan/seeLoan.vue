@@ -8,14 +8,14 @@
             </div>
         </div>
         <div class="w">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>借款单</span>
                 </div>
                 <ul class="list">
                     <li class="sm">
                         <span class="tit">金额</span>
-                        <input class="ipt" type="text" v-model="money" :readonly="isReject">
+                        <input class="ipt" type="text" v-model="money" :readonly="isReject" @blur="blur">
                     </li>
                     <li class="sm">
                         <span class="tit">已还金额</span>
@@ -29,10 +29,11 @@
                         <span class="tit">时间</span>
                         <el-date-picker
                             class="iptData"
-                            v-model="nowdata"
+                            v-model="debitDate"
                             type="date"
-                            @change="changeTime"
                             placeholder="选择日期"
+                            :picker-options="pickerOptions1"
+                            value-format="yyyy-MM-dd"
                             :disabled="isReject">
                         </el-date-picker>
                     </li>
@@ -72,7 +73,7 @@
                         <span class="tit2">附件</span>
                         <div class="uploadBox">
                             <el-upload
-                                action="http://192.168.2.192:8080/web/upload2.html"
+                                action="http://192.168.2.190:8080/web/upload2.html"
                                 list-type="picture-card"
                                 ref="upload"
                                 :show-file-list=true
@@ -117,11 +118,12 @@
             </div>
         </div>
     </div>
-
 </template>
-
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default{
         name:'seeLoan',
         data(){
@@ -129,7 +131,6 @@
                 money:'',//借款金额
                 creditMoney:'',//已还金额
                 unCreditMoney:'',//待还款金额
-                nowdata:'',//当前借款日期
                 debitDate:'',//上传日期（格式修改后的）
                 userName:'',//借款人
                 auditFlg:'',//0 仅保存；1 驳回；2待审核；3 等待出纳确认；4 通过；5 待审核；6 待审核；7 已对冲
@@ -139,6 +140,7 @@
                 debitId:this.$route.params.debitId,
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
+
                 dialogVisible: false,//dialog是否打开状态
                 dialogImageName:'',//展示图片名称
                 dialogImageUrl:'',//展示图片URL
@@ -157,10 +159,19 @@
                 imgName3:'',
                 imgUrl4:'',
                 imgName4:'',
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    }
+                },
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
+            blur:function(){
+                this.money = number.number(this.money)
+            },
             model(n){
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
@@ -214,7 +225,7 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-//                this.loading = true;
+                this.loading = true;
                 const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG) {
@@ -261,10 +272,8 @@
             },
 
             myUpload(content){
-                console.log(content);
                 var file = content.file;
                 var _this = this;
-                console.log(file);
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
@@ -275,14 +284,14 @@
                 this.allName.push(file.name);
             },
             submit(){
-                console.log('4');
-                this.loading = false;
+                this.loading = true;
                 var params = new URLSearchParams();
-
                 var newUrl = [];
                 var newName = [];
                 var finalUrl = [];
                 var finalName = [];
+                var money = unNumber.unNumber(this.money);
+                var url = addUrl.addUrl('seeLoanSubmit')
 
                 var urlList = this.attachUrlJson
                 for(var i = 0; i < urlList.length; i++){
@@ -293,9 +302,6 @@
                 }
                 finalUrl = newUrl.concat(this.allBase)
                 finalName = newName.concat(this.allName)
-                console.log(finalUrl);
-                console.log(finalName);
-                console.log(this.departmentId);
 
                 this.imgUrl1 = finalUrl[0] ? finalUrl[0] : '';
                 this.imgUrl2 = finalUrl[1] ? finalUrl[1] : '';
@@ -309,7 +315,7 @@
 
                 params.append('debitId',this.debitId);
                 params.append('title',this.discription);
-                params.append('money',this.money);
+                params.append('money',money);
                 params.append('debitDate',this.debitDate);
                 params.append('discription',this.discription);
                 params.append('departmentId',this.departmentId);
@@ -325,7 +331,7 @@
 
                 axios({
                     method:'post',
-                    url:'http://192.168.2.192:8080/web/vue/debit/edit/debit/submit.html',
+                    url:url,
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
@@ -346,47 +352,57 @@
                         }
                     })
             },
-
             //上传图片缩略图信息赋值
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
-            },
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.nowdata;
-                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
-            },
+            }
+        },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
         },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('seeLoan')
             params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/show.html',params)
+            axios.post(url,params)
                 .then(response=> {
+                    this.loading = false;
                     console.log(response);
                     var data = response.data.value;
-                    console.log(data);
                     this.options = data.departmentList;
                     this.userDebitAuditRecordList = data.userDebitAuditRecordList;
                     this.discription = data.userDebitItem.discription;
-                    this.money = data.userDebitItem.money;
-                    this.creditMoney = data.userDebitItem.creditMoney;
-                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
+                    this.money = number.number(data.userDebitItem.money);
+                    this.creditMoney = number.number(data.userDebitItem.creditMoney);
+                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
                     this.nowdata = data.userDebitItem.debitDateYMD;
                     this.debitDate = data.userDebitItem.debitDateYMD;
                     this.userName = data.userDebitItem.userName;
                     this.auditFlg = data.userDebitItem.auditFlg;
                     this.attachUrlJson = data.userDebitItem.attachUrlJson;
                     this.departmentId = data.userDebitItem.departmentIdStr;
-                    this.loading = false;
-                    console.log(this.options);
-                    console.log(this.departmentId);
+
                     if(this.auditFlg == 1){
                         this.isReject = false;
                     }
+
                     for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
                         this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0,10)
                     }
@@ -395,7 +411,6 @@
     }
 
 </script>
-
 <style scoped>
     .w{
         text-align: center;
@@ -419,8 +434,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
 
     .list{

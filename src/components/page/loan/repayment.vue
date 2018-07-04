@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="w cf">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>还款单</span>
                 </div>
@@ -25,14 +25,15 @@
                             <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney" readonly>
                         </li>
                         <li>
-                            <input type="text" class="hk" name="hk" id="hk" v-model="money">
+                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur">
                         </li>
                         <li>
                             <el-date-picker
                                 class="data"
-                                v-model="nowdata"
+                                v-model="debitDate"
                                 type="date"
-                                @change="changeTime"
+                                :picker-options="pickerOptions1"
+                                value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
                             </el-date-picker>
                         </li>
@@ -53,7 +54,9 @@
                             <span v-if="scope.row.payType == 99">其他货币资金</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
+                    <el-table-column prop="money" label="还款金额" sortable>
+
+                    </el-table-column>
                     <el-table-column prop="auditFlg" label="还款状态" sortable>
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
@@ -73,6 +76,9 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default{
         data(){
             return{
@@ -80,18 +86,19 @@
                 unCreditMoney:'',//待还款
                 money:'',//本次还款
                 debitDate:'',//上传日期
-                nowdata:'',//当前日期
                 tableData: [],//还款明细
-                loading:false,
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
+                loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.nowdata;
-                this.debitDate = date.getFullYear()+'-'+((date.getMonth()+1) > 9 ?(date.getMonth()+1):'0'+(date.getMonth()+1))+'-'+ (date.getDate()>9 ? date.getDate():'0'+date.getDate())
-                console.log(this.debitDate);
+            blur:function(){
+                this.money = number.number(this.money)
             },
             model(n){
                 if (n == 0) {
@@ -105,6 +112,14 @@
 
                     });
                 } else {
+                    if(this.money <= 0){
+                        this.$message.error('请正确输入金额');
+                        return
+                    }else if(this.debitDate == ''){
+                        this.$message.error('请正确输入还款日期');
+                        return
+                    }
+
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -120,13 +135,15 @@
                 }
             },
             axios(){
+                this.loading = true;
                 var params = new URLSearchParams();
+                var money = unNumber.unNumber(this.money);
+                var url = addUrl.addUrl('repaymentSubmit')
+
                 params.append('debitId',this.debitId);
                 params.append('debitDate',this.debitDate);
-                params.append('money',this.money);
-                console.log(this.debitDate);
-                console.log(this.money);
-                axios.post('http://192.168.2.192:8080/web/vue/debit/edit/credit/submit.html',params)
+                params.append('money',money);
+                axios.post(url,params)
                     .then(response=> {
                         console.log(response);
                         this.loading = false;
@@ -143,16 +160,34 @@
                     })
             },
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('repayment')
             params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/credit/create.html',params)
+            axios.post(url,params)
                 .then(response=> {
                     console.log(response);
                     var data = response.data.value
                     this.tableData = data.userDebitItemList;
-                    this.unCreditMoney = data.userDebitItem.unCreditMoney
-                    console.log(data);
+                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
 
                     this.loading = false;
                 })
@@ -191,8 +226,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .left{
         display: inline-block;

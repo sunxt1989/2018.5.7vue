@@ -9,7 +9,7 @@
         </div>
         <div class="w">
             <div class="w">
-                <div class="content">
+                <div class="content" :style="{height:screenHeight}">
                     <div class="line">
                         <span>查看费用单</span>
                     </div>
@@ -39,11 +39,11 @@
                         </li>
                         <li class="sm">
                             <span class="tit"><span class="red">*</span>费用金额</span>
-                            <input class="ipt" type="text" v-model="money" >
+                            <input class="ipt" type="text" v-model="money" @blur="blurMoney">
                         </li>
                         <li class="sm">
                             <span class="tit">增值税专用发票税额</span>
-                            <input class="ipt" type="text" v-model="taxMoney" >
+                            <input class="ipt" type="text" v-model="taxMoney" @blur="blurTaxMoney">
                         </li>
                         <li class="sm">
                             <span class="tit"><span class="red">*</span>费用发生日期</span>
@@ -52,6 +52,7 @@
                                 v-model="debitDate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
+                                :picker-options="pickerOptions1"
                                 placeholder="选择日期">
                             </el-date-picker>
                         </li>
@@ -68,7 +69,7 @@
                         </li>
                         <li class="sm">
                             <span class="tit">发票张数</span>
-                            <input class="ipt" type="text" v-model="receiptCount">
+                            <input class="ipt" type="text" v-model="receiptCount" @change="receiptCountChange">
                         </li>
                         <li class="pt cf">
                             <span class="tit2">费用描述</span>
@@ -79,7 +80,7 @@
                             <span class="tit2">附件</span>
                             <div class="uploadBox">
                                 <el-upload
-                                    action="http://192.168.2.192:8080/web/upload2.html"
+                                    action="http://192.168.2.190:8080/web/upload2.html"
                                     list-type="picture-card"
                                     ref="upload"
                                     :show-file-list=true
@@ -104,7 +105,6 @@
                     </ul>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -112,6 +112,9 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default{
         data(){
             return{
@@ -126,7 +129,7 @@
                 taxMoney:0,//税额
                 debitDate:'',//费用发生日期
                 aimType:'',//出差目的
-                receiptCount:'',//票据张数
+                receiptCount:'1',//票据张数
                 discription:'',//借款事由
                 objective:[//出差目的
                     {value:1,label:'工作出差'},
@@ -153,10 +156,34 @@
                 imgUrl4:'',
                 imgName4:'',
 
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    }
+                },
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods: {
+            //发票张数change事件
+            receiptCountChange(){
+                var str = /^\d+$/;//判断只允许输入正整数
+                if(!(str.test(this.receiptCount))){
+                    this.$message.error('请正确输入张数');
+                    this.receiptCount = 1
+                    return
+                }else if(this.receiptCount == '0'){
+                    this.$message.error('发票张数不能为 0');
+                    this.receiptCount = 1
+                }
+            },
+            blurMoney(){
+                this.money = number.number(this.money)
+            },
+            blurTaxMoney(){
+                this.taxMoney = number.number(this.taxMoney)
+            },
             //费用大类typeChange事件
             typeChange(){
                 var index= this.type;
@@ -188,19 +215,15 @@
                 }else{
                     if(this.money <= 0){
                         this.$message.error('请正确输入金额');
-                        this.loading = false;
                         return
                     }else if(this.debitDate == ''){
                         this.$message.error('请正确输入日期');
-                        this.loading = false;
                         return
                     }else if(this.type == '' || this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
-                        this.loading = false;
                         return
                     }else if(this.aimType == ''&& this.type == 1){
                         this.$message.error('请正确输入出差目的');
-                        this.loading = false;
                         return
                     }
 
@@ -210,7 +233,7 @@
                         type: 'warning'
                     }).then(() => {
                         var index = this.punch + this.punch2
-                        console.log(index);
+//                        console.log(index);
                         if(index !=0 ){
                             this.submitUpload();
                         }else{
@@ -231,7 +254,7 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-//                this.loading = true;
+                this.loading = true;
                 const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG) {
@@ -251,9 +274,9 @@
                 this.loading = false
                 this.$message.error('图片上传失败，请重试！');
             },
-            onChange(file,fileList){
+            onChange(){
                 this.punch++;
-                console.log(this.punch);
+//                console.log(this.punch);
             },
             onRemove(file){
                 var removeUrl = file.url;//在删除图片时进行一个判断，根据url看删除的是否是已经上传的图片
@@ -268,8 +291,8 @@
                     }
                 }
                 this.punch--;
-                console.log(this.punch);
-                console.log(this.punch2);
+//                console.log(this.punch);
+//                console.log(this.punch2);
             },
             //url转换base方法
             readBlobAsDataURL(blob, callback) {
@@ -283,7 +306,7 @@
             myUpload(content){
                 var file = content.file;
                 var _this = this;
-                console.log(file);
+//                console.log(file);
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
@@ -294,13 +317,16 @@
                 this.allName.push(file.name);
             },
             submit(){
-                this.loading = false;
+                this.loading = true;
                 var params = new URLSearchParams();
 
                 var newUrl = [];
                 var newName = [];
                 var finalUrl = [];
                 var finalName = [];
+                var money = unNumber.unNumber(this.money)
+                var taxMoney = unNumber.unNumber(this.taxMoney)
+                var url = addUrl.addUrl('seeCostSave')
 
                 var urlList = this.attachUrlJson
                 for(var i = 0; i < urlList.length; i++){
@@ -311,9 +337,9 @@
                 }
                 finalUrl = newUrl.concat(this.allBase)
                 finalName = newName.concat(this.allName)
-                console.log(finalUrl);
-                console.log(finalName);
-                console.log(this.departmentId);
+//                console.log(finalUrl);
+//                console.log(finalName);
+//                console.log(this.departmentId);
 
                 this.imgUrl1 = finalUrl[0] ? finalUrl[0] : '';
                 this.imgUrl2 = finalUrl[1] ? finalUrl[1] : '';
@@ -328,8 +354,8 @@
                 params.append('receiptId',this.id);
                 params.append('type',this.type);
                 params.append('childType1',this.childType1);
-                params.append('money',this.money);
-                params.append('taxMoney',this.taxMoney);
+                params.append('money',money);
+                params.append('taxMoney',taxMoney);
                 params.append('aimType',this.aimType);
                 params.append('discription ',this.discription);
                 params.append('receiptCount',this.receiptCount);
@@ -346,7 +372,7 @@
 
                 axios({
                     method:'post',
-                    url:'http://192.168.2.192:8080/web/vue/expense/save.html',
+                    url:url,
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
@@ -354,7 +380,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -378,40 +404,60 @@
             //获得费用小类
             optionList(index){
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('seeCostOptionList')
                 params.append('type',index);
-                axios.post('http://192.168.2.192:8080/web/vue/accountSubject/optionList.html',params)
+                axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;
                         this.optionsSmall = data;
                         this.loading = false
                     })
                     .catch(error=> {
                         this.loading = false
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     });
             }
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('seeCost')
             params.append('id',this.id);
-            axios.post('http://192.168.2.192:8080/web/vue/expense/edit.html',params)
+            axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+                    this.loading = false;
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data.list;
                     this.optionsSmall= data.optionList;
                     this.childType1 = String(data.originalReceipt.childType1);
-                    this.money = data.originalReceipt.money;
-                    this.taxMoney = data.originalReceipt.taxMoney;
+                    this.money = number.number(data.originalReceipt.money);
+                    this.taxMoney = number.number(data.originalReceipt.taxMoney);
                     this.aimType = data.originalReceipt.aimType;
                     this.discription = data.originalReceipt.discription;
                     this.receiptCount = data.originalReceipt.receiptCount;
                     this.debitDate = data.originalReceipt.simpleReceiptDate;
                     this.attachUrlJson = data.originalReceipt.attachUrlJson;
                     this.type = String(data.originalReceipt.type);
-                    this.loading = false;
 
                     var index= this.type;
                     if(index == 2 || index == 3){
@@ -455,10 +501,8 @@
     }
     .content{
         width: 1120px;
-        height:100%;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }

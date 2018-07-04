@@ -4,12 +4,12 @@
             <div class="top">
                 <h2>借款单确认</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button @click="model(2)" size="small" type="primary" class="sub2">同意</el-button>
+                <el-button @click="model(1)" v-if="!isBoss" size="small" type="danger" class="sub1">驳回</el-button>
+                <el-button @click="model(2)" v-if="!isBoss" size="small" type="primary" class="sub2">同意</el-button>
             </div>
         </div>
         <div class="w">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>借款单</span>
                 </div>
@@ -98,7 +98,7 @@
                                 :key="item.value"
                                 :label="item.payTypeItem"
                                 :value="item.value"
-                                :disabled="item.disabled">
+                                :disabled="isBoss">
                             </el-option>
                         </el-select>
                     </li>
@@ -116,11 +116,13 @@
                     <li>
                         <span>日期</span>
                         <el-date-picker
-                            @change="changeTime"
                             class="bankCode"
                             v-model="debitDate"
                             type="date"
-                            placeholder="选择日期">
+                            :picker-options="pickerOptions1"
+                            placeholder="选择日期"
+                            value-format="yyyy-MM-dd"
+                            :disabled="isBoss">
                         </el-date-picker>
                     </li>
                     <li>
@@ -131,13 +133,13 @@
                                 :key="item.value"
                                 :label="item.opinionItem"
                                 :value="item.value"
-                                :disabled="item.disabled">
+                                :disabled="isBoss">
                             </el-option>
                         </el-select>
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10" :disabled="isBoss">
                             </textarea>
                     </li>
                 </ul>
@@ -147,6 +149,8 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data () {
             return {
@@ -170,7 +174,7 @@
                 dialogImageUrl:'',//展示图片URL
                 bankAccountList:[],//银行账户信息
                 bankCode:'',//银行账户
-                payType:'',//付款类型
+                payType:'1',//付款类型
                 payTypeList:[
                     {value:'1',payTypeItem:'现金支付'},{value:'2',payTypeItem:'银行支付'}
                 ],//付款类型
@@ -178,7 +182,14 @@
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
                 isTrue:true,
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
+                isBoss:false,
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
@@ -212,25 +223,21 @@
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
             },
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.debitDate;
-                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
-            },
             //selsect框change事件
             opinionChange(){
                 this.discription2 = this.opinion
             },
             axios(n){
                 this.loading = true;
-                var url = '';
                 var params = new URLSearchParams();
-                console.log(this.payType);
-                console.log(this.discription2);
-                console.log(this.bankCode);
-                console.log(this.debitDate);
+
+                var url = '';
+                var agreeUrl = addUrl.addUrl('loanConfirmationAgree')
+                var refuseUrl = addUrl.addUrl('loanConfirmationRefuse')
+//                console.log(this.payType);
+//                console.log(this.discription2);
+//                console.log(this.bankCode);
+//                console.log(this.debitDate);
                 params.append('debitId', this.debitId);
                 params.append('payType', this.payType);
                 params.append('discription', this.discription2);
@@ -238,14 +245,14 @@
                 params.append('confirmDate', this.debitDate);
                 //判断n=1时为驳回，n=2时为同意
                 if (n == 1) {
-                    url = 'refuse'
+                    url = refuseUrl
                 } else if (n == 2) {
-                    url = 'agree'
+                    url = agreeUrl
                 }
-                axios.post('http://192.168.2.192:8080/web/payment/vue/item/cashier/' + url + '.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if (response.data.status == 200) {
                             this.$router.go(-1);
                             this.$message({
@@ -266,32 +273,54 @@
                     this.isTrue = false
                 }
             },
-            //selsect框change事件
-            opinionChange(){
-                this.discription2 = this.opinion
-            },
+        },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
         },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('loanConfirmation')
+
             params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/show.html',params)
+            axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+                    this.loading = false;
+//                    console.log(response);
                     var data = response.data.value;
-                    console.log(data);
                     this.options = data.departmentList;
                     this.userDebitAuditRecordList = data.userDebitAuditRecordList;
                     this.discription = data.userDebitItem.discription;
-                    this.money = data.userDebitItem.money;
-                    this.creditMoney = data.userDebitItem.creditMoney;
-                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
+                    this.money = number.number(data.userDebitItem.money);
+                    this.creditMoney = number.number(data.userDebitItem.creditMoney);
+                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
                     this.nowdata = data.userDebitItem.debitDateYMD;
                     this.userName = data.userDebitItem.userName;
                     this.auditFlg = data.userDebitItem.auditFlg;
                     this.attachUrlJson = data.userDebitItem.attachUrlJson;
                     this.departmentId = data.userDebitItem.departmentIdStr;
                     this.bankAccountList = data.bankAccountList;
-                    this.loading = false;
+                    var cashFlg = data.cashFlg;
+
+                    if(cashFlg == 1){
+                        this.isBoss = false
+                    }else{
+                        this.isBoss = true
+                    }
 
                     for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
                         this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0,10)
@@ -324,8 +353,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .list{
         width:100%;

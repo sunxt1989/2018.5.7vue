@@ -4,12 +4,12 @@
             <div class="top">
                 <h2>还款单确认</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button @click="model(2)" size="small" type="primary" class="sub2">同意</el-button>
+                <el-button @click="model(1)" v-if="!isBoss"  size="small" type="danger" class="sub1">驳回</el-button>
+                <el-button @click="model(2)" v-if="!isBoss"  size="small" type="primary" class="sub2">确认</el-button>
             </div>
         </div>
         <div class="w cf">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>还款单</span>
                 </div>
@@ -33,8 +33,8 @@
                                 class="data"
                                 v-model="nowdata"
                                 type="date"
-                                @change="changeTime"
                                 placeholder="选择日期"
+                                value-format="yyyy-MM-dd"
                                 disabled>
                             </el-date-picker>
                         </li>
@@ -55,7 +55,11 @@
                             <span v-if="scope.row.payType == 99">其他货币资金</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
+                    <el-table-column prop="money" label="还款金额" sortable>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showMoney }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="auditFlg" label="还款状态" sortable>
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
@@ -81,7 +85,7 @@
                                 :key="item.value"
                                 :label="item.payTypeItem"
                                 :value="item.value"
-                                :disabled="item.disabled">
+                                :disabled="isBoss">
                             </el-option>
                         </el-select>
                     </li>
@@ -99,11 +103,13 @@
                     <li>
                         <span>日期</span>
                         <el-date-picker
-                            @change="changeTime"
                             class="bankCode"
                             v-model="debitDate"
                             type="date"
-                            placeholder="选择日期">
+                            :picker-options="pickerOptions1"
+                            placeholder="选择日期"
+                            value-format="yyyy-MM-dd"
+                            :disabled="isBoss">
                         </el-date-picker>
                     </li>
                     <li>
@@ -114,13 +120,13 @@
                                 :key="item.value"
                                 :label="item.opinionItem"
                                 :value="item.value"
-                                :disabled="item.disabled">
+                                :disabled="isBoss">
                             </el-option>
                         </el-select>
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10" :disabled="isBoss">
                             </textarea>
                     </li>
                 </ul>
@@ -132,6 +138,9 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data () {
             return {
@@ -145,7 +154,7 @@
                 userCreditItemList:[],//还款明细
                 bankAccountList:[],//银行账户信息
                 bankCode:'',//银行账户
-                payType:'',//付款类型
+                payType:'1',//付款类型
                 payTypeList:[
                     {value:'1',payTypeItem:'现金收款'},{value:'2',payTypeItem:'银行收款'}
                 ],//付款类型
@@ -153,7 +162,14 @@
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
                 isTrue:true,
+                isBoss:true,
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
@@ -181,26 +197,16 @@
                     });
                 }
             },
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.debitDate;
-                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
-            },
             //selsect框change事件
             opinionChange(){
                 this.discription2 = this.opinion
             },
             axios(n){
                 this.loading = true;
-                var url = '';
                 var params = new URLSearchParams();
-                console.log(this.payType);
-                console.log(this.discription2);
-                console.log(this.bankCode);
-                console.log(this.debitDate);
-
+                var url = '';
+                var agreeUrl = addUrl.addUrl('repaymentConfirmationAgree')
+                var refuseUrl = addUrl.addUrl('repaymentConfirmationRefuse')
                 params.append('creditId', this.debitId);
                 params.append('payType', this.payType);
                 params.append('discription', this.discription2);
@@ -208,11 +214,11 @@
                 params.append('confirmDate', this.debitDate);
                 //判断n=1时为驳回，n=2时为同意
                 if (n == 1) {
-                    url = 'refuse'
+                    url = refuseUrl
                 } else if (n == 2) {
-                    url = 'agree'
+                    url = agreeUrl
                 }
-                axios.post('http://192.168.2.192:8080/web/payment/vue/item/credit/' + url + '.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
                         console.log(response);
@@ -237,21 +243,57 @@
                 }
             },
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('repaymentConfirmation')
             params.append('creditId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/credit/show.html',params)
+            axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
                     console.log(response);
                     var data = response.data.value;
                     console.log(data);
-                    this.unCreditMoney = data.userDebitItem.unCreditMoney;
-                    this.money = data.userCreditItem.money;
+                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
+                    this.money = number.number(data.userCreditItem.money);
                     this.nowdata = data.userCreditItem.debitDateYMD;
-                    this.userCreditItemList = data.userCreditItemList;
                     this.bankAccountList = data.bankAccountList;
-                    console.log(this.userCreditItemList);
+
+                    var tableDataarr =[];
+                    if(data.userCreditItemList){
+                        for(var i =0; i < data.userCreditItemList.length; i++){
+                            console.log(data.userCreditItemList[i]);
+                            data.userCreditItemList[i].showMoney = number.number(data.userCreditItemList[i].money);
+                            tableDataarr.push(data.userCreditItemList[i])
+                        }
+                        this.userCreditItemList = tableDataarr;
+                    }else{
+                        this.userCreditItemList = data.userCreditItemList
+                    }
+
+                    var cashFlg = data.cashFlg;
+                    if(cashFlg == 1){
+                        this.isBoss = false;
+                    }else{
+                        this.isBoss = true
+                    }
                 })
         },
     }
@@ -289,8 +331,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .left{
         display: inline-block;
@@ -353,7 +395,7 @@
         border-bottom: 1px solid #ccc;
     }
     .approval-opinion li .bankCode{
-        width:700px;
+        width:880px;
         height:30px;
         text-align: center;
         border: none;
@@ -361,7 +403,7 @@
 
     .opinionItem #opinionItem{
         display: inline-block;
-        width:680px;
+        width:860px;
         height:50px;
         padding: 5px 10px;
         resize: none;

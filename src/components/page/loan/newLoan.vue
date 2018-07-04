@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="w">
-            <div class="content cf">
+            <div class="content cf" :style="{height:screenHeight}">
                 <div class="left">
                     <ul>
                         <li>
@@ -34,14 +34,15 @@
                 <div class="right">
                     <ul>
                         <li>
-                            <input type="text" class="money" name="money" id="money" v-model="money">
+                            <input type="text" class="money" name="money" id="money" v-model="money" @blur="blur">
                         </li>
                         <li>
                             <el-date-picker
                                 class="data"
-                                v-model="nowdata"
+                                v-model="debitDate"
                                 type="date"
-                                @change="changeTime"
+                                :picker-options="pickerOption1"
+                                value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
                             </el-date-picker>
                         </li>
@@ -60,7 +61,7 @@
                         </li>
                         <li class="upload">
                             <el-upload
-                                action="http://192.168.2.192:8080/web/upload2.html"
+                                action="http://192.168.2.190:8080/web/upload2.html"
                                 list-type="picture-card"
                                 ref="upload"
                                 :show-file-list=true
@@ -92,11 +93,13 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default{
         data(){
             return{
                 money:0,//金额
-                nowdata:'',//当前日期
                 debitDate:'',//上传日期（格式修改后的）
                 departmentId:'',//部门
                 options:[],//部门详情
@@ -118,11 +121,19 @@
                 imgName3:'',
                 imgUrl4:'',
                 imgName4:'',
-
+                pickerOption1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    }
+                },
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods: {
+            blur:function(){
+                this.money = number.number(this.money)
+            },
             model(n){
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
@@ -154,7 +165,6 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-//                        console.log(this.punch);
                         if(this.punch != 0){
                             this.submitUpload();
                         }else{
@@ -175,7 +185,7 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-//                this.loading = true;
+                this.loading = true;
                 const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG) {
@@ -192,7 +202,7 @@
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
             },
             onError(){
-                this.loading = false
+                this.loading = false;
                 this.$message.error('图片上传失败，请重试！');
             },
             onChange(){
@@ -227,8 +237,8 @@
             submit(){
                 this.loading = true;
                 var params = new URLSearchParams();
-                console.log(this.money);
-                console.log(this.allName);
+                var money = unNumber.unNumber(this.money);
+                var url = addUrl.addUrl('newLoanSubmit')
 
                 this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
                 this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
@@ -240,9 +250,10 @@
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
 
+                console.log(money);
                 params.append('debitId',0);
                 params.append('title',this.discription);
-                params.append('money',this.money);
+                params.append('money',money);
                 params.append('debitDate',this.debitDate);
                 params.append('discription',this.discription);
                 params.append('departmentId',this.departmentId);
@@ -258,7 +269,7 @@
 
                 axios({
                     method:'post',
-                    url:'http://192.168.2.192:8080/web/vue/debit/edit/debit/submit.html',
+                    url:url,
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
@@ -290,23 +301,36 @@
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
             },
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.nowdata;
-                this.debitDate = date.getFullYear()+'-'+((date.getMonth()+1) > 9 ?(date.getMonth()+1):'0'+(date.getMonth()+1))+'-'+ (date.getDate()>9 ? date.getDate():'0'+date.getDate())
-                console.log(this.debitDate);
-            },
+
+        },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
         },
         created(){
-            axios.post('http://192.168.2.192:8080/web/vue/debit/department.html')
+            var url = addUrl.addUrl('newLoan')
+            axios.post(url)
                 .then(response=> {
+                    this.loading = false
                     var data = response.data.value;
                     this.options = data;
-                    this.loading = false
                 })
                 .catch(error=> {
-                    this.loading = false
+                    this.loading = false;
                     console.log(error);
                     alert('网络错误，不能访问');
                 });
@@ -343,8 +367,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .left{
         display: inline-block;

@@ -7,14 +7,26 @@
             </div>
         </div>
         <div class="w">
-            <div class="left">
+            <div class="left" :style="{height:screenHeight}">
                 <el-table :data="tableData" class="blueList">
                     <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
                     <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
                     <el-table-column prop="debitDateYMD" label="借款日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="借款金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center"></el-table-column>
-                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="借款金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showMoney }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="creditMoney" label="已还金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showCreditMoney}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="unCreditMoney" label="未还金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showUnCreditMoney }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
@@ -36,6 +48,8 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
             return {
@@ -43,6 +57,7 @@
                 count:0,//总条目数
                 currentPage:1,//当前页数
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
@@ -55,27 +70,69 @@
 
             axios(){
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('loanApprovalList')
                 params.append('pageNo', this.currentPage);
-                axios.post('http://192.168.2.192:8080/web/vue/debit/audit/debit/list.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
                         var data = response.data.value;//借款单审批列表数据
-                        console.log(data);
+                        var tableDataarr =[];
+//                        console.log(data);
+                        if(data){
+                            for(var i =0; i < data.debitList.length; i++){
+                                data.debitList[i].showMoney = number.number(data.debitList[i].money);
+                                data.debitList[i].showCreditMoney = number.number(data.debitList[i].creditMoney);
+                                data.debitList[i].showUnCreditMoney = number.number(data.debitList[i].unCreditMoney);
+                                tableDataarr.push(data.debitList[i])
+                            }
+                            this.tableData = tableDataarr;
+                        }else{
+                            this.tableData = data.debitList
+                        }
                         this.count = data.count;//总条目数
-                        this.tableData = data.debitList;
                     })
             }
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('loanApprovalList')
             params.append('pageNo', this.currentPage);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/audit/debit/list.html', params)
+            axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
                     var data = response.data.value;//借款单审批列表数据
-                    console.log(data);
+                    var tableDataarr =[];
+//                    console.log(data);
+                    if(data.debitList){
+                        for(var i =0; i < data.debitList.length; i++){
+                            data.debitList[i].showMoney = number.number(data.debitList[i].money);
+                            data.debitList[i].showCreditMoney = number.number(data.debitList[i].creditMoney);
+                            data.debitList[i].showUnCreditMoney = number.number(data.debitList[i].unCreditMoney);
+                            tableDataarr.push(data.debitList[i])
+                        }
+                        this.tableData = tableDataarr;
+                    }else{
+                        this.tableData = data.debitList
+                    }
                     this.count = data.count;//总条目数
-                    this.tableData = data.debitList;
                 })
         },
     }
@@ -96,12 +153,11 @@
     }
     .left {
         width: 1120px;
-        float: left;
         background-color: #fff;
         padding: 20px 40px;
         text-align: left;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .back{
         display: inline-block;

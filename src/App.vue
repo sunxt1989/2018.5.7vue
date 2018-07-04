@@ -122,5 +122,17 @@
         padding: 0;
         float: left;
     }
-
+    .el-tabs__item{
+        padding:0 28px
+    }
+    .newSupplier .el-radio{
+        width:400px;
+        font-size:18px;
+        margin-left: 150px;
+        color: #1c96d3;
+    }
+    .newSupplier .el-radio .el-radio__label{
+        font-size:18px;
+        font-weight: bold;
+    }
 </style>

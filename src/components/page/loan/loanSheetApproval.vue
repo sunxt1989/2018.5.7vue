@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="w">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>借款单</span>
                 </div>
@@ -55,6 +55,8 @@
                         <div class="uploadBox">
                             <el-upload
                                 action="/"
+                                ref="upload"
+                                :on-preview="handlePictureCardPreview"
                                 list-type="picture-card"
                                 :file-list="attachUrlJson"
                                 disabled>
@@ -114,6 +116,8 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data () {
             return {
@@ -138,8 +142,8 @@
                 opinionList:[
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
-
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
@@ -152,8 +156,21 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {});
-                }else{
-                    this.$confirm('确定是否提交？', '提示', {
+                }else if(n == 1){
+                    this.$confirm('确定是否驳回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.axios(n)
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                }else if(n == 2){
+                    this.$confirm('确定是否同意？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -185,20 +202,23 @@
                 this.discription2 = this.opinion
             },
             axios(n){
-                this.loading = false
+                this.loading = true
                 var url = '';
                 var params = new URLSearchParams();
+                var agreeUrl = addUrl.addUrl('loanSheetApprovalAgree')
+                var refuseUrl = addUrl.addUrl('loanSheetApprovalRefuse')
+
                 params.append('debitId',this.debitId);
                 params.append('discription',this.discription);
                 //判断n=1时为驳回，n=2时为同意
                 if(n == 1){
-                    url = 'refuse'
+                    url = refuseUrl
                 }else if(n == 2){
-                    url = 'agree'
+                    url = agreeUrl
                 }
-                axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/'+ url +'.html',params)
+                axios.post(url,params)
                     .then(response=>{
-                        this.loading = true;
+                        this.loading = false;
                         console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -213,20 +233,40 @@
                     })
             }
         },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
+        },
         created(){
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('loanSheetApproval')
             params.append('debitId',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/debit/item/debit/show.html',params)
+
+            axios.post(url,params)
                 .then(response=> {
-                console.log(response);
+//                console.log(response);
             var data = response.data.value;
-            console.log(data);
+//            console.log(data);
             this.options = data.departmentList;
             this.userDebitAuditRecordList = data.userDebitAuditRecordList;
             this.discription = data.userDebitItem.discription;
-            this.money = data.userDebitItem.money;
-            this.creditMoney = data.userDebitItem.creditMoney;
-            this.unCreditMoney = data.userDebitItem.unCreditMoney;
+            this.money = number.number(data.userDebitItem.money);
+            this.creditMoney = number.number(data.userDebitItem.creditMoney);
+            this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
             this.nowdata = data.userDebitItem.debitDateYMD;
             this.debitDate = data.userDebitItem.debitDateYMD;
             this.userName = data.userDebitItem.userName;
@@ -266,8 +306,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .list{
         width:100%;
@@ -412,11 +452,11 @@
         border-radius: 3px;
     }
     .opinion{
-        width:700px;
+        width:880px;
     }
     .opinionItem #opinionItem{
         display: inline-block;
-        width:680px;
+        width:860px;
         height:50px;
         padding: 5px 10px;
         resize: none;

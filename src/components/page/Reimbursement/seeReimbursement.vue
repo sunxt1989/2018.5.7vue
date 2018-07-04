@@ -6,14 +6,103 @@
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
                 <el-button @click="model(1)" v-show="showBtn1" size="small" type="danger" class="sub1">保存</el-button>
                 <el-button @click="model(2)" v-show="showBtn2" size="small" type="primary" class="sub2">提交</el-button>
-                <el-button @click="model(3)" v-show="showBtn3" size="small" type="primary" class="sub2">撤回</el-button>
+                <el-button @click="model(3)" v-show="showBtn3" size="small" type="danger" class="sub1">撤回</el-button>
             </div>
         </div>
         <div class="w">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
                 <div class="line">
                     <span>查看报销单</span>
                 </div>
+                <el-button type="danger" plain size="small" class="share" v-if="isShowShare" @click="shareClick">
+                    <span v-show="!isShare">费用分摊</span>
+                    <span v-show="isShare">取消费用分摊</span>
+                </el-button>
+                <ul class="list cf">
+                    <li class="hd" v-show="!isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-select class="sel" v-model="department" placeholder="请选择" :disabled="isReadonly">
+                            <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.name"
+                                :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </li>
+
+                    <li class="sm" v-if="isShowShareItem1" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" @change="inputWithSelectChange(1,$event)" :readonly="isReadonly">
+                            <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select" :disabled="isReadonly">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
+                    </li>
+                    <li class="sm" v-if="isShowShareItem2" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" @change="inputWithSelectChange(2,$event)" :readonly="isReadonly">
+                            <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select" :disabled="isReadonly">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
+                    </li>
+                    <li class="sm" v-if="isShowShareItem3" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" @change="inputWithSelectChange(3,$event)" :readonly="isReadonly">
+                            <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select" :disabled="isReadonly">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
+                    </li>
+                    <li class="sm" v-if="isShowShareItem4" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input4" class="input-with-select" @change="inputWithSelectChange(4,$event)" :readonly="isReadonly">
+                            <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select" :disabled="isReadonly">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
+                    </li>
+                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select" @change="inputWithSelectChange(5,$event)" :readonly="isReadonly">
+                            <el-select v-model="select5" slot="prepend" placeholder="请选择" class="input-select" :disabled="isReadonly">
+                                <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
+                    </li>
+                </ul>
+
                 <ul class="list">
                     <li class="sm">
                         <span class="tit">报销名称</span>
@@ -25,8 +114,9 @@
                             class="sel"
                             v-model="simpleReceiptDate"
                             type="date"
-                            @change="changeTime"
                             placeholder="选择日期"
+                            :picker-options="pickerOptions1"
+                            value-format="yyyy-MM-dd"
                             :disabled="isReadonly">
                         </el-date-picker>
                     </li>
@@ -37,17 +127,6 @@
                     <li class="sm">
                         <span class="tit">票据张数</span>
                         <input class="ipt" type="text" v-model="receiptCount" readonly>
-                    </li>
-                    <li class="sm">
-                        <span class="tit">报销部门</span>
-                        <el-select class="sel" v-model="reimbursementDepartment" placeholder="请选择"  :disabled="isReadonly">
-                            <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.departmentName"
-                                :value="item.idString">
-                            </el-option>
-                        </el-select>
                     </li>
                     <li class="sm" v-show="isShow">
                         <span class="tit">结算方式</span>
@@ -78,10 +157,10 @@
                 <div class="line">
                     <span>消费明细</span>
                 </div>
-                <el-button type="primary" v-if="showGridDataAdd" @click="addClick" class="gridDataAdd">添加费用单</el-button>
+                <el-button type="primary" v-if="showGridDataAdd" @click="addClick" class="gridDataAdd" size="small">添加费用单</el-button>
 
                 <el-dialog title="费用列表" :visible.sync="dialogTableVisible" showConfirmButton="true">
-                    <el-table :data="gridData" class="blueList">
+                    <el-table :data="gridData" class="blueList" >
                         <el-table-column property="idString" label="" align="center" width="30px">
                             <template slot-scope="scope">
                                 <span class="checkbox">
@@ -95,22 +174,35 @@
                         <el-table-column property="simpleReceiptDate" label="时间"  align="center"></el-table-column>
                         <el-table-column property="discription" label="描述" align="center"></el-table-column>
                         <el-table-column property="operateUserName" label="姓名" align="center"></el-table-column>
-                        <el-table-column property="money" label="金额" align="center"></el-table-column>
+                        <el-table-column property="money" label="金额" align="center">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.showMoney }}</span>
+                            </template>
+                        </el-table-column>
                     </el-table>
                     <span class="checkbox checkboxAll">
                         <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox" >
                         <i class="iconfont icon-31xuanze"></i>
                     </span>
                     <span class="all">全选</span>
-                    <el-button type="primary" class="saveList" @click="saveList">保存</el-button>
+                    <el-button type="primary" class="saveList" @click="saveList" size="small">保存</el-button>
                 </el-dialog>
 
                 <el-table class="hkTable grayList" :data="receiptList">
-                    <el-table-column prop="childTypeName" label="类型" sortable align="center"></el-table-column>
+                    <el-table-column prop="childTypeName" label="类型" sortable align="left">
+                        <template slot-scope="scope">
+                            <img class="logoImg"  :src=scope.row.url alt="">
+                            <span>{{scope.row.childTypeName}}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="simpleReceiptDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="discription" label="描述" sortable align="center"></el-table-column>
                     <el-table-column prop="operateUserName" label="姓名" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="金额" sortable align="center"></el-table-column>
+                    <el-table-column prop="money" label="金额" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.showMoney }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="receiptCount" label="附件张数" sortable align="center"></el-table-column>
                     <el-table-column v-if="showGridDataAdd" prop="money" label="操作"  align="center">
                         <template slot-scope="scope">
@@ -142,6 +234,9 @@
 </template>
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data () {
             return {
@@ -153,11 +248,30 @@
                 receiptCount:'',//票据张数
                 payType:'',//结算方式
                 discription:'',//事由
-                reimbursementDepartment:'',//报销部门
                 settlementMethod:'',//结算方式
                 bankCode:'',//银行账号
                 bankName:'',//银行名称
                 type:'',
+                originalType:'',
+
+                isShare:false,//是否分摊
+                isShowShare:true,//是否显示分摊
+                department:'',//报销部门
+                input1:0,
+                input2:0,
+                input3:0,
+                input4:0,
+                input5:0,
+                select1:'',
+                select2:'',
+                select3:'',
+                select4:'',
+                select5:'',
+                isShowShareItem1:true,
+                isShowShareItem2:true,
+                isShowShareItem3:true,
+                isShowShareItem4:true,
+                isShowShareItem5:true,
 
                 options:[],//报销部门列表
                 payTypeList:[//结算方式列表
@@ -165,13 +279,17 @@
                     {value:2,payTypeItem:'银行支付'}
                 ],
                 receiptList:[],//消费明细列表
+                nowReceiptList:[],//消费明细列表(临时)
+
                 auditRecordList:[],//审批记录列表
                 gridData:[],//费用列表（未选中列表）
+
                 dialogTableVisible: false,//可用的费用单列表状态
                 auditFlg:'',//报销单状态： 0 未提交 1 驳回；2/5/6 待审核； 3 待出纳确认；4 通过；7 已红冲；
 
                 originalReceiptIds:'',//费用单id字符串（用逗号拼接）
                 originalReceiptIdArr:'',//费用单id字符串（数组形式）
+
                 auditPerson:1,//是否显示撤回按钮  1 不能撤回；0 可以撤回
                 isReadonly:false,//判断查看页面状态，是否可以修改信息
                 isShow:false,//判断查看页面状态，是否显示 ‘结算日期/银行账号/付款日期’
@@ -179,10 +297,37 @@
                 showBtn1: false,//保存按钮是否显示
                 showBtn2: false,//提交按钮是否显示
                 showBtn3 :false,//撤回按钮是否显示
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
+            inputWithSelectChange(n,$event){
+                var str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
+                if(!(str.test($event) && $event >= 0 && $event <= 100)){
+                    this.$message.error('请正确输入百分比');
+                    if(n == 1){
+                        this.input1 = 0
+                    }else if(n == 2){
+                        this.input2 = 0
+                    }else if(n == 3){
+                        this.input3 = 0
+                    }else if(n == 4){
+                        this.input4 = 0
+                    }else if(n == 5){
+                        this.input5 = 0
+                    }
+                }
+            },
+            //费用分摊按钮点击事件
+            shareClick(){
+                this.isShare = !this.isShare
+            },
             model(n){
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
@@ -195,13 +340,27 @@
 
                     });
                 }else if(n == 1){
-                    if(this.debitDate == ''){
+                    if(this.isShare){
+                        //判断所有填写的百分比是不是等于100
+                        if((Number(this.input1) + Number(this.input2) + Number(this.input3) + Number(this.input4) + Number(this.input5)) != 100 ){
+                            this.$message.error('请正确输入分摊比例');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        //没有分摊时是否填写了部门/项目
+                        if(this.department == ''){
+                            this.$message.error('请选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                    }
+
+                    if(this.simpleReceiptDate == ''){
                         this.$message.error('请正确输入报销日期');
-                        this.loading = false;
                         return
                     }else if(this.type == '' || this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
-                        this.loading = false;
                         return
                     }
                     this.$confirm('确定是否保存？', '提示', {
@@ -217,13 +376,27 @@
                         });
                     });
                 }else if(n ==2){
-                    if(this.debitDate == ''){
+                    if(this.isShare){
+                        //判断所有填写的百分比是不是等于100
+                        if((Number(this.input1) + Number(this.input2) + Number(this.input3) + Number(this.input4) + Number(this.input5)) != 100 ){
+                            this.$message.error('请正确输入分摊比例');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        //没有分摊时是否填写了部门/项目
+                        if(this.department == ''){
+                            this.$message.error('请选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                    }
+
+                    if(this.simpleReceiptDate == ''){
                         this.$message.error('请正确输入报销日期');
-                        this.loading = false;
                         return
                     }else if(this.type == '' || this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
-                        this.loading = false;
                         return
                     }
                     this.$confirm('确定是否提交？', '提示', {
@@ -254,55 +427,150 @@
                 }
             },
 
-            //选择记录日期事件
-            changeTime(){
-                //设置记录日期的起始日期和终止日期
-                const date = this.debitDate;
-                this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
-            },
-            submit(){
+            submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
                 var url = ''
-                console.log(this.debitId);
-                console.log(this.discription);
-                console.log(this.type);
-                console.log(this.money);
-                console.log(this.reimbursementDepartment);
-                console.log(this.originalReceiptIds);
-                console.log(this.originalType);
-                console.log(this.simpleReceiptDate);
+                var saveUrl = addUrl.addUrl('seeReimbursementSave')
+                var submitUrl = addUrl.addUrl('seeReimbursementSubmit')
+                var backUrl = addUrl.addUrl('seeReimbursementBack')
+                this.originalReceiptIds = this.originalReceiptIdArr.join(',');
+                var money = unNumber.unNumber(this.money);
+
+                var departmentJson = [] ;
+                var options = this.options;
+
+                if(this.isShare){
+                    if (this.input1 != 0 && this.select1 != '') {
+                        let item1 = options.filter(x =>{
+                            return x.id == this.select1
+                        })
+
+                        item1[0].rate = this.input1;
+                        if(departmentJson.indexOf(item1[0]) == 0){ //判断是否有重复填写部门/项目的情况
+                            this.$message.error('分摊部门/项目不能相同，请重新选择');
+                            this.loading = false;
+                            return
+                        }else{
+                            departmentJson.push(item1[0])
+                        }
+
+                    }else if(this.input1 != 0 && this.select1 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input2 != 0 && this.select2 != '') {
+                        let item2 = options.filter(x =>{
+                            return x.id == this.select2
+                        })
+                        item2[0].rate = this.input2;
+                        if(departmentJson.indexOf(item2[0]) == 0){ //判断是否有重复填写部门/项目的情况
+                            this.$message.error('分摊部门/项目不能相同，请重新选择');
+                            this.loading = false;
+                            return
+                        }else{
+                            departmentJson.push(item2[0])
+                        }
+                    }else if(this.input2 != 0 && this.select2 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input3 != 0 && this.select3 != '') {
+                        let item3 = options.filter(x =>{
+                            return x.id == this.select3
+                        })
+                        item3[0].rate = this.input3;
+                        if(departmentJson.indexOf(item3[0]) == 0){ //判断是否有重复填写部门/项目的情况
+                            this.$message.error('分摊部门/项目不能相同，请重新选择');
+                            this.loading = false;
+                            return
+                        }else{
+                            departmentJson.push(item3[0])
+                        }
+
+                    }else if(this.input3 != 0 && this.select3 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input4 != 0 && this.select4 != '') {
+                        let item4 = options.filter(x =>{
+                            return x.id == this.select4
+                        })
+                        item4[0].rate = this.input4;
+                        if(departmentJson.indexOf(item4[0]) == 0){ //判断是否有重复填写部门/项目的情况
+                            this.$message.error('分摊部门/项目不能相同，请重新选择');
+                            this.loading = false;
+                            return
+                        }else{
+                            departmentJson.push(item4[0])
+                        }
+                    }else if(this.input4 != 0 && this.select4 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input5 != 0 && this.select5 != '') {
+                        let item5 = options.filter(x =>{
+                            return x.id == this.select5
+                        })
+                        item5[0].rate = this.input5;
+                        if(departmentJson.indexOf(item5[0]) == 0){ //判断是否有重复填写部门/项目的情况
+                            this.$message.error('分摊部门/项目不能相同，请重新选择');
+                            this.loading = false;
+                            return
+                        }else{
+                            departmentJson.push(item5[0])
+                        }
+                    }else if(this.input5 != 0 && this.select5 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+                } else {
+                    let item6 = options.filter(x =>{
+                        return x.id == this.department
+                    })
+                    departmentJson.push(item6[0])
+                }
+                departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
+                console.log(departmentJson);
+
                 if(n == 1){
-                    url = 'save'
+                    url = saveUrl
                     params.append('id',this.debitId);
                     params.append('discription',this.discription);
-                    params.append('money',this.money);
-                    params.append('department',this.reimbursementDepartment);
+                    params.append('money',money);
+                    params.append('departmentJson',departmentJson);
                     params.append('applicationDate',this.simpleReceiptDate);
                     params.append('originalReceiptIds',this.originalReceiptIds);
                     params.append('receiptCount',this.receiptCount);
                     params.append('originalType',this.originalType);
                 }else if(n == 2){
-                    url = 'submit'
+                    url = submitUrl
                     params.append('id',this.debitId);
                     params.append('discription',this.discription);
-                    params.append('money',this.money);
-                    params.append('department',this.reimbursementDepartment);
+                    params.append('money',money);
+                    params.append('departmentJson',departmentJson);
                     params.append('applicationDate',this.simpleReceiptDate);
                     params.append('originalReceiptIds',this.originalReceiptIds);
                     params.append('receiptCount',this.receiptCount);
                     params.append('originalType',this.originalType);
                 }else if(n == 3){
-                    url = 'back'
+                    url = backUrl
                     params.append('applicationId',this.debitId);
                 }
-                this.originalReceiptIds = this.originalReceiptIdArr.join(',');
 
-                axios.post('http://192.168.2.192:8080/web/vue/application/'+ url + '.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -317,12 +585,16 @@
             },
             //删除消费明细列表项
             deleteList(id){
+//                console.log(this.receiptList);
+//                console.log(this.nowReceiptList);
                 var list = this.receiptList;
                 var arr = this.originalReceiptIdArr;
 
                 //将临时删除的明细项存入临时列表nowList，当添加时将临时列表加入进去
                 for(var i=0; i <list.length; i++){
                     if(id == list[i].idString){
+                        this.money -= list[i].money;
+                        this.receiptCount -= list[i].receiptCount;
                         list.splice(i,1)
                     }
                 }
@@ -333,19 +605,32 @@
                 }
                 this.receiptList = list;
                 this.originalReceiptIdArr = arr;
+
+//                console.log(this.receiptList);
+//                console.log(this.nowReceiptList);
             },
             //点击添加按钮，弹出费用列表
             addClick(){
                 this.loading = true;
                 var params = new URLSearchParams();
+                var url = addUrl.addUrl('seeReimbursementList')
                 params.append('type',this.type);
-                axios.post('http://192.168.2.192:8080/web/vue/expense/enableReceiptList.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var arr = this.originalReceiptIdArr;
                         var data = response.data.value;
-
+                        var nowList = this.nowReceiptList;
+                        if(data){
+                            //把已选中列表加进去
+                            for(var j = 0; j < nowList.length; j++){
+                                nowList[j].showMoney = number.number(nowList[j].money);
+                                data.push(nowList[j])
+                            }
+//                        console.log(nowList);
+//                        console.log(data);
+                        }
                         for(var i = 0; i < arr.length; i++){
                             for(var ii = 0; ii < data.length; ii++){
                                 if(arr[i] == data[ii].idString){
@@ -354,7 +639,7 @@
                             }
                         }
                         this.gridData = data;
-                        console.log(this.gridData);
+//                        console.log(this.gridData);
                     });
                 this.dialogTableVisible = true;
             },
@@ -374,42 +659,75 @@
                 var str = this.originalReceiptIdArr;
                 var gridData = this.gridData;
                 var receiptList = this.receiptList;
-                console.log(input);
-                console.log(str);
+//                console.log(input);
                 input.each(function(i){
                     str.push(input[i].value);
-                    console.log(str);
                 });
                 for(var i = 0; i < gridData.length; i++){
                     for(var ii = 0; ii < str.length; ii++){
                         if(gridData[i].idString == str[ii]){
+                            this.money += gridData[i].money;
+                            this.receiptCount += gridData[i].receiptCount;
                             receiptList.push(gridData[i])//把删除的元素添加进数组
                             gridData.splice(i,1);//删除元素
                         }
                     }
                 }
                 this.originalReceiptIdArr = str;
-                this.receiptList = receiptList;
+                this.receiptList = this.addUrl(receiptList);
                 this.gridData = gridData;
                 this.dialogTableVisible = false;
             },
+            addUrl(list){
+//                console.log(list);
+                for(var i = 0; i < list.length; i++){
+                    if(list[i].type <=3){
+                        list[i].showMoney = number.number(list[i].money)
+                        list[i].url = 'static/images/expense/originalReceipt'+ list[i].type + '-'+ list[i].childType1 +'.png'
+                    }else{
+                        list[i].url = 'static/images/expense/originalReceipt'+ list[i].type + '.png'
+                    }
+                }
+                return list
+            },
+        },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+            };
         },
         created(){
-            console.log(this.debitId);
+//            console.log(this.debitId);
             var params = new URLSearchParams();
+            var url = addUrl.addUrl('seeReimbursement')
             params.append('id',this.debitId);
-            axios.post('http://192.168.2.192:8080/web/vue/application/check.html',params)
+            axios.post(url,params)
                 .then(response=> {
+                    this.loading = false;
                     var data = response.data.value;
                     console.log(data);
                     this.originalTypeName = data.application.originalTypeName
                     this.type = data.application.type
-                    this.money = data.application.money
+                    this.money = number.number(data.application.money)
                     this.simpleConfirmDate = data.application.simpleConfirmDate
                     this.simpleReceiptDate = data.application.simpleReceiptDate
                     this.payType = data.application.payType
                     this.receiptCount = data.application.receiptCount
                     this.discription = data.application.discription
+                    this.originalType = data.application.originalType
                     this.reimbursementDepartment = data.application.departmentIdString
                     this.settlementMethod = data.application.settlementMethod
                     this.auditPerson = data.application.auditPerson
@@ -417,34 +735,79 @@
                     this.bankName = data.application.bankName
                     this.auditFlg = data.application.auditFlg
 
+
                     this.auditRecordList = data.auditRecordList
-                    this.receiptList = data.receiptList
+
+                    var receiptList = data.receiptList
+//                    console.log(receiptList);
                     this.options = data.departmentList
-                    console.log(this.reimbursementDepartment);
-                    var receiptList = this.receiptList;
+//                    console.log(this.reimbursementDepartment);
                     var arr = [];
+                    var arr2 = []
                     for(var i = 0; i < receiptList.length; i++){
                         arr.push(receiptList[i].idString)
+                        arr2.push(receiptList[i])
                     }
                     this.originalReceiptIdArr = arr;
 
-                    var index= this.auditFlg;
+                    this.receiptList = this.addUrl(receiptList);
+                    this.nowReceiptList = arr2;
 
+                    var divideFlg = data.application.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊
+                    if(divideFlg ==0){
+                        this.isShare = false
+                        this.department = data.application.departmentIdString1
+                    }else{
+                        this.isShare = true;
+                        this.select1 = data.application.departmentIdString1
+                        this.select2 = data.application.departmentIdString2
+                        this.select3 = data.application.departmentIdString3
+                        this.select4 = data.application.departmentIdString4
+                        this.select5 = data.application.departmentIdString5
+
+                        this.input1 = data.application.projectDivRate
+                        this.input2 = data.application.projectDivRate2
+                        this.input3 = data.application.projectDivRate3
+                        this.input4 = data.application.projectDivRate4
+                        this.input5 = data.application.projectDivRate5
+                        if(data.application.departmentIdString1 == '0' || data.application.departmentIdString1 == 'null'){
+                            this.isShowShareItem1 = false
+                        }
+                        if(data.application.departmentIdString2 == '0' || data.application.departmentIdString2 == 'null'){
+                            this.isShowShareItem2 = false
+                        }
+                        if(data.application.departmentIdString3 == '0' || data.application.departmentIdString3 == 'null'){
+                            this.isShowShareItem3 = false
+                        }
+                        if(data.application.departmentIdString4 == '0' || data.application.departmentIdString4 == 'null'){
+                            this.isShowShareItem4 = false
+                        }
+                        if(data.application.departmentIdString5 == '0' || data.application.departmentIdString5 == 'null'){
+                            this.isShowShareItem5 = false
+                        }
+                    }
+
+                    var index= this.auditFlg;
+                    console.log(index);
                     //当index 0 未提交 1 驳回； 显示 ‘添加费用单’按钮
+//                    console.log(this.auditPerson);
                     if(index < 2){
                         this.showGridDataAdd = true;
                         this.showBtn1 = true;
                         this.showBtn2 = true;
+                        this.isShowShare = true;
                     }else if(index == 4 || index == 7){//当index 4 通过；7 已红冲；显示 ‘结算日期/银行账号/付款日期’
                         this.isShow = true;
-                        this.isReadonly = true
+                        this.isReadonly = true;
+                        this.isShowShare = false
                     }else{
                         if(this.auditPerson == 0){
                             this.showBtn3 = true
                         }
+                        this.isReadonly = true;
+                        this.isShowShare = false
                     }
 
-                    this.loading = false;
                 })
         },
     }
@@ -473,8 +836,8 @@
         width: 1120px;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
-        box-shadow: 0px 2px 7px rgba(0,0,0,0.25)
+        box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
+        overflow-y: auto;
     }
     .list{
         width:100%;
@@ -708,4 +1071,26 @@
     .grayList{
         margin: 30px 0;
     }
+    .logoImg{
+        width:22px;
+        height:22px;
+    }
+    .list li .input-with-select{
+        font-size:14px;
+        width:322px;
+        text-align: right;
+    }
+
+    .list .hd{
+        width:100%;
+    }
+    .share{
+        display: block;
+        margin-top: 10px;
+        margin-left: 80px;
+    }
+    .input-select{
+        width:220px;
+    }
+
 </style>
