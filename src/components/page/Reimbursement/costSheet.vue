@@ -132,16 +132,13 @@
                 if(length == 0){
                     this.$message.error('请选择需要添加的费用类别');
                 }else{
-                    console.log(checked);
                     checked.each(function(i){
-                        console.log(checked[i].value);
                         if(i == 0){
                             str += checked[i].value
                         }else{
                             str += ','+ checked[i].value
                         }
                     })
-                    console.log(str);
                     this.$router.push({
                         path: '/Reimbursement/newReimbursement',
                         name: 'newReimbursement',
@@ -162,7 +159,6 @@
             },
             //删除提示模态框
             deleteModel(id){
-                console.log(id);
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -188,7 +184,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         this.axios();
                         this.$message({
                             type: 'success',
@@ -197,13 +193,13 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
             //选择记录日期事件
             changeTime(){
-                console.log(this.timeInterval);
+//                console.log(this.timeInterval);
                 //设置记录日期的起始日期和终止日期
                 const date = this.timeInterval;
                 if(date){
@@ -257,7 +253,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -265,7 +261,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){

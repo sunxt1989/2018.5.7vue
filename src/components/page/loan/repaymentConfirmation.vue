@@ -126,7 +126,7 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10" :disabled="isBoss">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="isBoss">
                             </textarea>
                     </li>
                 </ul>
@@ -221,7 +221,7 @@
                 axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if (response.data.status == 200) {
                             this.$router.go(-1);
                             this.$message({
@@ -250,7 +250,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -258,7 +258,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -268,9 +268,9 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
-                    console.log(data);
+//                    console.log(data);
                     this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
                     this.money = number.number(data.userCreditItem.money);
                     this.nowdata = data.userCreditItem.debitDateYMD;
@@ -279,7 +279,7 @@
                     var tableDataarr =[];
                     if(data.userCreditItemList){
                         for(var i =0; i < data.userCreditItemList.length; i++){
-                            console.log(data.userCreditItemList[i]);
+//                            console.log(data.userCreditItemList[i]);
                             data.userCreditItemList[i].showMoney = number.number(data.userCreditItemList[i].money);
                             tableDataarr.push(data.userCreditItemList[i])
                         }

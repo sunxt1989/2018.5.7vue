@@ -34,7 +34,7 @@
                 <div class="right">
                     <ul>
                         <li>
-                            <input type="text" class="money" name="money" id="money" v-model="money" @blur="blur">
+                            <input type="text" class="money" name="money" id="money" v-model="money" @blur="blur" maxlength="14">
                         </li>
                         <li>
                             <el-date-picker
@@ -57,7 +57,7 @@
                             </el-select>
                         </li>
                         <li>
-                            <input type="text" class="cause" name="cause" id="cause" v-model="discription">
+                            <input type="text" class="cause" name="cause" id="cause" v-model="discription" maxlength="50">
                         </li>
                         <li class="upload">
                             <el-upload
@@ -73,7 +73,6 @@
                                 :on-error="onError"
                                 :on-change='onChange'
                                 :on-remove='onRemove'
-                                :file-list="fileList"
                                 :auto-upload="false">
                                 <i class="el-icon-plus"></i>
                             </el-upload>
@@ -109,7 +108,7 @@
                 dialogVisible: false,//dialog是否打开状态
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
-                fileList:[],//上传成功展示图片参数
+
 
                 allBase:[],//所有base64格式的地址
                 allName:[],//所有namen名称
@@ -250,7 +249,7 @@
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
 
-                console.log(money);
+//                console.log(money);
                 params.append('debitId',0);
                 params.append('title',this.discription);
                 params.append('money',money);
@@ -277,7 +276,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -291,7 +290,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
@@ -310,7 +309,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -318,7 +317,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -331,7 +330,7 @@
                 })
                 .catch(error=> {
                     this.loading = false;
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         },

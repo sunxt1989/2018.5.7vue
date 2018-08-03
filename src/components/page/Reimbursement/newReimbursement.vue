@@ -129,7 +129,7 @@
                     </li>
                     <li class="pt cf">
                         <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" >
+                            <textarea class="tex" v-model="discription" maxlength="50">
                             </textarea>
                     </li>
                 </ul>
@@ -275,8 +275,15 @@
                 }else{
                     //是否为分摊状态
                     if(this.isShare){
+                        let input1 = Number(this.input1)
+                        let input2 = Number(this.input2)
+                        let input3 = Number(this.input3)
+                        let input4 = Number(this.input4)
+                        let input5 = Number(this.input5)
+                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+//                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
-                        if((Number(this.input1) + Number(this.input2) + Number(this.input3) + Number(this.input4) + Number(this.input5)) != 100 ){
+                        if(allInput/100 != 100 ){
                             this.$message.error('请正确输入分摊比例');
                             this.loading = false;
                             return
@@ -425,17 +432,9 @@
                     departmentJson.push(item6[0])
                 }
                 departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
-                console.log(departmentJson);
+//                console.log(departmentJson);
 
                 this.originalReceiptIds = this.originalReceiptIdArr.join(',');
-//                console.log(this.ids);
-//                console.log(this.discription);
-//                console.log(this.type);
-//                console.log(this.money);
-//                console.log(this.department);
-//                console.log(this.originalReceiptIds);
-//                console.log(this.originalType);
-//                console.log(this.simpleReceiptDate);
 
                 params.append('id',0);
                 params.append('discription',this.discription);
@@ -449,7 +448,7 @@
                 axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -506,10 +505,10 @@
                 axios.post('http://192.168.2.190:8080/web/vue/expense/enableReceiptList.html', params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var arr = this.originalReceiptIdArr;
                         var data = response.data.value;
-                        console.log(data);
+//                        console.log(data);
                         if(data){
                             for(var i = 0; i < arr.length; i++){
                                 for(var ii = 0; ii < data.length; ii++){
@@ -572,7 +571,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -580,7 +579,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -591,7 +590,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     this.options = data.departmentList;
@@ -599,7 +598,7 @@
                     var tableDataarr =[];
                     if(data.receiptList){
                         for(var i =0; i < data.receiptList.length; i++){
-                            console.log(data.receiptList[i]);
+//                            console.log(data.receiptList[i]);
                             data.receiptList[i].showMoney = number.number(data.receiptList[i].money);
                             tableDataarr.push(data.receiptList[i])
                         }
@@ -802,10 +801,7 @@
         margin-left: 80px;
     }
     .input-select{
-        width:220px;
+        width:200px;
     }
-    .bumen{
-        font-size:20px;
-        color: #1a96d4;
-    }
+
 </style>

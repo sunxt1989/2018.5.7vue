@@ -15,82 +15,59 @@
                 <ul class="list cf">
                     <li class="pt">
                         <span class="tit">待付款</span>
-                        <input class="ipt" type="text" v-model="money">
+                        <input class="ipt" type="text" v-model="unPayMoney" readonly>
                     </li>
                     <li class="pt">
                         <span class="tit">本次付款</span>
-                        <input class="ipt" type="text" v-model="money">
+                        <input class="ipt" type="text" v-model="money" @change="changeMoney" maxlength="14">
                     </li>
-
                     <li class="ptx">
-                        <div class="card">
-                            <ul>
-                                <li class="card-head">
-                                    销售方：
-                                    <span>百度</span>
-                                    <img src="../../../../static/images/kong.png" alt="">
-                                </li>
-                                <li>
-                                    <span>税价合计：</span>
-                                    <span class="card-money"></span>
-                                </li>
-                                <li>
-                                    <span>费用明细：</span>
-                                    <span class="card-val"></span>
-                                </li>
-                                <li>
-                                    <span>开票日期：</span>
-                                    <span class="card-val">2018-06-11</span>
-                                </li>
-                                <li>
-                                    <div class="btn">
-                                        <i class="icon iconfont icon-shuru"></i>
-                                        <span>关联</span>
-                                    </div>
-                                </li>
-                            </ul>
+                        <div class="upload cf">
+                            <span class="tit2">附件</span>
+                            <div class="uploadBox">
+                                <el-upload
+                                    action="http://192.168.2.190:8080/web/upload2.html"
+                                    list-type="picture-card"
+                                    ref="upload"
+                                    :show-file-list=true
+                                    :limit='limit'
+                                    :http-request="myUpload"
+                                    :on-preview="handlePictureCardPreview"
+                                    :before-upload='beforeAvatarUpload'
+                                    :on-exceed="onExceed"
+                                    :on-error="onError"
+                                    :on-change='onChange'
+                                    :on-remove='onRemove'
+                                    :auto-upload="false">
+                                    <i class="el-icon-plus"></i>
+                                </el-upload>
+                                <el-dialog :visible.sync="dialogVisible">
+                                    <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                    <img width="100%" :src="dialogImageUrl" alt="">
+                                </el-dialog>
+                            </div>
                         </div>
                     </li>
                 </ul>
-                <div class="upload cf">
-                    <span class="tit2">附件</span>
-                    <div class="uploadBox">
-                        <el-upload
-                            action="http://192.168.2.190:8080/web/upload2.html"
-                            list-type="picture-card"
-                            ref="upload"
-                            :show-file-list=true
-                            :limit='limit'
-                            :http-request="myUpload"
-                            :on-preview="handlePictureCardPreview"
-                            :before-upload='beforeAvatarUpload'
-                            :on-exceed="onExceed"
-                            :on-error="onError"
-                            :on-change='onChange'
-                            :on-remove='onRemove'
-                            :auto-upload="false">
-                            <i class="el-icon-plus"></i>
-                        </el-upload>
-                        <el-dialog :visible.sync="dialogVisible">
-                            <h2 class="dialogImageName">{{dialogImageName}}</h2>
-                            <img width="100%" :src="dialogImageUrl" alt="">
-                        </el-dialog>
-                    </div>
-                </div>
-
                 <div class="line">
                     <span>付款明细</span>
                 </div>
-
-                <el-table :data="detailedList" class="grayList">
-                    <el-table-column property="idString" label="设备类别" align="center"></el-table-column>
-                    <el-table-column property="childTypeName" label="明细" align="center"></el-table-column>
-                    <el-table-column property="simpleReceiptDate" label="单位"  align="center"></el-table-column>
-                    <el-table-column property="discription" label="数量" align="center"></el-table-column>
-                    <el-table-column property="operateUserName" label="单价" align="center"></el-table-column>
-                    <el-table-column property="money" label="金额" align="center"></el-table-column>
-                    <el-table-column property="money" label="税率" align="center"></el-table-column>
-                    <el-table-column property="money" label="税额" align="center"></el-table-column>
+                <el-table :data="List" class="grayList">
+                    <el-table-column property="sendDate" label="日期" align="center"></el-table-column>
+                    <el-table-column property="childTypeName" label="付款记录" align="center">
+                        <template slot-scope="scope">
+                            <span>付给{{scope.row.supplierName}}一笔款项</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="showMoney" label="金额"  align="center"></el-table-column>
+                    <el-table-column property="attachCount" label="附件" align="center">
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'seePurchasePayment',params:{debitId:scope.row.sendId}}" class="see">
+                                {{scope.row.attachCount}}
+                            </router-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="auditFlg" label="状态" align="center"></el-table-column>
                 </el-table>
 
             </div>
@@ -102,39 +79,14 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import addUrl from '../../../../static/js/addUrl'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
     export default{
         data(){
             return{
-                childType1:'',//费用小类
-                typeShow:false,//是否显示费用小类
-                destination:false,//是否显示目的地
-                money:0,//金额
-                taxMoney:0,//税额
-                debitDate:'',//上传日期（格式修改后的）
-                aimType:'',//出差目的
-                receiptCount:'',//票据张数
-                discription:'',//借款事由
-
-                rowNumber:1,//明细列表行数（只加不减）
-                deviceList:[],//明细列表，设备类别
-
-                type:'1',//设备类别
-                options:[//费用大类列表
-                    {value:'1',label:'设备'},
-                    {value:'2',label:'材料'},
-                    {value:'3',label:'软件'},
-                    {value:'4',label:'劳务服务'},
-                    {value:'5',label:'技术服务'},
-                    {value:'6',label:'待销商品'},
-                ],
-                isShowLow:true,//是否显示明细列表 设备相关信息列
-
-                optionsSmall:[],//费用小类列表
-                objective:[//出差目的
-                    {value:1,label:'工作出差'},
-                    {value:2,label:'参加会议'},
-                    {value:3,label:'参加培训'}
-                ],
+                unPayMoney:'',//待付款
+                money:'',//本次付款
+                List:[],//付款明细
                 dialogImageUrl: '',//展示图片URL
                 dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
@@ -157,67 +109,23 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                loading:false,
+                debitId:this.$route.params.debitId,
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods: {
-            //设备类别change事件
-            sblbChange(n){
-                var deviceList = $("select[name=deviceList"+ n +"]").val()
-                var unit = $("input[name=unit"+ n +"]")
-                var list = this.deviceList;
-                for(var i = 0; i < list.length; i++){
-                    if(deviceList == list[i].classCode){
-                        unit.val(list[i].unit)
-                    }
+            //本次付款change事件
+            changeMoney(){
+                var money = this.money
+                var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
+                if(!str2.test(money)) {
+                    this.$message.error('请正确输入金额');
+                    this.money = 0;
+                    return
                 }
-                console.log(deviceList);
-
+                this.money = number.number(this.money)
             },
-            //改变金额的change事件
-            moneyChange(n){
-                var count = $("input[name=count"+ n +"]").val()
-                var perPrice = $("input[name=perPrice"+ n +"]").val();
-                var $money =  $("input[name=money"+ n +"]")
-                var money = 0
-                if(count != ''&& perPrice !=''){
-                    money = count * perPrice;
-                }
-                $money.val(money)
-                this.taxMoneyChange(n)
-            },
-            taxMoneyChange(n){
-                var money = $("input[name=money"+ n +"]").val()
-                var taxRate1 = $("select[name=taxRate"+ n +"]").val();
-                var $taxMoney =  $("input[name=taxMoney"+ n +"]")
-                var taxMoney = 0
-                console.log(taxRate1);
-                if(money != ''&& taxRate1 !=''){
-                    taxMoney = money * taxRate1;
-                }
-                $taxMoney.val(taxMoney)
-            },
-
-            //采购类别change事件，当选择设备时明细列表进行修改
-            typeChange(){
-                var type = this.type
-                if(type == '1'){
-                    console.log('true');
-                    this.isShowLow = true
-                }else{
-                    console.log('false');
-                    this.isShowLow = false
-                }
-                console.log(this.isShowLow);
-            },
-            detailedAdd(){
-
-            },
-            detailedDelete(){
-                console.log('@@');
-            },
-
             model(n){
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
@@ -225,25 +133,13 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        this.$router.go(-1)
+                        this.$router.push('/Purchase/PurchaseList')
                     }).catch(() => {
 
                     });
                 }else{
-                    if(this.money <= 0){
+                    if(this.money == ''){
                         this.$message.error('请正确输入金额');
-                        this.loading = false;
-                        return
-                    }else if(this.debitDate == ''){
-                        this.$message.error('请正确输入日期');
-                        this.loading = false;
-                        return
-                    }else if(this.type == '' || this.childType1 == ''){
-                        this.$message.error('请正确输入费用类别');
-                        this.loading = false;
-                        return
-                    }else if(this.aimType == ''&& this.type == 1){
-                        this.$message.error('请正确输入出差目的');
                         this.loading = false;
                         return
                     }
@@ -329,9 +225,9 @@
             },
             submit(){
                 this.loading = true;
+                var url = addUrl.addUrl('newPurchasePaymentSave')
                 var params = new URLSearchParams();
-//                console.log(this.money);
-//                console.log(this.allName);
+                var money = unNumber.unNumber(this.money)
 
                 this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
                 this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
@@ -342,23 +238,8 @@
                 this.imgName2 = this.allName[1] ? this.allName[1] : '';
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
-//                console.log(this.type,'type');
-//                console.log(this.childType1,'childType1');
-//                console.log(this.money,'money');
-//                console.log(this.taxMoney,'taxMoney');
-//                console.log(this.aimType,'aimType');
-//                console.log(this.discription,'discription');
-//                console.log(this.receiptCount,'receiptCount');
-//                console.log(this.debitDate,'debitDate');
-                params.append('debitId',0);
-                params.append('type',this.type);
-                params.append('childType1',this.childType1);
-                params.append('money',this.money);
-                params.append('taxMoney',this.taxMoney);
-                params.append('aimType',this.aimType);
-                params.append('discription',this.discription);
-                params.append('receiptCount',this.receiptCount);
-                params.append('receiptDate',this.debitDate);
+                params.append('purchase_id',this.debitId);
+                params.append('pay_money',money);
 
                 params.append('imgUrl1',this.imgUrl1);
                 params.append('imgName1',this.imgName1);
@@ -369,17 +250,18 @@
                 params.append('imgUrl4',this.imgUrl4);
                 params.append('imgName4',this.imgName4);
 
+
                 axios({
                     method:'post',
-                    url:'http://192.168.2.190:8080/web/vue/expense/save.html',
+                    url:url,
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
                     }
                 },params)
                     .then(response=> {
-                        this.loading = false;
-                        console.log(response);
+
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -390,10 +272,11 @@
                             var msg = response.data.msg;
                             this.$message.error(msg);
                         }
+                        this.loading = false;
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
@@ -409,7 +292,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -417,24 +300,33 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
+            var params = new URLSearchParams();
             var url = addUrl.addUrl('newPurchasePayment')
-//            axios.post(url)
-//                .then(response=> {
+//            console.log(this.debitId);
+            params.append('purchaseId',this.debitId);
+            axios.post(url,params)
+                .then(response=> {
 //                    console.log(response);
-//                    var data = response.data.value;
-//
-//                    this.loading = false
-//                })
-//                .catch(error=> {
-//                    this.loading = false
-//
+                    var data = response.data.value;
+                    this.unPayMoney = number.number(data.unPayMoney)
+                    var list = data.list
+                    for(let i = 0; i < list.length; i++){
+                        list[i].showMoney =number.number(list[i].sendMoney)
+                    }
+                    this.List = list
+//                    console.log(this.List);
+                    this.loading = false
+                })
+                .catch(error=> {
+                    this.loading = false
+
 //                    console.log(error);
-//                    alert('网络错误，不能访问');
-//                });
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -463,13 +355,6 @@
         right:110px;
         font-size:12px;
     }
-
-    .sblb{
-        width:100%;
-        height:100%;
-        border: none;
-        outline:none;
-    }
     .content{
         width: 1120px;
         background-color: #fff;
@@ -493,8 +378,12 @@
     }
     .list .ptx{
         width:100%;
-        height:260px;
         display: inline-block;
+        height:320px;
+        text-align: left;
+        line-height: 36px;
+        margin-top: 20px;
+        float: left;
     }
     .list li .ipt{
         display: inline-block;
@@ -505,87 +394,87 @@
         vertical-align: middle;
         padding: 3px 10px;
     }
-    .list .ptx .card{
-        width:78%;
-        height:180px;
-        border: 1px solid #ccc;
-        box-shadow: 2px 2px 7px -2px #ccc;
-        padding: 5px 3px;
-        margin: 30px auto 0;
-        font-size:16px;
-    }
-    .list .ptx .card ul li{
-        line-height: 30px;
-        vertical-align: middle;
-        padding: 0 20px;
-        color: #999;
-        text-align: left;
-    }
-    .list .ptx .card .card-head{
-        height:40px;
-        border-bottom: 1px solid #ccc;
-    }
-    .list .ptx .card .card-head img{
-        width:37px;
-        float: right;
-        margin-top: -4px;
-    }
-    .list .ptx .card .btn{
-        width:80px;
-        height:30px;
-        background-color: #f6b37f;
-        color: #fff;
-        border-radius: 3px;
-        text-align: center;
-        line-height: 30px;
-        font-size:18px;
-        float: right;
-        cursor: pointer;
-    }
-    .list .ptx .card .btn i{
-        display: block;
-        width:20px;
-        float: left;
-        margin-left: 8px;
-    }
-    .list .ptx .card .btn-delete{
-        width:80px;
-        height:30px;
-        color: red;
-        text-align: center;
-        line-height: 30px;
-        font-size:18px;
-        float: right;
-        cursor: pointer;
-    }
-    .list .ptx .card .btn-delete img{
-        display: block;
-        width:18px;
-        float: left;
-        margin-top: 5px;
-        margin-left: 10px;
-    }
+    /*.list .ptx .card{*/
+        /*width:78%;*/
+        /*height:180px;*/
+        /*border: 1px solid #ccc;*/
+        /*box-shadow: 2px 2px 7px -2px #ccc;*/
+        /*padding: 5px 3px;*/
+        /*margin: 30px auto 0;*/
+        /*font-size:16px;*/
+    /*}*/
+    /*.list .ptx .card ul li{*/
+        /*line-height: 30px;*/
+        /*vertical-align: middle;*/
+        /*padding: 0 20px;*/
+        /*color: #999;*/
+        /*text-align: left;*/
+    /*}*/
+    /*.list .ptx .card .card-head{*/
+        /*height:40px;*/
+        /*border-bottom: 1px solid #ccc;*/
+    /*}*/
+    /*.list .ptx .card .card-head img{*/
+        /*width:37px;*/
+        /*float: right;*/
+        /*margin-top: -4px;*/
+    /*}*/
+    /*.list .ptx .card .btn{*/
+        /*width:80px;*/
+        /*height:30px;*/
+        /*background-color: #f6b37f;*/
+        /*color: #fff;*/
+        /*border-radius: 3px;*/
+        /*text-align: center;*/
+        /*line-height: 30px;*/
+        /*font-size:18px;*/
+        /*float: right;*/
+        /*cursor: pointer;*/
+    /*}*/
+    /*.list .ptx .card .btn i{*/
+        /*display: block;*/
+        /*width:20px;*/
+        /*float: left;*/
+        /*margin-left: 8px;*/
+    /*}*/
+    /*.list .ptx .card .btn-delete{*/
+        /*width:80px;*/
+        /*height:30px;*/
+        /*color: red;*/
+        /*text-align: center;*/
+        /*line-height: 30px;*/
+        /*font-size:18px;*/
+        /*float: right;*/
+        /*cursor: pointer;*/
+    /*}*/
+    /*.list .ptx .card .btn-delete img{*/
+        /*display: block;*/
+        /*width:18px;*/
+        /*float: left;*/
+        /*margin-top: 5px;*/
+        /*margin-left: 10px;*/
+    /*}*/
 
-    .list .ptx .card .card-head span{
-        font-size:18px;
-        margin-left: 30px;
-        color: #333;
-    }
-    .list .ptx .card ul li .sign{
-        display: inline-block;
-        float: right;
-        color: #fff;
-    }
-    .list .ptx .card ul li .card-money{
-        color: #fe842f;
-        float: right;
-        font-size:18px;
-    }
-    .list .ptx .card ul li .card-val{
-        color: #333;
-        float: right;
-        font-size:18px;
-    }
+    /*.list .ptx .card .card-head span{*/
+        /*font-size:18px;*/
+        /*margin-left: 30px;*/
+        /*color: #333;*/
+    /*}*/
+    /*.list .ptx .card ul li .sign{*/
+        /*display: inline-block;*/
+        /*float: right;*/
+        /*color: #fff;*/
+    /*}*/
+    /*.list .ptx .card ul li .card-money{*/
+        /*color: #fe842f;*/
+        /*float: right;*/
+        /*font-size:18px;*/
+    /*}*/
+    /*.list .ptx .card ul li .card-val{*/
+        /*color: #333;*/
+        /*float: right;*/
+        /*font-size:18px;*/
+    /*}*/
 
     .list li .tit{
         font-size:14px;
@@ -603,16 +492,9 @@
         margin-right: 20px;
         vertical-align: top;
     }
-    .list .hd{
-        width:100%;
-    }
-    .list .hd .ipthd{
-        padding: 5px 30px;
-        font-size:16px;
-        border: none;
-        border-bottom: 2px solid #1a96d4;
-        outline:none;
-        cursor: default;
+    .see{
+        text-decoration: none;
+        color: #1a96d4;
     }
 
     .dialogImageName{

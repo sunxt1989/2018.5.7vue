@@ -62,14 +62,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-
-                <el-pagination
-                    @current-change="changePage"
-                    background
-                    layout="prev, pager, next"
-                    :total='count'>
-                </el-pagination>
-
             </div>
         </div>
     </div>
@@ -79,53 +71,18 @@
     import axios from 'axios'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
 
     export default {
         data() {
             return {
-                tableData: [],//借款单列表数据
-                count:0,//总条目数
-                currentPage:1,//当前页数
-                loading:false,
+                tableData: [],//采购单审批列表数据
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
-            //执行ajax重新获取借款单列表数据
-            axios(){
-                var params = new URLSearchParams();
-                params.append('pageNo',this.currentPage);
-                axios.post('http://192.168.2.190:8080/web/vue/purchase/audit/list.html',params)
-                    .then(response=> {
-                        this.loading = false;
-                        console.log(response);
-                        var data = response.data.value.list;//借款单列表数据
 
-                        this.count = response.data.value.count;//总条目数
-                        var tableDataarr =[];
-                        if(data){
-                            for(var i =0; i < data.length; i++){
-                                data[i].showTaxMoney = number.number(data[i].taxMoney)
-                                data[i].showUnsendMoney = number.number(data[i].unsendMoney)
-                                data[i].showTotalMoney = number.number(data[i].totalMoney)
-                                tableDataarr.push(data[i])
-                            }
-                            console.log(tableDataarr);
-                            this.tableData = tableDataarr;
-                        }
-
-
-                    })
-                    .catch(error=> {
-                        console.log(error);
-                        alert('网络错误，不能访问');
-                    })
-            },
-            //分页器
-            changePage(val){
-                this.currentPage = val;
-                this.axios()
-            }
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -134,7 +91,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -142,19 +99,17 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
-            var params = new URLSearchParams();
-            params.append('pageNo',this.currentPage);
-            axios.post('http://192.168.2.190:8080/web/vue/purchase/audit/list.html',params)
+            var url = addUrl.addUrl('approvalPurchaseList')
+            axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
-                    var data = response.data.value.list;//借款单列表数据
+//                    console.log(response);
+                    var data = response.data.value.list;//采购单审批列表数据
 
-                    this.count = response.data.value.count;//总条目数
                     var tableDataarr =[];
                     if(data){
                         for(var i =0; i < data.length; i++){
@@ -163,12 +118,12 @@
                             data[i].showTotalMoney = number.number(data[i].totalMoney)
                             tableDataarr.push(data[i])
                         }
-                        console.log(tableDataarr);
+//                        console.log(tableDataarr);
                         this.tableData = tableDataarr;
                     }
                 })
                 .catch(error=> {
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 })
         },

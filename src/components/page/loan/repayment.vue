@@ -25,7 +25,7 @@
                             <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney" readonly>
                         </li>
                         <li>
-                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur">
+                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur" maxlength="14">
                         </li>
                         <li>
                             <el-date-picker
@@ -145,7 +145,7 @@
                 params.append('money',money);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         this.loading = false;
                         this.$router.go(-1);
                         this.$message({
@@ -155,7 +155,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
@@ -167,7 +167,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -175,7 +175,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -184,7 +184,7 @@
             params.append('debitId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value
                     this.tableData = data.userDebitItemList;
                     this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
@@ -193,7 +193,7 @@
                 })
                 .catch(error=> {
                     this.loading = false;
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 })
         },

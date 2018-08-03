@@ -73,7 +73,7 @@
                         </li>
                         <li class="pt cf">
                             <span class="tit2">费用描述</span>
-                            <textarea class="tex" v-model="discription" name="" id="">
+                            <textarea class="tex" v-model="discription" maxlength="50">
                             </textarea>
                         </li>
                         <li class="ptx cf">
@@ -282,7 +282,7 @@
                 var removeUrl = file.url;//在删除图片时进行一个判断，根据url看删除的是否是已经上传的图片
                 var urlList = this.attachUrlJson;
                 for(var i = 0; i < urlList.length; i++){
-                    console.log(urlList[i]);
+//                    console.log(urlList[i]);
                     if(urlList[i]){
                         if(removeUrl == urlList[i].url){
                             delete urlList[i];
@@ -427,7 +427,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -435,7 +435,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){

@@ -73,11 +73,11 @@
                 params.append('pageNo', this.currentPage);
                 axios.post(url, params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         this.loading = false;
                         var data = response.data.value;//借款单审批列表数据
                         let tableDataarr =[];
-                        console.log(data);
+//                        console.log(data);
                         if(data){
                             for(var i =0; i < data.debitList.length; i++){
                                 data.debitList[i].showMoney = number.number(data.debitList[i].money);
@@ -100,7 +100,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -108,7 +108,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){

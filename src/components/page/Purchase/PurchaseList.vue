@@ -254,13 +254,13 @@
                 var debitId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('PurchaseListDelete')
-                console.log(debitId);
+//                console.log(debitId);
                 params.append('id',debitId);
 
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         this.axios();
                         this.$message({
                             type: 'success',
@@ -269,7 +269,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
@@ -277,16 +277,15 @@
             getTotal(){
                 var totalMoney = 0;
                 var sendMoney = 0;
-                var unsendMoney = 0;
                 var tol = this.tableData;
                 if(tol){
                     for(var i = 0; i < tol.length; i++){
-                        totalMoney += unNumber.unNumber(tol[i].totalMoney);//含税总价
-                        sendMoney += unNumber.unNumber(tol[i].sendMoney);//已付款
+                        totalMoney += unNumber.unNumber(tol[i].totalMoney) * 100;//含税总价
+                        sendMoney += unNumber.unNumber(tol[i].sendMoney) * 100;//已付款
                     }
                 }
-                totalMoney = number.number(totalMoney)
-                sendMoney = number.number(sendMoney)
+                totalMoney = number.number(totalMoney / 100)
+                sendMoney = number.number(sendMoney / 100)
                 const sums = ['合计','','含税总价：',(totalMoney + '元'),'','已付款：',(sendMoney + '元'),]
                 return sums
             },
@@ -303,7 +302,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -311,7 +310,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -325,7 +324,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value.list
                     this.count = response.data.value.count;//总条目数
 
@@ -342,7 +341,7 @@
                     }
                 })
                 .catch(error=> {
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 })
         },

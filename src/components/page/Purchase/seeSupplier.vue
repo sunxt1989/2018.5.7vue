@@ -43,7 +43,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">固定电话</span>
-                        <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="11">
+                        <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系人</span>
@@ -51,7 +51,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系电话</span>
-                        <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="11">
+                        <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit">紧急联系人</span>
@@ -59,7 +59,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">紧急联系电话</span>
-                        <input class="ipt" type="text" v-model="tradePersonPhone2" maxlength="11">
+                        <input class="ipt" type="text" v-model="tradePersonPhone2" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
@@ -188,7 +188,7 @@
                 },
                 isShowList:true,// 是否显示采购列表 false显示销售列表
                 isState:false,// 是否为未交易状态，如果是则允许修改所以内容
-                loading:false,
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -297,11 +297,7 @@
                     }
                 }
 //
-//                console.log(params);
-//                console.log(supplierFlg);
-//                console.log(customFlg);
-//                console.log(tradeType);
-                console.log(this.debitId);
+//                console.log(this.debitId);
                 var params = new URLSearchParams();
                 params.append('id',this.debitId);
                 params.append('tradeName',tradeName);
@@ -347,7 +343,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -355,16 +351,16 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
-            console.log(this.debitId);
+//            console.log(this.debitId);
             var params = new URLSearchParams();
             params.append('id',this.debitId);
             axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/detail.html',params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value
                     var bankInfo = data.tradeCompany.bankInfo;//银行账户信息
@@ -417,11 +413,11 @@
                         this.IDnumber = tradeIdNumber
                     }
                     //银行账户信息json格式；如果有多个的话，取第一条数据：[{"bankCode":"1511156156122222222"}]
-                    console.log(bankInfo);
+//                    console.log(bankInfo);
                     if(bankInfo){
                         var ob=JSON.parse(bankInfo);
                         this.bankCode = ob[0].bankCode
-                        console.log(this.bankCode);
+//                        console.log(this.bankCode);
                     }
                     //判断身份选择
                     if(customFlg == 1){
@@ -436,8 +432,9 @@
                     }
                 })
                 .catch(error=> {
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
+                    this.loading = false;
                 })
         }
     }

@@ -11,160 +11,216 @@
         <div class="w">
             <div class="content" :style="{height:screenHeight}">
                 <div class="line">
-                    <span>新建采购单</span>
+                    <span>采购单</span>
                 </div>
                 <ul class="list cf">
-                    <li class="hd">
-                        <span class="tit"><span class="red">*</span><span class="bumen">部门</span></span>
-                        <select name="" id="bumen">
-                        </select>
-                    </li>
-                    <li class="sm">
-                        <span class="tit"><span class="red">*</span>供应商</span>
-                        <el-select class="sel" v-model="type" placeholder="请选择">
+                    <li class="hd" v-show="!isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-select class="sel" v-model="department" placeholder="请选择" disabled>
                             <el-option
-                                v-for="item in options"
+                                v-for="item in options4"
                                 :key="item.value"
-                                :label="item[1]"
-                                :value="item[0]">
-                            </el-option>
-                        </el-select>
-                    </li>
-                    <li class="sm" v-show="typeShow">
-                        <span class="tit"><span class="red">*</span>统一社会信用代码</span>
-                        <el-select class="sel" v-model="childType1" placeholder="请选择">
-                            <el-option
-                                v-for="item in optionsSmall"
-                                :key="item.value"
-                                :label="item[1]"
-                                :value="item[0]">
+                                :label="item.name"
+                                :value="item.id">
                             </el-option>
                         </el-select>
                     </li>
 
-                    <li class="sm">
-                        <span class="tit"><span class="red">*</span>地址</span>
-                        <input class="ipt" type="text" v-model="money" >
+                    <li class="sm" v-if="isShowShareItem1" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" readonly>
+                            <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select" disabled>
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
                     </li>
-                    <li class="sm">
-                        <span class="tit">固定电话</span>
-                        <input class="ipt" type="text" v-model="taxMoney" >
+                    <li class="sm" v-if="isShowShareItem2" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" readonly>
+                            <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select" disabled>
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
                     </li>
-                    <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系人</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
+                    <li class="sm" v-if="isShowShareItem3" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" readonly>
+                            <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select" disabled>
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
                     </li>
-                    <li class="sm cf" v-show="destination">
-                        <span class="tit"><span class="red">*</span>联系电话</span>
-                        <el-select class="sel" v-model="aimType" placeholder="请选择" >
-                            <el-option
-                                v-for="item in objective"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                            </el-option>
-                        </el-select>
+                    <li class="sm" v-if="isShowShareItem4" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input4" class="input-with-select"  readonly>
+                            <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select" disabled>
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
                     </li>
-                    <li class="sm cf">
-                        <span class="tit">紧急联系人</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2">紧急联系电话</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit"><span class="red">*</span>采购类别</span>
-                        <el-select class="sel" type="text" v-model="type" @change="typeChange">
-                            <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                            </el-option>
-                        </el-select>
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2"><span class="red">*</span>发票类别</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2"><span class="red">*</span>日期</span>
-                        <el-date-picker
-                            class="iptData"
-                            v-model="debitDate"
-                            type="date"
-                            value-format="yyyy-MM-dd"
-                            :picker-options="pickerOptions1"
-                            placeholder="选择日期">
-                        </el-date-picker>
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2">运输费</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2">装卸费</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2">保险费</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2">其他费用</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2"><span class="red">*</span>含税总价</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
-                    </li>
-                    <li class="sm cf">
-                        <span class="tit2"><span class="red">*</span>不含税总价</span>
-                        <input class="ipt" type="text" v-model="receiptCount">
+                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select" readonly>
+                            <el-select v-model="select5" slot="prepend" placeholder="请选择" class="input-select" disabled>
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                            </el-select>
+                            <template slot="append">%</template>
+                        </el-input>
                     </li>
                 </ul>
 
-                <el-table :data="detailedList" class="grayList">
-                    <el-table-column property="idString" label="" align="center" width="30px">
-                        <template slot-scope="scope">
-                                <span class="checkbox">
-                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox" >
-                                <i class="iconfont icon-31xuanze"></i>
-                            </span>
-                        </template>
-                    </el-table-column>
+                <ul class="list cf">
+                    <li class="sm" style="width:48.2%;">
+                        <span class="tit"><span class="red">*</span>供应商</span>
+                        <el-select class='sel' v-model="tradeName" filterable="" allow-create=""
+                                   default-first-option placeholder="请选择或输入" disabled>
+                            <el-option v-for="item in supplierList"
+                                       :key="item.value"
+                                       :label="item.tradeName"
+                                       :value="item.tradeIdNumber">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li class="sm" >
+                        <span class="tit" style="width:170px;">统一社会信用代码/身份证</span>
+                        <input class="ipt" type="text" v-model="supplierIdNumber" maxlength="18" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">地址</span>
+                        <input class="ipt" type="text" v-model="supplierAddress" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">固定电话</span>
+                        <input class="ipt" type="text" v-model="supplierTelephone" maxlength="15" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit"><span class="red">*</span>联系人</span>
+                        <input class="ipt" type="text" v-model="supplierPerson1" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit"><span class="red">*</span>联系电话</span>
+                        <input class="ipt" type="text" v-model="supplierPersonPhone1" maxlength="15" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">紧急联系人</span>
+                        <input class="ipt" type="text" v-model="supplierPerson2" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit2">紧急联系电话</span>
+                        <input class="ipt" type="text" v-model="supplierPersonPhone2" maxlength="15" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit"><span class="red">*</span>采购类别</span>
+                        <el-select class="sel" type="text" v-model="type" disabled>
+                            <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li class="sm">
+                        <span class="tit2"><span class="red">*</span>发票类别</span>
+                        <el-select class="sel" type="text" v-model="taxFlg" disabled>
+                            <el-option
+                                v-for="item in options2"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li class="sm">
+                        <span class="tit2"><span class="red">*</span>日期</span>
+                        <el-date-picker
+                            class="iptData"
+                            v-model="purchaseDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            :picker-options="pickerOptions1"
+                            placeholder="选择日期" readonly>
+                        </el-date-picker>
+                    </li>
+                    <li class="sm">
+                        <span class="tit2"><span class="red">*</span>含税总价</span>
+                        <input class="ipt" type="text" v-model="totalMoney" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit2"><span class="red">*</span>不含税总价</span>
+                        <input class="ipt" type="text" v-model="unTotalMoney" readonly>
+                    </li>
+                </ul>
 
-                    <el-table-column property="childTypeName" label="类型" align="center"></el-table-column>
-                    <el-table-column property="simpleReceiptDate" label="时间"  align="center"></el-table-column>
-                    <el-table-column property="discription" label="描述" align="center"></el-table-column>
-                    <el-table-column property="operateUserName" label="姓名" align="center"></el-table-column>
+                <div class="line">
+                    <span>采购明细</span>
+                </div>
+                <el-table :data="newList1" class="grayList" v-show="isShowLow">
+                    <el-table-column property="className" label="设备类别" align="center" ></el-table-column>
+                    <el-table-column property="commodityName" label="明细" align="center"></el-table-column>
+                    <el-table-column property="unit" label="单位"  align="center"></el-table-column>
+                    <el-table-column property="count" label="数量" align="center"></el-table-column>
+                    <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
                     <el-table-column property="money" label="金额" align="center"></el-table-column>
+                    <el-table-column property="taxRate" label="税率" align="center"></el-table-column>
+                    <el-table-column property="taxMoney" label="税额" align="center"></el-table-column>
                 </el-table>
-
-                <div class="upload cf">
-                    <span class="tit2">附件</span>
-                    <div class="uploadBox">
-                        <el-upload
-                            action="http://192.168.2.190:8080/web/upload2.html"
-                            list-type="picture-card"
-                            ref="upload"
-                            :show-file-list=true
-                            :limit='limit'
-                            :http-request="myUpload"
-                            :on-preview="handlePictureCardPreview"
-                            :before-upload='beforeAvatarUpload'
-                            :on-exceed="onExceed"
-                            :on-error="onError"
-                            :on-change='onChange'
-                            :on-remove='onRemove'
-                            :auto-upload="false">
-                            <i class="el-icon-plus"></i>
-                        </el-upload>
-                        <el-dialog :visible.sync="dialogVisible">
-                            <h2 class="dialogImageName">{{dialogImageName}}</h2>
-                            <img width="100%" :src="dialogImageUrl" alt="">
-                        </el-dialog>
+                <el-table :data="newList2" class="grayList" v-show="!isShowLow">
+                    <el-table-column property="commodityName" label="明细" align="center"></el-table-column>
+                    <el-table-column property="unit" label="单位"  align="center"></el-table-column>
+                    <el-table-column property="count" label="数量" align="center"></el-table-column>
+                    <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
+                    <el-table-column property="money" label="金额" align="center"></el-table-column>
+                    <el-table-column property="taxRate" label="税率" align="center"></el-table-column>
+                    <el-table-column property="taxMoney" label="税额" align="center"></el-table-column>
+                </el-table>
+                <div class="ptx">
+                    <div class="upload cf">
+                        <span class="tit2">附件</span>
+                        <div class="uploadBox">
+                            <el-upload
+                                action="/"
+                                ref="upload"
+                                :on-preview="handlePictureCardPreview"
+                                list-type="picture-card"
+                                :file-list="attachUrlJson"
+                                disabled>
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                                <h2 class="dialogImageName">{{dialogImageName}}</h2>
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                        </div>
                     </div>
                 </div>
                 <div class="line">
@@ -172,12 +228,11 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
+                        <img :src="item.faceUri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.auditUserName}}</span>
-                            ——
-                            <span class="listDepartment">{{item.auditDepartmentName}}</span>
-                            <span class="listData">{{item.auditTimeYMDHM}}</span>
+                            <span class="listDepartment" v-if="item.auditDepartmentName != ''">——{{item.auditDepartmentName}}</span>
+                            <span class="listData">{{item.simpleAuditTime}}</span>
                         </div>
                         <div class="listFooter">
                             <span class="listState">意见：</span>
@@ -200,7 +255,7 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50">
                             </textarea>
                     </li>
                 </ul>
@@ -212,70 +267,98 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
+
     export default{
         data(){
             return{
-                childType1:'',//费用小类
-                typeShow:false,//是否显示费用小类
-                destination:false,//是否显示目的地
-                money:0,//金额
-                taxMoney:0,//税额
-                debitDate:'',//上传日期（格式修改后的）
-                aimType:'',//出差目的
-                receiptCount:'',//票据张数
-                discription:'',//借款事由
+                options4:[],//报销部门列表
+                isShare:false,//是否分摊
+                isShowShare:true,//是否显示分摊
+                department:'',//报销部门
+                input1:0,
+                input2:0,
+                input3:0,
+                input4:0,
+                input5:0,
+                select1:'',
+                select2:'',
+                select3:'',
+                select4:'',
+                select5:'',
+                isShowShareItem1:true,
+                isShowShareItem2:true,
+                isShowShareItem3:true,
+                isShowShareItem4:true,
+                isShowShareItem5:true,
 
-                rowNumber:1,//明细列表行数（只加不减）
-                deviceList:[],//明细列表，设备类别
-
-                type:'1',//设备类别
-                options:[//费用大类列表
+                debitId:this.$route.params.debitId,
+                tradeName:'',//供应商
+                supplierList:[],//供应商列表
+                supplierIdNumber:'',//统一社会信用代码
+                supplierAddress:'',//地址
+                supplierTelephone:'',//固定电话
+                supplierPerson1:'',//联系人
+                supplierPersonPhone1:'',//联系电话
+                supplierPerson2:'',//紧急联系人
+                supplierPersonPhone2:'',//紧急联系电话
+                type:'1',//采购类别类别
+                options:[//采购类别列表
                     {value:'1',label:'设备'},
-                    {value:'2',label:'材料'},
-                    {value:'3',label:'软件'},
-                    {value:'4',label:'劳务服务'},
-                    {value:'5',label:'技术服务'},
-                    {value:'6',label:'待销商品'},
+                    {value:'2',label:'软件'},
+                    {value:'3',label:'劳务服务'},
+                    {value:'4',label:'技术服务'},
+                    {value:'5',label:'待销商品'},
+                    {value:'11',label:'专利技术'},
+                    {value:'12',label:'非专利技术'},
+                    {value:'13',label:'商标'},
+                    {value:'14',label:'著作权'},
                 ],
+                taxFlg:'1',//发票类别
+                options2:[//发票类别列表
+                    {value:'1',label:'增值税专用发票'},
+                    {value:'2',label:'增值税普通发票'},
+                    {value:'3',label:'增值税电子普通发票'},
+                    {value:'4',label:'未开具发票'},
+                ],
+                purchaseDate:'',//日期
+                totalMoney:'',//含税总价
+                unTotalMoney:'',//不含税总价
+
+                newList1:[],//新建明细列表（设备）
+                newList2:[],//新建明细列表（其他）
+
+                totalMoney1:'',//含税总价1
+                unTotalMoney1:'',//不含税总价1
+
+                totalMoney2:'',//含税总价2
+                unTotalMoney2:'',//不含税总价2
+
                 isShowLow:true,//是否显示明细列表 设备相关信息列
 
-                optionsSmall:[],//费用小类列表
-                objective:[//出差目的
-                    {value:1,label:'工作出差'},
-                    {value:2,label:'参加会议'},
-                    {value:3,label:'参加培训'}
-                ],
-
-
-                discription2:'同意',//审批意见
+                userDebitAuditRecordList:[],//审批意见
                 opinion:'同意',//select框
                 opinionList:[
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
-
+                discription2:'同意',//审批意见
+                attachUrlJson:[],//上传图片展示
                 dialogImageUrl: '',//展示图片URL
                 dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
-                limit:4,//上传图片最大张数
-                punch:0,//打点器,判断是否有图片上传
+
                 fileList:[],//上传成功展示图片参数
 
-                allBase:[],//所有base64格式的地址
-                allName:[],//所有namen名称
-                imgUrl1:'',//上传图片url
-                imgName1:'',//上传图片name
-                imgUrl2:'',
-                imgName2:'',
-                imgUrl3:'',
-                imgName3:'',
-                imgUrl4:'',
-                imgName4:'',
+
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
                     },
                 },
-                loading:false,
+                isAuditPerson:false,//审批流程 true为已审批 false为无人审批
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -284,66 +367,9 @@
             opinionChange(){
                 this.discription2 = this.opinion
             },
-            //设备类别change事件
-            sblbChange(n){
-                var deviceList = $("select[name=deviceList"+ n +"]").val()
-                var unit = $("input[name=unit"+ n +"]")
-                var list = this.deviceList;
-                for(var i = 0; i < list.length; i++){
-                    if(deviceList == list[i].classCode){
-                        unit.val(list[i].unit)
-                    }
-                }
-                console.log(deviceList);
-
-            },
-            //改变金额的change事件
-            moneyChange(n){
-                var count = $("input[name=count"+ n +"]").val()
-                var perPrice = $("input[name=perPrice"+ n +"]").val();
-                var $money =  $("input[name=money"+ n +"]")
-                var money = 0
-                if(count != ''&& perPrice !=''){
-                    money = count * perPrice;
-                }
-                $money.val(money)
-                this.taxMoneyChange(n)
-            },
-            taxMoneyChange(n){
-                console.log('@');
-                var money = $("input[name=money"+ n +"]").val()
-                var taxRate1 = $("select[name=taxRate"+ n +"]").val();
-                var $taxMoney =  $("input[name=taxMoney"+ n +"]")
-                var taxMoney = 0
-                console.log(taxRate1);
-                if(money != ''&& taxRate1 !=''){
-                    taxMoney = money * taxRate1;
-                }
-                $taxMoney.val(taxMoney)
-            },
-
-            //采购类别change事件，当选择设备时明细列表进行修改
-            typeChange(){
-                var type = this.type
-                if(type == '1'){
-                    console.log('true');
-                    this.isShowLow = true
-                }else{
-                    console.log('false');
-                    this.isShowLow = false
-                }
-                console.log(this.isShowLow);
-            },
-            detailedAdd(){
-
-            },
-            detailedDelete(){
-                console.log('@@');
-            },
-
             model(n){
                 if(n == 0){
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                    this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
@@ -353,34 +379,12 @@
 
                     });
                 }else{
-                    if(this.money <= 0){
-                        this.$message.error('请正确输入金额');
-                        this.loading = false;
-                        return
-                    }else if(this.debitDate == ''){
-                        this.$message.error('请正确输入日期');
-                        this.loading = false;
-                        return
-                    }else if(this.type == '' || this.childType1 == ''){
-                        this.$message.error('请正确输入费用类别');
-                        this.loading = false;
-                        return
-                    }else if(this.aimType == ''&& this.type == 1){
-                        this.$message.error('请正确输入出差目的');
-                        this.loading = false;
-                        return
-                    }
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-//                        console.log(this.punch);
-                        if(this.punch != 0){
-                            this.submitUpload();
-                        }else{
-                            this.submit()
-                        }
+                        this.submit(n)
                     }).catch(() => {
                         this.$message({
                             type: 'info',
@@ -389,112 +393,27 @@
                     });
                 }
             },
-            submitUpload(){
-                this.$refs.upload.submit();
-                this.allBase = [];//清空base
-                this.allName = [];//清空name
-            },
-            //限制用户上传图片格式和大小
-            beforeAvatarUpload(file){
-                this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
-                const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
-                    this.loading = false;
-                    this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
-                }
-                if (!isLt4M) {
-                    this.loading = false;
-                    this.$message.error('上传图片大小不能超过 4MB!');
-                }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
-            },
-            onExceed(){
-                this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
-            },
-            onError(){
-                this.loading = false
-                this.$message.error('图片上传失败，请重试！');
-            },
-            onChange(){
-                this.punch++;
-            },
-            onRemove(){
-                this.punch--;
-            },
-            //url转换base方法
-            readBlobAsDataURL(blob, callback) {
-//                console.log(blob);
-                var fileReader = new FileReader();
-                fileReader.onload = function(e){
-                    callback(e.target.result);
-                };
-                fileReader.readAsDataURL(blob);
-            },
-            myUpload(content){
-//                console.log(content);
-                var file = content.file;
-                var _this = this;
-                this.readBlobAsDataURL(file,function (dataurl){
-                    _this.allBase.push(dataurl);
-                    _this.allName.push(file.name);
-                    if(_this.allBase.length == _this.punch){
-                        _this.submit()
-                    }
-                });
-                this.allName.push(file.name);
-            },
+
             //上传图片缩略图信息赋值
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
                 this.dialogImageName = file.name;
                 this.dialogVisible = true;
             },
-            submit(){
+            submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
-//                console.log(this.money);
-//                console.log(this.allName);
-
-                this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
-                this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
-                this.imgUrl3 = this.allBase[2] ? this.allBase[2] : '';
-                this.imgUrl4 = this.allBase[3] ? this.allBase[3] : '';
-
-                this.imgName1 = this.allName[0] ? this.allName[0] : '';
-                this.imgName2 = this.allName[1] ? this.allName[1] : '';
-                this.imgName3 = this.allName[2] ? this.allName[2] : '';
-                this.imgName4 = this.allName[3] ? this.allName[3] : '';
-//                console.log(this.type,'type');
-//                console.log(this.childType1,'childType1');
-//                console.log(this.money,'money');
-//                console.log(this.taxMoney,'taxMoney');
-//                console.log(this.aimType,'aimType');
-//                console.log(this.discription,'discription');
-//                console.log(this.receiptCount,'receiptCount');
-//                console.log(this.debitDate,'debitDate');
-                params.append('debitId',0);
-                params.append('type',this.type);
-                params.append('childType1',this.childType1);
-                params.append('money',this.money);
-                params.append('taxMoney',this.taxMoney);
-                params.append('aimType',this.aimType);
-                params.append('discription',this.discription);
-                params.append('receiptCount',this.receiptCount);
-                params.append('receiptDate',this.debitDate);
-
-                params.append('imgUrl1',this.imgUrl1);
-                params.append('imgName1',this.imgName1);
-                params.append('imgUrl2',this.imgUrl2);
-                params.append('imgName2',this.imgName2);
-                params.append('imgUrl3',this.imgUrl3);
-                params.append('imgName3',this.imgName3);
-                params.append('imgUrl4',this.imgUrl4);
-                params.append('imgName4',this.imgName4);
-
+                params.append('purchaseId',this.debitId);
+                params.append('discription',this.discription2);
+                var url = '';
+                if(n == 1){
+                    url = addUrl.addUrl('approvalPurchaseAgree')
+                }else if(n == 2){
+                    url = addUrl.addUrl('approvalPurchaseRefuse')
+                }
                 axios({
                     method:'post',
-                    url:'http://192.168.2.190:8080/web/vue/expense/save.html',
+                    url:url,
                     data:params,
                     headers:{
                         'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
@@ -502,7 +421,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -516,14 +435,43 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
 
         },
         watch:{
+            newList1:function(val){
+//                console.log(val);
+                var totalMoney = 0;
+                var unTotalMoney = 0;
+                for(var i = 0; i < val.length; i++){
+                    unTotalMoney += unNumber.unNumber(val[i].money);
+                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                }
+                totalMoney += unTotalMoney;
+                this.totalMoney1 = number.number(totalMoney);
+                this.unTotalMoney1 = number.number(unTotalMoney);
 
+                this.totalMoney = this.totalMoney1
+                this.unTotalMoney = this.unTotalMoney1
+            },
+            newList2:function(val){
+//                console.log(val);
+                var totalMoney = 0;
+                var unTotalMoney = 0;
+                for(var i = 0; i < val.length; i++){
+                    unTotalMoney += unNumber.unNumber(val[i].money);
+                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                }
+                totalMoney += unTotalMoney;
+                this.totalMoney2 = number.number(totalMoney);
+                this.unTotalMoney2 = number.number(unTotalMoney);
+
+                this.totalMoney = this.totalMoney2
+                this.unTotalMoney = this.unTotalMoney2
+            },
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -532,7 +480,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -540,39 +488,108 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
-            axios.post('http://192.168.2.190:8080/web/vue/purchase/add.html')
+            var params = new URLSearchParams();
+            var url = addUrl.addUrl('seePurchase')
+            params.append('id',this.debitId);
+            axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
-                    var data = response.data.value;
-                    //设置部门
-                    var departmentList = data.departmentList;
-                    var departmentListHtml =''
-                    for(var i = 0; i < departmentList.length; i++){
-                        var id = departmentList[i].idStr
-                        var name = departmentList[i].departmentName
-                        departmentListHtml +='<option value="'+ id +'">'+ name +'</option>'
+//                    console.log(response);
+                    var status = response.data.status
+                    if(status == 200){
+                        var data = response.data.value;
+                        //设置部门
+                        this.options4 = data.departmentList;
+                        this.supplierList = data.supplierList;
+                        this.userDebitAuditRecordList = data.auditRecordList;
+
+                        this.attachUrlJson = data
+
+                        var purchase = data.purchase
+                        this.tradeName = purchase.supplierName;
+                        this.supplierIdNumber = purchase.supplierIdNumber;
+                        this.supplierAddress = purchase.supplierAddress;
+                        this.supplierTelephone = purchase.supplierTelephone;
+                        this.supplierPerson1 = purchase.supplierPerson1;
+                        this.supplierPersonPhone1 = purchase.supplierPersonPhone1;
+                        this.supplierPerson2 = purchase.supplierPerson2;
+                        this.supplierPersonPhone2 = purchase.supplierPersonPhone2;
+                        this.taxFlg = String(purchase.taxFlg);
+                        this.attachUrlJson = purchase.attachUrlJson;
+
+                        this.purchaseDate = purchase.simplePurchaseDate;
+                        var type = purchase.type;
+                        var purchaseItemList = purchase.purchaseItemList
+
+                        for(let i = 0; i < purchaseItemList.length; i++){
+                            purchaseItemList[i].money = number.number(purchaseItemList[i].noTaxMoney)
+                            purchaseItemList[i].perPrice = number.number(purchaseItemList[i].perPrice)
+                            purchaseItemList[i].taxMoney = number.number(purchaseItemList[i].taxMoney)
+                        }
+                        if(type == 1){
+                            this.isShowLow = true
+                            this.newList1 = purchase.purchaseItemList
+                        }else{
+                            this.isShowLow = false
+                            this.newList2 = purchase.purchaseItemList
+                        }
+                        this.type = String(type)
+                        var auditPerson = purchase.auditPerson
+                        //审批流程 true为已审批 false为无人审批
+                        if(auditPerson == 1){
+                            this.isAuditPerson = true
+                            this.isShowShare = false
+                            if(data.purchase.departmentIdString1 == '0' || data.purchase.departmentIdString1 == 'null'){
+                                this.isShowShareItem1 = false
+                            }
+                            if(data.purchase.departmentIdString2 == '0' || data.purchase.departmentIdString2 == 'null'){
+                                this.isShowShareItem2 = false
+                            }
+                            if(data.purchase.departmentIdString3 == '0' || data.purchase.departmentIdString3 == 'null'){
+                                this.isShowShareItem3 = false
+                            }
+                            if(data.purchase.departmentIdString4 == '0' || data.purchase.departmentIdString4 == 'null'){
+                                this.isShowShareItem4 = false
+                            }
+                            if(data.purchase.departmentIdString5 == '0' || data.purchase.departmentIdString5 == 'null'){
+                                this.isShowShareItem5 = false
+                            }
+                        }else if(auditPerson == 0){
+                            this.isAuditPerson = false
+                            this.isShowShare = true;
+                        }
+
+                        var divideFlg = data.purchase.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊
+                        if(divideFlg ==0){
+                            this.isShare = false
+                            this.department = data.purchase.departmentIdString1
+                        }else{
+                            this.isShare = true;
+                            this.select1 = data.purchase.departmentIdString1
+                            this.select2 = data.purchase.departmentIdString2
+                            this.select3 = data.purchase.departmentIdString3
+                            this.select4 = data.purchase.departmentIdString4
+                            this.select5 = data.purchase.departmentIdString5
+
+                            this.input1 = data.purchase.projectDivRate || 0
+                            this.input2 = data.purchase.projectDivRate2 || 0
+                            this.input3 = data.purchase.projectDivRate3 || 0
+                            this.input4 = data.purchase.projectDivRate4 || 0
+                            this.input5 = data.purchase.projectDivRate5 || 0
+                        }
+                    }else if(status == 400){
+                        var str = response.data.msg
+                        this.$message.error(str);
                     }
-                    $('#bumen').html(departmentListHtml);
-                    //
-                    var deviceList = data.deviceList;
-                    var deviceListHtml =''
-                    for(var ii = 0; ii < deviceList.length; ii++){
-                        var id = deviceList[ii].classCode
-                        var name = deviceList[ii].className
-                        this.deviceList.push(deviceList[ii])
-                        deviceListHtml +='<option value="'+ id +'">'+ name +'</option>'
-                    }
-                    $("select[name=deviceList1]").html(deviceListHtml);
                     this.loading = false
                 })
                 .catch(error=> {
                     this.loading = false
 
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         },
@@ -607,16 +624,6 @@
         position: absolute;
         right:190px;
         font-size:12px;
-    }
-    .bumen{
-        font-size:20px;
-        color: #1a96d4;
-    }
-    #bumen{
-        border: none;
-        border-bottom: 2px solid #1a96d4;
-        padding: 5px 10px;
-        outline:none;
     }
 
     .content{
@@ -856,5 +863,22 @@
     }
     .grayList{
         margin: 30px 0;
+    }
+    .list li .input-with-select{
+        font-size:14px;
+        width:322px;
+        text-align: right;
+    }
+
+    .list .hd{
+        width:100%;
+    }
+    .share{
+        display: block;
+        margin-top: 10px;
+        margin-left: 80px;
+    }
+    .input-select{
+        width:200px;
     }
 </style>

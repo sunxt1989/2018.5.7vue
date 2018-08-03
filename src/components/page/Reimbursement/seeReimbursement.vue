@@ -150,7 +150,7 @@
                     </li>
                     <li class="pt cf">
                         <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" :readonly="isReadonly">
+                            <textarea class="tex" v-model="discription" maxlength="50" :readonly="isReadonly">
                             </textarea>
                     </li>
                 </ul>
@@ -341,8 +341,15 @@
                     });
                 }else if(n == 1){
                     if(this.isShare){
+                        let input1 = Number(this.input1)
+                        let input2 = Number(this.input2)
+                        let input3 = Number(this.input3)
+                        let input4 = Number(this.input4)
+                        let input5 = Number(this.input5)
+                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+//                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
-                        if((Number(this.input1) + Number(this.input2) + Number(this.input3) + Number(this.input4) + Number(this.input5)) != 100 ){
+                        if(allInput/100 != 100 ){
                             this.$message.error('请正确输入分摊比例');
                             this.loading = false;
                             return
@@ -377,8 +384,15 @@
                     });
                 }else if(n ==2){
                     if(this.isShare){
+                        let input1 = Number(this.input1)
+                        let input2 = Number(this.input2)
+                        let input3 = Number(this.input3)
+                        let input4 = Number(this.input4)
+                        let input5 = Number(this.input5)
+                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+//                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
-                        if((Number(this.input1) + Number(this.input2) + Number(this.input3) + Number(this.input4) + Number(this.input5)) != 100 ){
+                        if(allInput/100 != 100 ){
                             this.$message.error('请正确输入分摊比例');
                             this.loading = false;
                             return
@@ -540,7 +554,7 @@
                     departmentJson.push(item6[0])
                 }
                 departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
-                console.log(departmentJson);
+//                console.log(departmentJson);
 
                 if(n == 1){
                     url = saveUrl
@@ -698,7 +712,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -706,7 +720,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -718,7 +732,7 @@
                 .then(response=> {
                     this.loading = false;
                     var data = response.data.value;
-                    console.log(data);
+//                    console.log(data);
                     this.originalTypeName = data.application.originalTypeName
                     this.type = data.application.type
                     this.money = number.number(data.application.money)
@@ -765,11 +779,11 @@
                         this.select4 = data.application.departmentIdString4
                         this.select5 = data.application.departmentIdString5
 
-                        this.input1 = data.application.projectDivRate
-                        this.input2 = data.application.projectDivRate2
-                        this.input3 = data.application.projectDivRate3
-                        this.input4 = data.application.projectDivRate4
-                        this.input5 = data.application.projectDivRate5
+                        this.input1 = data.application.projectDivRate || 0
+                        this.input2 = data.application.projectDivRate2 || 0
+                        this.input3 = data.application.projectDivRate3 || 0
+                        this.input4 = data.application.projectDivRate4 || 0
+                        this.input5 = data.application.projectDivRate5 || 0
                         if(data.application.departmentIdString1 == '0' || data.application.departmentIdString1 == 'null'){
                             this.isShowShareItem1 = false
                         }
@@ -788,7 +802,7 @@
                     }
 
                     var index= this.auditFlg;
-                    console.log(index);
+//                    console.log(index);
                     //当index 0 未提交 1 驳回； 显示 ‘添加费用单’按钮
 //                    console.log(this.auditPerson);
                     if(index < 2){
@@ -1090,7 +1104,7 @@
         margin-left: 80px;
     }
     .input-select{
-        width:220px;
+        width:200px;
     }
 
 </style>

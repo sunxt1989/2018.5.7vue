@@ -19,61 +19,83 @@
                 </el-button>
                 <ul class="list cf">
                     <li class="hd" v-show="!isShare">
-                        <span class="tit"><span class="red">*</span><span class="bumen">部门</span></span>
-                        <select name="" id="bumen">
-                        </select>
+                        <span class="tit"><span class="red">*</span>部门/项目</span>
+                        <el-select class="sel" v-model="department" placeholder="请选择">
+                            <el-option
+                                v-for="item in options4"
+                                :key="item.value"
+                                :label="item.name"
+                                :value="item.id">
+                            </el-option>
+                        </el-select>
                     </li>
+
                     <li class="sm" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
-                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select">
-                            <el-select v-model="select" slot="prepend" placeholder="请选择" class="input-select">
-                                <el-option label="餐厅名" value="1"></el-option>
-                                <el-option label="订单号" value="2"></el-option>
-                                <el-option label="用户电话" value="3"></el-option>
+                        <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" @change="inputWithSelectChange(1,$event)">
+                            <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select">
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
                             </el-select>
                             <template slot="append">%</template>
                         </el-input>
                     </li>
                     <li class="sm" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
-                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select">
-                            <el-select v-model="select" slot="prepend" placeholder="请选择" class="input-select">
-                                <el-option label="餐厅名" value="1"></el-option>
-                                <el-option label="订单号" value="2"></el-option>
-                                <el-option label="用户电话" value="3"></el-option>
+                        <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" @change="inputWithSelectChange(2,$event)">
+                            <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select">
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
                             </el-select>
                             <template slot="append">%</template>
                         </el-input>
                     </li>
                     <li class="sm" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
-                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select">
-                            <el-select v-model="select" slot="prepend" placeholder="请选择" class="input-select">
-                                <el-option label="餐厅名" value="1"></el-option>
-                                <el-option label="订单号" value="2"></el-option>
-                                <el-option label="用户电话" value="3"></el-option>
+                        <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" @change="inputWithSelectChange(3,$event)">
+                            <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select">
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
                             </el-select>
                             <template slot="append">%</template>
                         </el-input>
                     </li>
                     <li class="sm" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
-                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select">
-                            <el-select v-model="select" slot="prepend" placeholder="请选择" class="input-select">
-                                <el-option label="餐厅名" value="1"></el-option>
-                                <el-option label="订单号" value="2"></el-option>
-                                <el-option label="用户电话" value="3"></el-option>
+                        <el-input placeholder="分摊比例" v-model="input4" class="input-with-select" @change="inputWithSelectChange(4,$event)">
+                            <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select">
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
                             </el-select>
                             <template slot="append">%</template>
                         </el-input>
                     </li>
                     <li class="sm" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
-                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select">
-                            <el-select v-model="select" slot="prepend" placeholder="请选择" class="input-select">
-                                <el-option label="餐厅名" value="1"></el-option>
-                                <el-option label="订单号" value="2"></el-option>
-                                <el-option label="用户电话" value="3"></el-option>
+                        <el-input placeholder="分摊比例" v-model="input5" class="input-with-select" @change="inputWithSelectChange(5,$event)">
+                            <el-select v-model="select5" slot="prepend" placeholder="请选择" class="input-select">
+                                <el-option
+                                    v-for="item in options4"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
                             </el-select>
                             <template slot="append">%</template>
                         </el-input>
@@ -104,7 +126,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">固定电话</span>
-                        <input class="ipt" type="text" v-model="supplierTelephone" maxlength="11">
+                        <input class="ipt" type="text" v-model="supplierTelephone" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系人</span>
@@ -112,7 +134,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系电话</span>
-                        <input class="ipt" type="text" v-model="supplierPersonPhone1" maxlength="11">
+                        <input class="ipt" type="text" v-model="supplierPersonPhone1" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit">紧急联系人</span>
@@ -120,7 +142,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit2">紧急联系电话</span>
-                        <input class="ipt" type="text" v-model="supplierPersonPhone2" maxlength="11">
+                        <input class="ipt" type="text" v-model="supplierPersonPhone2" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>采购类别</span>
@@ -188,11 +210,11 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
-                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange">
+                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange(2)" >
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>金额</span>
@@ -216,7 +238,7 @@
 
                         <li class="pt cf">
                             <span class="tit3"><span class="red">*</span>明细</span>
-                            <textarea class="tex" v-model="newDetailed" >
+                            <textarea class="tex" v-model="newDetailed" maxlength="50">
                             </textarea>
                         </li>
                     </ul>
@@ -244,11 +266,11 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
-                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange">
+                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange(2)">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>金额</span>
@@ -272,7 +294,7 @@
 
                         <li class="pt cf">
                             <span class="tit3"><span class="red">*</span>明细</span>
-                            <textarea class="tex" v-model="newDetailed" >
+                            <textarea class="tex" v-model="newDetailed" maxlength="50">
                             </textarea>
                         </li>
                     </ul>
@@ -287,7 +309,11 @@
                     <el-table-column property="count" label="数量" align="center"></el-table-column>
                     <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
                     <el-table-column property="money" label="金额" align="center"></el-table-column>
-                    <el-table-column property="taxRate" label="税率" align="center"></el-table-column>
+                    <el-table-column property="taxRate" label="税率" align="center">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.taxRate}}%</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column property="taxMoney" label="税额" align="center"></el-table-column>
                     <el-table-column property="" label="操作" align="center">
                         <template slot-scope="scope">
@@ -306,7 +332,11 @@
                     <el-table-column property="count" label="数量" align="center"></el-table-column>
                     <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
                     <el-table-column property="money" label="金额" align="center"></el-table-column>
-                    <el-table-column property="taxRate" label="税率" align="center"></el-table-column>
+                    <el-table-column property="taxRate" label="税率" align="center">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.taxRate}}%</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column property="taxMoney" label="税额" align="center"></el-table-column>
                     <el-table-column property="" label="操作" align="center">
                         <template slot-scope="scope">
@@ -359,9 +389,21 @@
     export default{
         data(){
             return{
-                input5:'',
-                select:'',
-                isShare:true,//是否为分摊状态
+                n:'',//保存提交按钮参数
+                department:'',//报销部门
+                input1:0,
+                input2:0,
+                input3:0,
+                input4:0,
+                input5:0,
+                select1:'',
+                select2:'',
+                select3:'',
+                select4:'',
+                select5:'',
+                isShare:false,//是否分摊
+                options4:[],//报销部门列表
+
 
                 tradeName:'',//供应商
                 supplierList:[],//供应商列表
@@ -413,7 +455,7 @@
                 newNum:1,//数量(明细列表)
                 newUnitPrice:'0.00',//单价(明细列表)
                 newMoney:'0.00',//金额(明细列表)
-                newTaxRate:'0.00',//税率(明细列表)
+                newTaxRate:0,//税率(明细列表)
                 options3:[//发票类别列表
                     {value:0,label:'免税'},
                     {value:3,label:'3%'},
@@ -459,7 +501,7 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                loading:false,
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -504,6 +546,23 @@
             }
         },
         methods: {
+            inputWithSelectChange(n,$event){
+                var str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
+                if(!(str.test($event) && $event >= 0 && $event <= 100)){
+                    this.$message.error('请正确输入百分比');
+                    if(n == 1){
+                        this.input1 = 0
+                    }else if(n == 2){
+                        this.input2 = 0
+                    }else if(n == 3){
+                        this.input3 = 0
+                    }else if(n == 4){
+                        this.input4 = 0
+                    }else if(n == 5){
+                        this.input5 = 0
+                    }
+                }
+            },
             //分摊按钮
             shareClick(){
                 this.isShare = !this.isShare
@@ -514,7 +573,7 @@
                 var supplierList = this.supplierList
                 console.log(supplierList);
                 for(var i = 0; i < supplierList.length; i++){
-                    if(tradeName == supplierList[i].tradeName){
+                    if(tradeName == supplierList[i].tradeName || tradeName == supplierList[i].tradeIdNumber){
                         this.supplierIdNumber = supplierList[i].tradeIdNumber;
                         this.supplierTelephone = supplierList[i].tradeTelephone;
                         this.supplierPerson1 = supplierList[i].tradePerson1;
@@ -557,7 +616,7 @@
                         this.newDetailed ='';
                         this.newUnitPrice = '0.00';
                         this.newNum = 1;
-                        this.newTaxRate = '0.00';
+                        this.newTaxRate = 0;
                         this.newMoney = '0.00';
                         this.newTaxAmount = 0;
                         this.newUnit ='';
@@ -626,7 +685,7 @@
                             this.newDetailed ='';
                             this.newUnitPrice = '0.00';
                             this.newNum = 1;
-                            this.newTaxRate = '0.00';
+                            this.newTaxRate = 0;
                             this.newMoney = '0.00';
                             this.newTaxAmount = 0;
                             this.newUnit ='';
@@ -671,7 +730,7 @@
                             this.newDetailed ='';
                             this.newUnitPrice = '0.00';
                             this.newNum = 1;
-                            this.newTaxRate = '0.00';
+                            this.newTaxRate = 0;
                             this.newMoney = '0.00';
                             this.newTaxAmount = 0;
                             this.newUnit ='';
@@ -692,7 +751,7 @@
                         this.newDetailed ='';
                         this.newUnitPrice = '0.00';
                         this.newNum = 1;
-                        this.newTaxRate = '0.00';
+                        this.newTaxRate = 0;
                         this.newMoney = '0.00';
                         this.newTaxAmount = 0;
                         this.newUnit ='';
@@ -747,7 +806,7 @@
                         this.newDetailed ='';
                         this.newUnitPrice = '0.00';
                         this.newNum = 1;
-                        this.newTaxRate = '0.00';
+                        this.newTaxRate = 0;
                         this.newMoney = '0.00';
                         this.newTaxAmount = 0;
                         this.newUnit ='';
@@ -820,7 +879,7 @@
                             this.newDetailed ='';
                             this.newUnitPrice = '0.00';
                             this.newNum = 1;
-                            this.newTaxRate = '0.00';
+                            this.newTaxRate = 0;
                             this.newMoney = '0.00';
                             this.newTaxAmount = 0;
                             this.newUnit ='';
@@ -860,7 +919,7 @@
                             this.newDetailed ='';
                             this.newUnitPrice = '0.00';
                             this.newNum = 1;
-                            this.newTaxRate = '0.00';
+                            this.newTaxRate = 0;
                             this.newMoney = '0.00';
                             this.newTaxAmount = 0;
                             this.newUnit ='';
@@ -885,9 +944,7 @@
                         }
                     }
                     this.newList1 = newList1
-                    console.log(this.newList1);
                 }).catch(() => {
-                    console.log('@@');
                     this.$message({
                         type: 'info',
                         message: '取消删除'
@@ -927,45 +984,58 @@
                 }
             },
             //改变金额的change事件
-            moneyChange(){
+            moneyChange(n){
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
-                var newUnitPrice = this.newUnitPrice;
-                if(this.isShowLow){
-                    if(!str.test(newNum)){
-                        this.$message.error('请正确输入数量');
-                        this.newNum = 1;
-                        return
-                    }else if(!str2.test(newUnitPrice)){
-                        this.$message.error('请正确输入单价');
-                        this.newUnitPrice = '0.00';
-                        return
+                var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
+                if(n == 1){
+                    if(!this.isShowCount){
+                        if(!str.test(newNum)){
+                            this.$message.error('请正确输入数量');
+                            this.newNum = 1;
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.taxMoneyChange()
+                    }else{
+                        this.newUnitPrice  = number.number(newUnitPrice);
+                        this.newMoney = number.number(newUnitPrice);
+                        this.taxMoneyChange()
                     }
-                    this.newUnitPrice  = number.number(newUnitPrice);
-                    this.newMoney = number.number(this.newNum * newUnitPrice);
-                    this.taxMoneyChange()
-                }else{
-                    if(!str2.test(newUnitPrice)){
-                        this.$message.error('请正确输入单价');
-                        this.newUnitPrice = '0.00';
-                        return
+                }else if(n == 2){
+                    if(!this.isShowCount){
+                        if(!str2.test(newUnitPrice)){
+                            this.$message.error('请正确输入单价');
+                            this.newUnitPrice = '0.00';
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.taxMoneyChange()
+                    }else{
+                        if(!str2.test(newUnitPrice)){
+                            this.$message.error('请正确输入单价');
+                            this.newUnitPrice = '0.00';
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice);
+                        this.newMoney = number.number(newUnitPrice);
+                        this.taxMoneyChange()
                     }
-                    this.newUnitPrice  = number.number(newUnitPrice);
-                    this.newMoney = number.number(newUnitPrice);
-                    this.taxMoneyChange()
                 }
-
             },
             //改变税额的change事件
             taxMoneyChange(){
                 var newMoney = unNumber.unNumber(this.newMoney);
                 var newTaxRate = unNumber.unNumber(this.newTaxRate);
-               this.newTaxAmount = number.number(newMoney * newTaxRate / 100)
+                this.newTaxAmount = number.number(newMoney * newTaxRate / 100)
             },
             //after模态框事件
 
             model(n){
+                this.n = n;
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -977,6 +1047,29 @@
 
                     });
                 }else{
+                    //是否为分摊状态
+                    if(this.isShare){
+                        let input1 = Number(this.input1)
+                        let input2 = Number(this.input2)
+                        let input3 = Number(this.input3)
+                        let input4 = Number(this.input4)
+                        let input5 = Number(this.input5)
+                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+                        //判断所有填写的百分比是不是等于100
+                        if(allInput/100 != 100 ){
+                            this.$message.error('请正确输入分摊比例');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        //没有分摊时是否填写了部门/项目
+                        if(this.department == ''){
+                            this.$message.error('请选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                    }
+
                     if(this.tradeName == ''){
                         this.$message.error('请正确输入供应商');
                         this.loading = false;
@@ -1010,24 +1103,93 @@
                         this.loading = false;
                         return
                     }
-
-                    this.$confirm('确定是否提交？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-//                        console.log(this.punch);
-                        if(this.punch != 0){
-                            this.submitUpload(n);
-                        }else{
-                            this.submit(n)
-                        }
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '已取消'
+                    //判断点击是保存还是提交 1为保存 2为提交
+                    if(n == 1){
+                        this.$confirm('确定是否提交？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+//                            console.log(this.punch);
+                            if(this.punch != 0){
+                                this.submitUpload(n);
+                            }else{
+                                this.submit(n)
+                            }
+                        }).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取消'
+                            });
                         });
-                    });
+                    }else if(n == 2){
+                        if(this.type == 1){
+                            let newList1 = this.newList1;
+                            let isFixed =false;
+                            for(let i = 0; i < newList1.length; i++){
+                                if((unNumber.unNumber(newList1[i].perPrice)) >= 2000){
+                                    isFixed = true
+                                }
+                            }
+                            if(isFixed){
+                                this.$confirm('固定资产单价超过2000元，如需进行分配，请在固定资产管理模块下进行,确定是否提交？', '提示', {
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+//                                    console.log(this.punch);
+                                    if(this.punch != 0){
+                                        this.submitUpload(n);
+                                    }else{
+                                        this.submit(n)
+                                    }
+                                }).catch(() => {
+                                    this.$message({
+                                        type: 'info',
+                                        message: '已取消'
+                                    });
+                                });
+                            }else{
+                                this.$confirm('确定是否提交？', '提示', {
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+//                                    console.log(this.punch);
+                                    if(this.punch != 0){
+                                        this.submitUpload(n);
+                                    }else{
+                                        this.submit(n)
+                                    }
+                                }).catch(() => {
+                                    this.$message({
+                                        type: 'info',
+                                        message: '已取消'
+                                    });
+                                });
+                            }
+                        }else{
+                            this.$confirm('确定是否提交？', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+//                                console.log(this.punch);
+                                if(this.punch != 0){
+                                    this.submitUpload(n);
+                                }else{
+                                    this.submit(n)
+                                }
+                            }).catch(() => {
+                                this.$message({
+                                    type: 'info',
+                                    message: '已取消'
+                                });
+                            });
+                        }
+
+                    }
+
                 }
             },
             submitUpload(n){
@@ -1072,19 +1234,19 @@
                 };
                 fileReader.readAsDataURL(blob);
             },
-            myUpload(content,n){
-                console.log(content);
+            myUpload(content){
+//                console.log(content);
                 var file = content.file;
                 var _this = this;
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
                     if(_this.allBase.length == _this.punch){
-                        _this.submit()
+                        _this.submit(_this.n)
                     }
                 });
                 this.allName.push(file.name);
-                console.log(this.allName);
+//                console.log(this.allName);
             },
             //上传图片缩略图信息赋值
             handlePictureCardPreview(file) {
@@ -1095,10 +1257,12 @@
             submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
-                var departmentId = $('#bumen').val();
                 var type = this.type;
                 var purchaseItems = '';
                 var commodityName = '';
+                var departmentJson = [] ;
+                var options = this.options4;
+                var totalMoney = unNumber.unNumber(this.totalMoney)
 
                 var newList1 = this.newList1;
                 for(var i = 0; i < newList1.length; i++){
@@ -1116,10 +1280,116 @@
                 if(type == '1'){
                     commodityName = newList1[0].className
                     purchaseItems = JSON.stringify(newList1)
-                }else if(type == '2'){
+                }else{
                     commodityName = newList2[0].className
                     purchaseItems = JSON.stringify(newList2)
                 }
+                if(this.isShare){
+                    if (this.input1 != 0 && this.select1 != '') {
+                        let item1 = options.filter(x =>{
+                            return x.id == this.select1
+                        })
+
+                        item1[0].rate = this.input1;
+//                        console.log(item1[0]);
+                        for(let i in departmentJson){
+                            if(departmentJson[i].id == this.select1){
+                                this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                this.loading = false;
+                                return
+                            }
+                        }
+                        departmentJson.push(item1[0])
+                    }else if(this.input1 != 0 && this.select1 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input2 != 0 && this.select2 != '') {
+                        let item2 = options.filter(x =>{
+                            return x.id == this.select2
+                        })
+                        item2[0].rate = this.input2;
+                        for(let i in departmentJson){
+                            if(departmentJson[i].id == this.select2){
+                                this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                this.loading = false;
+                                return
+                            }
+                        }
+                        departmentJson.push(item2[0])
+
+                    }else if(this.input2 != 0 && this.select2 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input3 != 0 && this.select3 != '') {
+                        let item3 = options.filter(x =>{
+                            return x.id == this.select3
+                        })
+                        item3[0].rate = this.input3;
+                        for(let i in departmentJson){
+                            if(departmentJson[i].id == this.select3){
+                                this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                this.loading = false;
+                                return
+                            }
+                        }
+                        departmentJson.push(item3[0])
+                    }else if(this.input3 != 0 && this.select3 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input4 != 0 && this.select4 != '') {
+                        let item4 = options.filter(x =>{
+                            return x.id == this.select4
+                        })
+                        item4[0].rate = this.input4;
+                        for(let i in departmentJson){
+                            if(departmentJson[i].id == this.select4){
+                                this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                this.loading = false;
+                                return
+                            }
+                        }
+                        departmentJson.push(item4[0])
+                    }else if(this.input4 != 0 && this.select4 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+
+                    if (this.input5 != 0 && this.select5 != '') {
+                        let item5 = options.filter(x =>{
+                            return x.id == this.select5
+                        })
+                        item5[0].rate = this.input5;
+                        for(let i in departmentJson){
+                            if(departmentJson[i].id == this.select5){
+                                this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                this.loading = false;
+                                return
+                            }
+                        }
+                        departmentJson.push(item5[0])
+                    }else if(this.input5 != 0 && this.select5 == ''){
+                        this.$message.error('请正确选择部门/项目');
+                        this.loading = false;
+                        return
+                    }
+                } else {
+                    let item6 = options.filter(x =>{
+                        return x.id == this.department
+                    })
+                    departmentJson.push(item6[0])
+                }
+                departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
+//                console.log(departmentJson);
 
                 this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
                 this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
@@ -1131,8 +1401,7 @@
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
 
-                console.log(purchaseItems);
-                console.log(typeof purchaseItems);
+//                console.log(this.totalMoney);
 
                 params.append('supplierName',this.tradeName);
                 params.append('supplierIdNumber',this.supplierIdNumber);
@@ -1142,13 +1411,14 @@
                 params.append('supplierPersonPhone1',this.supplierPersonPhone1);
                 params.append('supplierPerson2',this.supplierPerson2);
                 params.append('supplierPersonPhone2',this.supplierPersonPhone2);
-                params.append('departmentId',departmentId);
+                params.append('departmentJson',departmentJson);
                 params.append('commodityName',commodityName);
                 params.append('type',type);
                 params.append('taxFlg',this.taxFlg);
-                params.append('totalMoney',this.totalMoney);
+                params.append('totalMoney',totalMoney);
                 params.append('purchaseId','');
                 params.append('purchaseItems',purchaseItems);
+                params.append('purchaseDate',this.purchaseDate);
 
                 params.append('imgUrl1',this.imgUrl1);
                 params.append('imgName1',this.imgName1);
@@ -1167,6 +1437,7 @@
                 }else if(n == 2){
                     url = submitUrl
                 }
+//                console.log(url);
                 axios({
                     method:'post',
                     url:url,
@@ -1177,7 +1448,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -1191,7 +1462,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
@@ -1203,7 +1474,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -1211,38 +1482,29 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
             var url = addUrl.addUrl('newPurchase')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     //设置部门
-                    var departmentList = data.departmentList;
-                    var departmentListHtml =''
-                    this.supplierList = data.supplierList;
+                    this.options4 = data.departmentList;
 
-                    for(var i = 0; i < departmentList.length; i++){
-                        var id = departmentList[i].idStr
-                        var name = departmentList[i].departmentName
-                        departmentListHtml +='<option value="'+ id +'">'+ name +'</option>'
-                    }
-                    $('#bumen').html(departmentListHtml);
+                    this.supplierList = data.supplierList;
 
                     var deviceList = data.deviceList;
                     for(var ii = 0; ii < deviceList.length; ii++){
                         this.deviceList.push(deviceList[ii])
                     }
-                    console.log(this.deviceList);
                     this.loading = false
                 })
                 .catch(error=> {
                     this.loading = false
-
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         },
@@ -1514,15 +1776,21 @@
     .grayList{
         margin-top: 30px;
     }
-    .input-with-select {
+    .list li .input-with-select{
+        font-size:14px;
         width:322px;
-        background-color: #fff;
-     }
+        text-align: right;
+    }
+
+    .list .hd{
+        width:100%;
+    }
     .share{
         display: block;
         margin-top: 10px;
+        margin-left: 80px;
     }
     .input-select{
-        width:220px;
+        width:200px;
     }
 </style>

@@ -73,7 +73,7 @@
                         </li>
                         <li class="pt cf">
                             <span class="tit2">费用描述</span>
-                            <textarea class="tex" v-model="discription" name="" id="">
+                            <textarea class="tex" v-model="discription" maxlength="50">
                             </textarea>
                         </li>
                         <li class="ptx cf">
@@ -317,14 +317,6 @@
                 this.imgName2 = this.allName[1] ? this.allName[1] : '';
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
-//                console.log(this.type,'type');
-//                console.log(this.childType1,'childType1');
-//                console.log(this.money,'money');
-//                console.log(this.taxMoney,'taxMoney');
-//                console.log(this.aimType,'aimType');
-//                console.log(this.discription,'discription');
-//                console.log(this.receiptCount,'receiptCount');
-//                console.log(this.debitDate,'debitDate');
                 params.append('debitId',0);
                 params.append('type',this.type);
                 params.append('childType1',this.childType1);
@@ -354,7 +346,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -368,7 +360,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
@@ -385,14 +377,14 @@
                 params.append('type',index);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;
                         this.optionsSmall = data;
                         this.loading = false
                     })
                     .catch(error=> {
                         this.loading = false
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     });
             }
@@ -404,7 +396,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -412,21 +404,21 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
             var url = addUrl.addUrl('newCost')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data;
                     this.loading = false
                 })
                 .catch(error=> {
                     this.loading = false
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         },

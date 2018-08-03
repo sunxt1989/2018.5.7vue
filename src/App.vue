@@ -66,6 +66,10 @@
         color: #fff;
         background-color: #1c96d3;
     }
+    .littleTable .el-table__header-wrapper table thead tr th{
+        background-color: #f7f6f6;
+        color: #333;
+    }
     .grayList thead th{
         color: #333;
         background-color: #f4f4f4;

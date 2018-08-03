@@ -4,7 +4,8 @@
             <div class="top">
                 <h2>查看借款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button v-if="auditFlg == 1" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
+                <el-button v-if="!isReject" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
+                <el-button @click="model(2)"  size="small" type="danger" class="sub1" v-show="showBtn">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -15,7 +16,7 @@
                 <ul class="list">
                     <li class="sm">
                         <span class="tit">金额</span>
-                        <input class="ipt" type="text" v-model="money" :readonly="isReject" @blur="blur">
+                        <input class="ipt" type="text" v-model="money" :readonly="isReject" @blur="blur" maxlength="14">
                     </li>
                     <li class="sm">
                         <span class="tit">已还金额</span>
@@ -66,7 +67,7 @@
                     </li>
                     <li class="pt cf">
                         <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" name="" id="" :readonly="isReject">
+                            <textarea class="tex" v-model="discription" maxlength="50" :readonly="isReject">
                             </textarea>
                     </li>
                     <li class="pt cf">
@@ -145,6 +146,8 @@
                 dialogImageName:'',//展示图片名称
                 dialogImageUrl:'',//展示图片URL
                 isReject:true,//是否是驳回状态 true为否 false为是
+                showBtn:true,//是否显示撤回按钮
+
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
                 punch2:0,//打点器
@@ -169,6 +172,23 @@
             }
         },
         methods:{
+            back(){
+                var params = new URLSearchParams();
+                var url = addUrl.addUrl('seeLoanBack')
+                params.append('debitId',this.debitId);
+                axios.post(url,params)
+                    .then(response=>{
+                        if(response.data.status == 200){
+                            this.$router.go(-1);
+                            this.$message({
+                                type:'success',
+                                message:'撤回成功'
+                            })
+                        }else if(response.data.status == 400){
+                            this.$message.error(response.data.msg);
+                        }
+                    })
+            },
             blur:function(){
                 this.money = number.number(this.money)
             },
@@ -183,6 +203,14 @@
                     }).catch(() => {
 
                     });
+                }else if(n == 2) {
+                    this.$confirm('确定是否撤回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.back()
+                    })
                 }else{
                     if(this.money <= 0){
                         this.$message.error('请正确输入金额');
@@ -204,7 +232,7 @@
                         type: 'warning'
                     }).then(() => {
                         var index = this.punch + this.punch2;
-                        console.log(index);
+//                        console.log(index);
                         if(index !=0 ){
                             this.submitUpload();
                         }else{
@@ -252,7 +280,7 @@
                 var removeUrl = file.url;//在删除图片时进行一个判断，根据url看删除的是否是已经上传的图片
                 var urlList = this.attachUrlJson;
                 for(var i = 0; i < urlList.length; i++){
-                    console.log(urlList[i]);
+//                    console.log(urlList[i]);
                     if(urlList[i]){
                         if(removeUrl == urlList[i].url){
                             delete urlList[i];
@@ -339,7 +367,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -366,7 +394,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -374,7 +402,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -384,7 +412,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     this.userDebitAuditRecordList = data.userDebitAuditRecordList;
@@ -399,8 +427,14 @@
                     this.attachUrlJson = data.userDebitItem.attachUrlJson;
                     this.departmentId = data.userDebitItem.departmentIdStr;
 
-                    if(this.auditFlg == 1){
+                    if(this.auditFlg < 2){
+                        this.showBtn = false
                         this.isReject = false;
+                    }else{
+                        if(data.userDebitItem.auditPerson == 0){
+                            this.showBtn = true
+                        }
+                        this.isReject = true;
                     }
 
                     for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
@@ -428,6 +462,11 @@
     .back{
         position: absolute;
         right:20px;
+        font-size:12px;
+    }
+    .sub1{
+        position: absolute;
+        right:110px;
         font-size:12px;
     }
     .content{

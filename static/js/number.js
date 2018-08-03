@@ -10,8 +10,9 @@ function number(value){
         value = value.split(',').join('')
     }
     //console.log(value);
+    //console.log(Number(value));
 
-    var intPart = Number(value).toFixed(0); //获取整数部分
+    var intPart = Math.floor(value); //获取整数部分 向下取整
     var intPartFormat = intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'); //将整数部分逢三一断
 
     var floatPart = ".00"; //预定义小数部分

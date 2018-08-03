@@ -44,7 +44,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">固定电话</span>
-                        <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="11">
+                        <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系人</span>
@@ -52,7 +52,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit"><span class="red">*</span>联系电话</span>
-                        <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="11">
+                        <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit">紧急联系人</span>
@@ -60,7 +60,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">紧急联系电话</span>
-                        <input class="ipt" type="text" v-model="tradePersonPhone2" maxlength="11">
+                        <input class="ipt" type="text" v-model="tradePersonPhone2" maxlength="15">
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
@@ -112,7 +112,7 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                loading:false,//初始值为false
+                loading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -125,8 +125,8 @@
                 var str3 = /^\d+$/;//判断是否为纯数字
                 var IDnumber = this.IDnumber;
                 var bankCode = this.bankCode;
-                console.log(this.bankCode);
-                console.log(typeof this.bankCode);
+//                console.log(this.bankCode);
+//                console.log(typeof this.bankCode);
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -218,10 +218,6 @@
                     }
                 }
 //
-//                console.log(params);
-//                console.log(supplierFlg);
-//                console.log(customFlg);
-//                console.log(tradeType);
 
                 var params = new URLSearchParams();
                 params.append('supplierId','');
@@ -237,7 +233,6 @@
                 params.append('supplierFlg',supplierFlg);
                 params.append('customFlg',customFlg);
                 params.append('tradeType',tradeType);
-
 
                 axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/save.html',params)
                     .then(response=> {
@@ -268,7 +263,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -276,7 +271,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         }
     }

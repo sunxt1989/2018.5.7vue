@@ -79,7 +79,8 @@
                         <template slot-scope="scope">
                                 <span class="operation">
                                     <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString}}" class="see">
-                                        <i class="icon iconfont icon-kanguo blue"></i></router-link>
+                                        <i class="icon iconfont icon-kanguo blue"></i>
+                                    </router-link>
                                 </span>
 
                                 <span class="operation">
@@ -205,7 +206,7 @@
 
                 axios.post(url,Params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value.list;//借款单列表数据
                         this.count = response.data.value.count;//总条目数
                         let tableDataarr =[];
@@ -224,7 +225,7 @@
                         this.loading = false;
                     })
                     .catch(error=> {
-                        console.log(error);
+//                        console.log(error);
                         this.loading = false;
                         alert('网络错误，不能访问');
                     })
@@ -250,13 +251,13 @@
                 var debitId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('loanDelete')
-                console.log(debitId);
+//                console.log(debitId);
                 params.append('debitId',debitId);
 
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         this.axios();
                         this.$message({
                             type: 'success',
@@ -265,7 +266,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
@@ -276,11 +277,11 @@
                 var hk = 0;
                 var tol = this.tableData;
                 for(var i = 0; i < tol.length; i++){
-                    jk += tol[i].money;
-                    hk += tol[i].creditMoney
+                    jk += (tol[i].money * 100);
+                    hk += (tol[i].creditMoney * 100)
                 }
-                jk = number.number(jk);
-                hk = number.number(hk);
+                jk = number.number(jk/100);
+                hk = number.number(hk/100);
                 const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')];
                 return sums
             },
@@ -297,7 +298,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -305,7 +306,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -318,7 +319,7 @@
             params.append('pageNo',this.currentPage);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value.list;//借款单列表数据
                     this.creditMoney = response.data.value.creditMoney;//还款
                     this.debitMoney = response.data.value.debitMoney;//借款
@@ -326,7 +327,7 @@
                     var tableDataarr =[];
                     if(data){
                         for(var i =0; i < data.length; i++){
-                            console.log(data[i]);
+//                            console.log(data[i]);
                             data[i].showMoney = number.number(data[i].money);
                             data[i].showCreditMoney = number.number(data[i].creditMoney);
                             data[i].showUnCreditMoney = number.number(data[i].unCreditMoney);
@@ -336,12 +337,13 @@
                     }else{
                         this.tableData = data
                     }
-                    console.log(this.tableData);
+//                    console.log(this.tableData);
                     this.loading = false;
                 })
                 .catch(error=> {
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
+                    this.loading = false;
                 })
         },
     }

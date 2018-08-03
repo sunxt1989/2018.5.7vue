@@ -46,6 +46,7 @@
                 count:0,//总条目数
                 currentPage:1,//当前页数
                 loading:true,
+                screenHeight: '' //页面初始化高度
             }
         },
         methods:{
@@ -64,11 +65,29 @@
                     .then(response=> {
                         this.loading = false;
                         var data = response.data.value;//借款单审批列表数据
-                        console.log(data);
+//                        console.log(data);
                         this.count = data.count;//总条目数
                         this.tableData = data.debitList;
                     })
-            }
+            },
+            mounted(){
+                // 动态设置背景图的高度为浏览器可视区域高度
+                // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+                this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+                // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+                const that = this;
+                window.onresize = function temp() {
+                    var topHeight = $('.top').innerHeight()
+                    var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                    that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+                };
+            },
         },
         created(){
             var params = new URLSearchParams();
@@ -77,7 +96,7 @@
             axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
                     this.count = data.count;//总条目数
                     let tableDataarr =[];

@@ -3,338 +3,401 @@
         <div class="w cf">
             <div class="top">
                 <h2>工资单</h2>
-
-                <router-link to="/loan/newLoan" class="addLink">新增</router-link>
+                <router-link to="/" class="back">返回</router-link>
+                <a :href=url target="_blank" class="sub1">导出</a>
+                <el-button @click="grant" size="small" type="primary" class="sub2" >工资发放</el-button>
+                <el-button @click="Calculation" size="small" type="primary" class="sub3" >工资计提</el-button>
+                <el-button @click="dialogFormVisible = true" size="small" type="primary" class="sub4" >工资发放时间：{{showProvideDay}}</el-button>
+                <router-link v-if="!isCalculation" :to="{name:'addPayroll',params:{ym:currentYM} }" class="sub5">新增临时员工</router-link>
             </div>
             <div class="w">
-                <img src="/static/originalReceipt1.png" alt="">
-                <img :src="Url" alt="">
                 <div class="content cf">
                     <el-date-picker
                         class="yearSelect"
                         v-model="year"
                         type="year"
                         placeholder="选择年"
-                    size="small">
+                        size="small"
+                        value-format="yyyy"
+                        @change="changeYear">
                     </el-date-picker>
-                    <!--<ul>-->
-                        <!--<li>-->
-                            <!--<span class="month">1月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='1' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">2月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='2' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">3月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='3' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">4月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='4' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">5月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='5' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">6月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='6' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">7月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='7' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">8月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='8' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">9月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='9' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">10月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='10' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li>-->
-                            <!--<span class="month">11月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='11' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<li class="last">-->
-                            <!--<span class="month">12月</span>-->
-                            <!--<span class="checkbox">-->
-                                <!--<input name=checkbox type="radio" value='12' class="inputcheckbox" >-->
-                                <!--<div class="yuan"></div>-->
-                            <!--</span>-->
-                        <!--</li>-->
-                        <!--<div class="timeLine"></div>-->
-                    <!--</ul>-->
+
                     <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
-                        <el-tab-pane name="1月">
+                        <el-tab-pane name="01">
                             <span slot="label" class="mon">1月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="02">
                             <span slot="label" class="mon">2月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="03">
                             <span slot="label" class="mon">3月</span>
                         </el-tab-pane>
-                        <el-tab-pane name="4月">
+                        <el-tab-pane name="04">
                             <span slot="label" class="mon">4月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="05">
                             <span slot="label" class="mon">5月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="06">
                             <span slot="label" class="mon">6月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="07">
                             <span slot="label" class="mon">7月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="08">
                             <span slot="label" class="mon">8月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="09">
                             <span slot="label" class="mon">9月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="10">
                             <span slot="label" class="mon">10月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="11">
                             <span slot="label" class="mon">11月</span>
                         </el-tab-pane>
-                        <el-tab-pane>
+                        <el-tab-pane name="12">
                             <span slot="label" class="mon">12月</span>
                         </el-tab-pane>
                     </el-tabs>
 
                     <el-table class="single" :data="tableData3" style="width: 100%" height="500">
-                            <el-table-column fixed prop="date" label="序号"></el-table-column>
-                            <el-table-column fixed prop="name" label="姓名"></el-table-column>
-                            <el-table-column fixed prop="bumen" label="部门"></el-table-column>
-                            <el-table-column fixed prop="cz" label="操作"></el-table-column>
-                            <el-table-column prop="yfgz" label="应发工资"></el-table-column>
+                            <el-table-column fixed prop="userName" label="姓名">
+                                <template slot-scope="scope">
+                                    <span v-if="scope.row.userId == 0"><span class="red">*</span>{{scope.row.userName}}</span>
+                                    <span v-else-if="scope.row.userName == ''">合计</span>
+                                    <span v-else>{{scope.row.userName}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column fixed prop="departmentName" label="部门"></el-table-column>
+                            <el-table-column fixed prop="" label="操作">
+                                <template slot-scope="scope">
+                                    <span class="operation" v-if="scope.row.userName != ''">
+                                        <router-link :to="{name:'seePayroll',params:{id:scope.row.id,
+                                        userName:scope.row.userName,
+                                        userId:scope.row.userId,
+                                        ym:currentYM}}" class="see">
+                                            <i class="icon iconfont icon-bianji blue"></i>
+                                        </router-link>
+                                    </span>
+                                    <span class="operation" v-if="scope.row.userName != ''">
+                                        <!--当userId为 0 时才能点击删除按钮-->
+                                        <i v-if='scope.row.userId == 0' @click='deleteModel(scope.row.id)'
+                                            class="icon iconfont icon-shanchu red"></i>
+                                        <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
+                                    </span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="shouldWages" label="应发工资" width="100px"></el-table-column>
                             <el-table-column label="个人代缴保险">
-                                <el-table-column prop="yfgz" label="养老保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="医疗保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="失业保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="生育保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="工伤保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="住房公积金"></el-table-column>
-                                <el-table-column prop="yfgz" label="五险一金合计"></el-table-column>
+                                <el-table-column prop="endowmentInsurancePerson" label="养老保险"></el-table-column>
+                                <el-table-column prop="medicalInsurancePerson" label="医疗保险"></el-table-column>
+                                <el-table-column prop="unemploymentInsurancePerson" label="失业保险"></el-table-column>
+                                <el-table-column prop="maternityInsurancePerson" label="生育保险"></el-table-column>
+                                <el-table-column prop="employmentInjuryInsurancePerson" label="工伤保险"></el-table-column>
+                                <el-table-column prop="housingProvidentFundPerson" label="住房公积金"></el-table-column>
+                                <el-table-column prop="insuranceSumPerson" label="五险一金合计"></el-table-column>
                             </el-table-column>
                             <el-table-column label="公司代缴保险">
-                                <el-table-column prop="yfgz" label="养老保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="医疗保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="失业保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="生育保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="工伤保险"></el-table-column>
-                                <el-table-column prop="yfgz" label="住房公积金"></el-table-column>
-                                <el-table-column prop="yfgz" label="五险一金合计"></el-table-column>
+                                <el-table-column prop="endowmentInsuranceCompany" label="养老保险"></el-table-column>
+                                <el-table-column prop="medicalInsuranceCompany" label="医疗保险"></el-table-column>
+                                <el-table-column prop="unemploymentInsuranceCompany" label="失业保险"></el-table-column>
+                                <el-table-column prop="maternityInsuranceCompany" label="生育保险"></el-table-column>
+                                <el-table-column prop="employmentInjuryInsuranceCompany" label="工伤保险"></el-table-column>
+                                <el-table-column prop="housingProvidentFundCompany" label="住房公积金"></el-table-column>
+                                <el-table-column prop="insuranceSumCompany" label="五险一金合计"></el-table-column>
                             </el-table-column>
-                            <el-table-column prop="yfgz" label="应纳税所得额"></el-table-column>
-                            <el-table-column prop="yfgz" label="个人所得税"></el-table-column>
-                            <el-table-column prop="yfgz" label="实发工资"></el-table-column>
+                            <el-table-column prop="taxableIncome" label="应纳税所得额"></el-table-column>
+                            <el-table-column prop="incomeTax" label="个人所得税"></el-table-column>
+                            <el-table-column prop="actualWages" label="实发工资"></el-table-column>
                         </el-table>
 
+                    <el-dialog title="修改工资发放日" :visible.sync="dialogFormVisible" width="400px" >
+                        <el-select class="provideDay" v-model="provideDay"
+                                   filterable=""
+                                   allow-create=""
+                                   default-first-option placeholder="请选择">
+                            <el-option v-for="item in options"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible = false" size="small">取 消</el-button>
+                            <el-button type="primary" @click="provideTime" size="small">确 定</el-button>
+                        </div>
+                    </el-dialog>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
+    import axios from 'axios'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
+
     export default{
         data(){
             return {
-                activeName: '4月',
+                currentYM:'',//当前账期
+                indexYM:'',//显示账期
+                accruedYM:'',//末次计提年月
+                provideYM:'',//末次发放年月
+                isCalculation:false,//是否已计提
+                url:'',
+                dialogFormVisible:false,
+                activeName: '',
                 year:'',
-                tableData3:[
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    },
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    },
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
-                    ,
-                    {
-                        date:1,
-                        name:'姓名',
-                        bumen:'部门',
-                        cz:'操作',
-                        yfgz:'300000000',
-                    }
+                tableData3:[],
+                provideDay:'',//工资发放时间
+                showProvideDay:'未设置',//工资发放时间显示
+                options:[//工资发放日列表
+                    {value:'5',label:'每月5日'},
+                    {value:'6',label:'每月6日'},
+                    {value:'7',label:'每月7日'},
+                    {value:'8',label:'每月8日'},
+                    {value:'9',label:'每月9日'},
+                    {value:'10',label:'每月10日'},
+                    {value:'11',label:'每月11日'},
+                    {value:'12',label:'每月12日'},
+                    {value:'13',label:'每月13日'},
+                    {value:'14',label:'每月14日'},
+                    {value:'15',label:'每月15日'},
+                    {value:'16',label:'每月16日'},
+                    {value:'17',label:'每月17日'},
+                    {value:'18',label:'每月18日'},
+                    {value:'19',label:'每月19日'},
+                    {value:'20',label:'每月20日'},
+                    {value:'21',label:'每月21日'},
+                    {value:'22',label:'每月22日'},
+                    {value:'23',label:'每月23日'},
+                    {value:'24',label:'每月24日'},
+                    {value:'25',label:'每月25日'},
+                    {value:'26',label:'每月26日'},
+                    {value:'27',label:'每月27日'},
+                    {value:'28',label:'每月28日'},
+                    {value:'-2',label:'月末前2天'},
+                    {value:'-1',label:'月末前一天'},
+                    {value:'0',label:'月末'}
                 ],
-                Url:'static/originalReceipt1.png',
-                loading:false
+                loading:true
             }
         },
         methods: {
-            handleClick(tab, event) {
-                console.log(tab, event);
+            //工资发放
+            grant(){
+                this.loading = true
+                if(this.showProvideDay == '未设置'){
+                    this.$message.error('您还未设置工资发放时间');
+                    this.loading = false
+                    return
+                }else if(Number(this.currentYM) <= (Number(this.provideYM) + 1)){
+                    this.$message.error('上月工资已发放');
+                    this.loading = false
+                    return
+                }else{
+                    this.$confirm('确定是否工资发放？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        let params = new URLSearchParams();
+                        let url = addUrl.addUrl('grant');
+                        params.append('ym',this.currentYM);
+                        axios.post(url,params)
+                            .then(response=> {
+//                                console.log(response);
+                                let provideType = response.data.value.provideType
+                                let provideMsg = response.data.value.provideMsg
+                                if(provideType == 1){
+                                    this.$message.success(provideMsg);
+                                    this.provideYM = String(Number(this.provideYM) + 1);//将末次发放年月+1
+                                }else{
+                                    this.$message.error(provideMsg);
+                                }
+
+                                this.loading = false
+                                this.dialogFormVisible = false
+                            })
+                        .catch(()=>{
+                            this.loading = false
+                        })
+                    })
+                }
+            },
+            //工资计提
+            Calculation(){
+                this.loading = true
+                if(!this.isCalculation){
+                    this.$confirm('计提工资之后，不可修改当前账期的工资单，同时也不能进行员工的添加，建议等到月结时系统自动计提当前账期下的工资！确定是否进行计提？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        let url = addUrl.addUrl('Calculation');
+                        axios.post(url)
+                            .then(response=> {
+//                                console.log(response);
+                                let accruedType = response.data.value.accruedType
+                                let accruedMsg = response.data.value.accruedMsg
+                                if (accruedType == 1) {
+                                    this.$message.success(accruedMsg);
+                                    this.accruedYM = String(Number(this.accruedYM) + 1);//将末次计提年月+1
+                                    this.isCalculation = true;
+//                                    console.log(this.accruedYM);
+                                } else {
+                                    this.$message.error(accruedMsg);
+                                }
+                                this.loading = false
+                                this.dialogFormVisible = false
+                            })
+                    }).catch(()=>{
+                        this.loading = false
+                    })
+                }else{
+                    this.$message.error('当前账期工资已计提！');
+                    this.loading = false
+                }
+
+            },
+            //修改工资发放时间
+            provideTime(){
+//                console.log(this.provideDay);
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('provideTime');
+                params.append('provide_day',this.provideDay)
+                axios.post(url,params)
+                    .then(response=> {
+//                        console.log(response);
+                        let dataNew = response.data.value.dataNew
+                        if(dataNew == 1){
+                            this.showProvideDay = response.data.value.providDay
+                        }else{
+                            this.$message.error(dataMsg);
+
+                        }
+                        this.loading = false
+                        this.dialogFormVisible = false
+                    })
+            },
+            //删除条目事件
+            deleteModel(id){
+                this.loading = true
+//                console.log(id);
+                this.$confirm('确定是否删除？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let params = new URLSearchParams();
+                    let url = addUrl.addUrl('payrollDelete');
+                    params.append('id',id)
+                    axios.post(url,params)
+                        .then(response=> {
+//                            console.log(response);
+                            let dataMsg = response.data.value.dataMsg
+                            let dataNew = response.data.value.dataNew
+                            if(dataNew == 1){
+                                this.axios();
+                                this.loading = false
+                            }else{
+                                this.$message.error(dataMsg);
+                                this.loading = false
+                            }
+                        })
+                }).catch(() => {
+                    this.loading = false
+                });
+            },
+            //年change事件
+            changeYear(){
+                this.indexYM = String(this.year) + String(this.activeName)
+                if(Number(this.currentYM) < Number(this.indexYM)){
+                    this.$message.error('对不起，当前日期没有员工数据')
+                }else{
+                    this.axios()
+                }
+            },
+            //月change事件
+            handleClick() {
+                this.indexYM = String(this.year) + String(this.activeName)
+                if(Number(this.currentYM) < Number(this.indexYM)){
+                    this.$message.error('对不起，当前日期没有员工数据')
+                }else{
+                    this.axios()
+                }
+            },
+            //工资表列表接口
+            axios(){
+                this.loading = true
+                var params = new URLSearchParams();
+                var url = addUrl.addUrl('payrollList');
+//                console.log(this.indexYM);
+                params.append('ym', this.indexYM);
+                axios.post(url,params)
+                    .then(response=> {
+//                        console.log(response);
+                        let status = response.data.status
+                        let msg = response.data.msg
+                        if(status == 200){
+                            let data = response.data.value;
+                            this.tableData3 = data.sumList;
+                        }else if(status == 400){
+                            this.$message.error(msg)
+                            this.tableData3 = [];
+                        }
+
+                        this.loading = false
+                    })
+                .catch(()=>{
+                    this.loading = false
+                })
             }
+        },
+        created(){
+            var url = addUrl.addUrl('payroll');
+            axios.post(url)
+                .then(response=> {
+//                    console.log(response);
+                    let data = response.data.value
+                    let currentYM = data.currentYM;
+                    var url = addUrl.addUrl('derive');
+                    this.year = currentYM.substring(0,4)
+                    this.activeName = currentYM.substring(4,6)
+
+
+                    let showProvideDay = data.provideTime;
+//                    console.log(showProvideDay);
+
+                    if(showProvideDay == '未设置工资发放日'){
+                        this.showProvideDay = '未设置'
+                    }else{
+                        this.showProvideDay = showProvideDay
+                    }
+
+                    this.accruedYM = data.accruedYM;
+                    this.currentYM = currentYM
+                    this.indexYM = data.indexYM
+                    this.provideYM = data.provideYM
+
+//                    console.log(this.currentYM,'当前账期');
+//                    console.log(this.provideYM,'末次发放年月');
+//                    console.log(this.accruedYM,'末次计提年月');
+                    if(Number(this.accruedYM) >= Number(this.currentYM)){
+                        this.isCalculation = false
+                    }
+                    this.url = url + '?ym=' + this.indexYM;
+
+                    this.axios();
+                    this.loading = false
+                })
+            .catch(()=>{
+                this.loading = false
+            })
         }
     }
 </script>
@@ -372,86 +435,79 @@
         float: left;
         margin-top: 10px;
     }
-    ul{
-        display: flex;
-        display: -webkit-flex;
-        flex-wrap:nowrap;
-        justify-content:space-between;
-        width:88%;
-        margin-left: 2%;
-        position: relative;
-        float: left;
-    }
-    ul li {
-        display: inline-block;
-        z-index:2;
-    }
-    .last{
-        background-color: #fff;
-    }
-    ul li .month{
-        width:100%;
-        display: inline-block;
-    }
-    .checkbox {
-        display: inline-block;
-        position: relative;
-        overflow: hidden;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        border: 1px solid #bfbfbf;
-        margin: 0px 0px;
-        padding: 0;
-        cursor: pointer;
-        background-color: #fff;
-        z-index:1;
-    }
-    .checkbox:hover{
-        border: 1px solid #4e9fd8;
-    }
-    .iconfont{
-        font-size:20px;
-        color: #ccc;
-    }
-    .checkbox .yuan{
-        display: none;
-        width:10px;
-        height:10px;
-        margin: 2px;
-        border-radius: 50%;
-        background-color: #4e9fd8;
-    }
-    .checkbox input {
-        position: absolute;
-        z-index: 2;
-        left: -10px;
-        top: -10px;
-        width: 200px;
-        height: 200px;
-        opacity: 0;
-        cursor: pointer;
-    }
-    .checkbox input[type="radio"]:checked + .checkbox{
-        border: 1px solid #4e9fd8;
-    }
-    .checkbox input[type="radio"]:checked + .yuan {
-        display: block;
-    }
-    .timeLine{
-        width:100%;
-        border-bottom: 1px solid #ccc;
-        position: absolute;
-        top:30px;
-        z-index:1;
-    }
-    .single {
-        margin-top: 80px;
-    }
+
     .mon{
         font-size:16px;
         font-weight: bold;
     }
-
+    .back{
+        display: inline-block;
+        width:56px;
+        height:31px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        line-height: 32px;
+        text-align: center;
+        font-size:14px;
+        text-decoration: none;
+        color: #333;
+        position: absolute;
+        right: -2px;
+    }
+    .sub1{
+        display: inline-block;
+        width: 56px;
+        height:32px;
+        color: #fff;
+        background-color: #409EFF;
+        border-radius: 3px;
+        line-height: 32px;
+        text-decoration: none;
+        position: absolute;
+        right:60px;
+        font-size:12px;
+    }
+    .sub2{
+        position: absolute;
+        right:120px;
+        font-size:12px;
+    }
+    .sub3{
+        position: absolute;
+        right:205px;
+        font-size:12px;
+    }
+    .sub4{
+        position: absolute;
+        right:290px;
+        font-size:12px;
+    }
+    .sub5{
+        display: inline-block;
+        width: 104px;
+        height:32px;
+        color: #fff;
+        background-color: #fea728;
+        border-radius: 3px;
+        line-height: 32px;
+        text-decoration: none;
+        position: absolute;
+        left:0px;
+        font-size:12px;
+    }
+    .operation {
+        cursor: pointer;
+    }
+    .see{
+        text-decoration: none;
+    }
+    .provideDay{
+        width:100%;
+    }
+    .littleTable .el-table__header-wrapper table thead tr th{
+        background-color: #fff;
+        color: #333;
+    }
 
 </style>

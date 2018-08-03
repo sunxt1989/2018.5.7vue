@@ -47,7 +47,7 @@
                     </li>
                     <li class="pt cf">
                         <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" name="" id="" readonly>
+                            <textarea class="tex" v-model="discription" maxlength="50" readonly>
                             </textarea>
                     </li>
                     <li class="pt cf">
@@ -105,7 +105,7 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50">
                             </textarea>
                     </li>
                 </ul>
@@ -195,7 +195,7 @@
                 //设置记录日期的起始日期和终止日期
                 const date = this.nowdata;
                 this.debitDate = date.getFullYear() + '-' + ((date.getMonth() + 1) > 9 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() > 9 ? date.getDate() : '0' + date.getDate())
-                console.log(this.debitDate);
+//                console.log(this.debitDate);
             },
             //selsect框change事件
             opinionChange(){
@@ -209,7 +209,7 @@
                 var refuseUrl = addUrl.addUrl('loanSheetApprovalRefuse')
 
                 params.append('debitId',this.debitId);
-                params.append('discription',this.discription);
+                params.append('discription',this.discription2);
                 //判断n=1时为驳回，n=2时为同意
                 if(n == 1){
                     url = refuseUrl
@@ -219,7 +219,7 @@
                 axios.post(url,params)
                     .then(response=>{
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -240,7 +240,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -248,7 +248,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){

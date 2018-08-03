@@ -71,7 +71,7 @@
                 tableData: [],//借款单列表数据
                 count:0,//总条目数
                 currentPage:1,//当前页数
-                loading:false,
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -83,7 +83,7 @@
                 axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/list.html',params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value.list;//借款单列表数据
 
                         this.count = response.data.value.count;//总条目数
@@ -91,12 +91,12 @@
                         for(var i =0; i < data.length; i++){
                             tableDataarr.push(data[i])
                         }
-                        console.log(tableDataarr);
+//                        console.log(tableDataarr);
                         this.tableData = tableDataarr;
 
                     })
                     .catch(error=> {
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
@@ -125,7 +125,7 @@
                 axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/delete.html',params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         this.axios();
                         this.$message({
                             type: 'success',
@@ -134,7 +134,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
-                        console.log(error);
+//                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
@@ -151,7 +151,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -159,7 +159,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -168,7 +168,7 @@
             axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/list.html',params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value.list;//借款单列表数据
 
                     this.count = response.data.value.count;//总条目数
@@ -176,12 +176,12 @@
                     for(var i =0; i < data.length; i++){
                         tableDataarr.push(data[i])
                     }
-                    console.log(tableDataarr);
+//                    console.log(tableDataarr);
                     this.tableData = tableDataarr;
 
                 })
                 .catch(error=> {
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 })
         },

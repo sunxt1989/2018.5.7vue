@@ -226,7 +226,7 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" cols="30" rows="10" :disabled="isBoss">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="isBoss">
                             </textarea>
                     </li>
                 </ul>
@@ -348,12 +348,6 @@
                 var refuseUrl = addUrl.addUrl('ReimbursementConfirmationRefuse')
 
                 var payMoney = unNumber.unNumber(this.payMoney)
-//                console.log(this.debitId);
-//                console.log(this.discription);
-//                console.log(this.payType);
-//                console.log(this.bankCode);
-//                console.log(this.payMoney);
-//                console.log(this.debitDate);
 
                 params.append('id',this.debitId);
                 params.append('discription',this.discription2);
@@ -404,7 +398,7 @@
             var headerHeight = $('header').innerHeight()
 //            console.log(topHeight);
 //            console.log(headerHeight);
-            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 80}px`;
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
             const that = this;
             window.onresize = function temp() {
@@ -412,7 +406,7 @@
                 var headerHeight = $('header').innerHeight()
 //                console.log(topHeight);
 //                console.log(headerHeight);
-                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight -80}px`;
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
         created(){
@@ -464,11 +458,11 @@
                         this.select4 = data.application.departmentIdString4
                         this.select5 = data.application.departmentIdString5
 
-                        this.input1 = data.application.projectDivRate
-                        this.input2 = data.application.projectDivRate2
-                        this.input3 = data.application.projectDivRate3
-                        this.input4 = data.application.projectDivRate4
-                        this.input5 = data.application.projectDivRate5
+                        this.input1 = data.application.projectDivRate || 0
+                        this.input2 = data.application.projectDivRate2 || 0
+                        this.input3 = data.application.projectDivRate3 || 0
+                        this.input4 = data.application.projectDivRate4 || 0
+                        this.input5 = data.application.projectDivRate5 || 0
                         if(data.application.departmentIdString1 == '0' || data.application.departmentIdString1 == 'null'){
                             this.isShowShareItem1 = false
                         }
