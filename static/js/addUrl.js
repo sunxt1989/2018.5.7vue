@@ -671,7 +671,112 @@ function addUrl(name){
     if(name == 'generalLedger'){
         return url + '/vue/report/general/ledger/get/list.html'
     }
+    //获取科目tree
+    if(name == 'tree'){
+        return url + '/vue/report/getSubType.html'
+    }
+    //导出总分类账xls
+    if(name == 'generalLedgerExcel'){
+        return url + '/vue/report/general/ledger/download/list.html'
+    }
+    //获取明细账
+    if(name == 'detailAccount'){
+        return url + '/vue/report/detail/account/get/list.html'
+    }
+    //导出明细账账xls
+    if(name == 'detailAccountExcel'){
+        return url + '/vue/report/detail/account/download/list.html'
+    }
+    //获取科目余额
+    if(name == 'subjectBalance'){
+        return url + '/vue/report/subject/remainder/get/list.html'
+    }
+    //导出科目余额xls
+    if(name == 'subjectBalanceExcel'){
+        return url + '/vue/report/subject/remainder/download/list.html'
+    }
+    //获取现金日记账
+    if(name == 'cashDayAccount'){
+        return url + '/vue/report/cash/journal/get/list.html'
+    }
+    //导出现金日记账xls
+    if(name == 'cashDayAccountExcel'){
+        return url + '/vue/report/cash/journal/download/list.html'
+    }
+    //获取银行日记账
+    if(name == 'bankJournal'){
+        return url + '/vue/report/bank/deposit/journal/get/list.html'
+    }
+    //导出银行日记账xls
+    if(name == 'bankJournalExcel'){
+        return url + '/vue/report/bank/deposit/journal/download/list.html'
+    }
+    //获取辅助科目余额
+    if(name == 'auxiliarySubjectBalance'){
+        return url + '/vue/report/assistant/subject/remainder/get/list.html'
+    }
+    //导出辅助科目余额xls
+    if(name == 'auxiliarySubjectBalanceExcel'){
+        return url + '/vue/report/assistant/subject/remainder/download/list.html'
+    }
+    //红冲-查看还款单列表
+    if(name == 'repaymentRedFlush'){
+        return url + '/vue/hedging/credit/list.html'
+    }
+    //红冲-查看借款单列表
+    if(name == 'loanRedFlush'){
+        return url + '/vue/hedging/debit/list.html'
+    }
+    //红冲-查看报销单列表
+    if(name == 'ReimbursementRedFlush'){
+        return url + '/vue/hedging/application/list.html'
+    }
+    //红冲-查看采购单列表
+    if(name == 'purchaseRedFlush'){
+        return url + '/vue/hedging/purchase/list.html'
+    }
+    //红冲-查看采购付款单列表
+    if(name == 'purchasePaymentRedFlush'){
+        return url + '/vue/hedging/purchase/send/list.html'
+    }
+    //红冲-查看销售单列表
+    if(name == 'saleRedFlush'){
+        return url + '/vue/hedging/sale/list.html'
+    }
+    //红冲-查看销售收款单列表
+    if(name == 'salePaymentRedFlush'){
+        return url + '/vue/hedging/sale/receive/list.html'
+    }
 
+
+    //红冲-红冲还款单
+    if(name == 'repaymentRedFlushSubmit'){
+        return url + '/vue/hedging/credit.html'
+    }
+    //红冲-红冲借款单
+    if(name == 'loanRedFlushSubmit'){
+        return url + '/vue/hedging/debit.html'
+    }
+    //红冲-红冲报销单
+    if(name == 'reimbursementRedFlushSubmit'){
+        return url + '/vue/hedging/application.html'
+    }
+    //红冲-红冲采购单
+    if(name == 'purchaseRedFlushSubmit'){
+        return url + '/vue/hedging/purchase.html'
+    }
+    //红冲-红冲采购付款单
+    if(name == 'purchasePaymentRedFlushSubmit'){
+        return url + '/vue/hedging/purchase/send.html'
+    }
+    //红冲-红冲销售单
+    if(name == 'saleRedFlushSubmit'){
+        return url + '/vue/hedging/sale.html'
+    }
+    //红冲-红冲销售收款单
+    if(name == 'salePaymentRedFlushSubmit'){
+        return url + '/vue/hedging/sale/receive.html'
+    }
 
 
 }

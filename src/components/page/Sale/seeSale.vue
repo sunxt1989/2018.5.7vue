@@ -1370,13 +1370,16 @@
                         this.isShowShare = true;
                         this.isReadonly = false;
                     }else{
-                        if(sale.auditPerson == 0){
-                            this.showBtn = true
-                        }
+
                         this.isAuditPerson = true
                         this.isShowShare = false;
                         this.isReadonly = true;
                     }
+
+                    if(index == 2 || index == 3 && sale.auditPerson == 0){
+                        this.showBtn = true
+                    }
+
                     this.loading = false
                 })
                 .catch(error=> {

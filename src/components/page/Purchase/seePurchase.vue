@@ -1529,9 +1529,6 @@
                         this.isShowShare = true;
                         this.isReadonly = false;
                     }else{
-                        if(purchase.auditPerson == 0){
-                            this.showBtn = true
-                        }
                         if(data.purchase.departmentIdString1 == '0' || data.purchase.departmentIdString1 == 'null'){
                             this.isShowShareItem1 = false
                         }
@@ -1550,6 +1547,9 @@
                         this.isAuditPerson = true
                         this.isShowShare = false;
                         this.isReadonly = true;
+                    }
+                    if((index == 2 || index == 3) && purchase.auditPerson == 0){
+                        this.showBtn = true
                     }
 
                     var divideFlg = data.purchase.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊

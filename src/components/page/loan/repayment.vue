@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>还款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click.native="model(1)" size="small" type="danger" class="sub" >提交</el-button>
+                <el-button @click.native="model(1)" v-if="!isRedFlush" size="small" type="danger" class="sub" >提交</el-button>
             </div>
         </div>
         <div class="w cf">
@@ -25,7 +25,7 @@
                             <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney" readonly>
                         </li>
                         <li>
-                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur" maxlength="14">
+                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur" maxlength="14" :readonly="isRedFlush">
                         </li>
                         <li>
                             <el-date-picker
@@ -34,7 +34,8 @@
                                 type="date"
                                 :picker-options="pickerOptions1"
                                 value-format="yyyy-MM-dd"
-                                placeholder="选择日期">
+                                placeholder="选择日期"
+                                :disabled="isRedFlush">
                             </el-date-picker>
                         </li>
                     </ul>
@@ -83,6 +84,7 @@
         data(){
             return{
                 debitId:this.$route.params.debitId,//单据ID
+                isRedFlush:this.$route.params.isRedFlush,//是否为红冲
                 unCreditMoney:'',//待还款
                 money:'',//本次还款
                 debitDate:'',//上传日期
@@ -179,6 +181,7 @@
             };
         },
         created(){
+            console.log(this.isRedFlush);
             var params = new URLSearchParams();
             var url = addUrl.addUrl('repayment')
             params.append('debitId',this.debitId);

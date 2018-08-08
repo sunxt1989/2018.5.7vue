@@ -101,7 +101,14 @@ import Initialization from '@/components/page/AccountingTreatment/Initialization
 import voucherList from '@/components/page/AccountingTreatment/voucherList'//查看凭证列表
 import monthlyKnot from '@/components/page/AccountingTreatment/monthlyKnot'//月结
 import generalLedger from '@/components/page/AccountingTreatment/generalLedger'//总账
+import detailAccount from '@/components/page/AccountingTreatment/detailAccount'//明细账
+import subjectBalance from '@/components/page/AccountingTreatment/subjectBalance'//科目余额
+import cashDayAccount from '@/components/page/AccountingTreatment/cashDayAccount'//现金日记账
+import bankJournal from '@/components/page/AccountingTreatment/bankJournal'//银行存款日记账
+import auxiliarySubjectBalance from '@/components/page/AccountingTreatment/auxiliarySubjectBalance'//辅助科目余额
 
+//红冲
+import RedFlush from '@/components/page/RedFlush/RedFlush' //红冲列表
 Vue.use(Router)
 
 export default new Router({
@@ -530,7 +537,36 @@ export default new Router({
             name:'generalLedger',
             component:generalLedger
         },
-
+        {
+            path:'/AccountingTreatment/detailAccount',
+            name:'detailAccount',
+            component:detailAccount
+        },
+        {
+            path:'/AccountingTreatment/subjectBalance',
+            name:'subjectBalance',
+            component:subjectBalance
+        },
+        {
+            path:'/AccountingTreatment/cashDayAccount',
+            name:'cashDayAccount',
+            component:cashDayAccount
+        },
+        {
+            path:'/AccountingTreatment/bankJournal',
+            name:'bankJournal',
+            component:bankJournal
+        },
+        {
+            path:'/AccountingTreatment/auxiliarySubjectBalance',
+            name:'auxiliarySubjectBalance',
+            component:auxiliarySubjectBalance
+        },
+        {
+            path:'/RedFlush/RedFlush',
+            name:'RedFlush',
+            component:RedFlush
+        },
 
 
     ]

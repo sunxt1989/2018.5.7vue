@@ -2,7 +2,7 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>总账</h2>
+                <h2>科目余额</h2>
                 <router-link to="/" class="back">返回</router-link>
                 <a :href=url1 target="_blank" class="sub1">导出Excel</a>
             </div>
@@ -123,18 +123,25 @@
                     </el-dialog>
 
                 </div>
-                <el-table :data="tableData" class="single" :span-method="objectSpanMethod" :height="tableDataHeight">
-                    <el-table-column prop="subjectCode" label="科目编号" align="center"></el-table-column>
+                <el-table :data="tableData" class="single" :height="tableDataHeight">
+                    <el-table-column prop="subjectCode" label="科目编号" align="center" width="100px"></el-table-column>
                     <el-table-column prop="subjectName" label="科目名称" align="center"></el-table-column>
-                    <el-table-column :label="year">
-                        <el-table-column prop="month" align="center" label="月" width="60px"></el-table-column>
-                        <el-table-column prop="day" align="center" label="日" width="60px"></el-table-column>
+                    <el-table-column label="年初余额">
+                        <el-table-column prop="debitQC" header-align="center" align="right" label="借方"></el-table-column>
+                        <el-table-column prop="creditQC" header-align="center" align="right" label="贷方"></el-table-column>
                     </el-table-column>
-                    <el-table-column prop="remark" label="摘要" align="center"></el-table-column>
-                    <el-table-column prop="debit" label="借方" header-align="center" align="right"></el-table-column>
-                    <el-table-column prop="credit" label="贷方" header-align="center" align="right"></el-table-column>
-                    <el-table-column prop="direction" label="方向" align="center"></el-table-column>
-                    <el-table-column prop="sum" label="余额" header-align="center" align="right"></el-table-column>
+                    <el-table-column label="本期发生额">
+                        <el-table-column prop="debitBQ" header-align="center" align="right" label="借方"></el-table-column>
+                        <el-table-column prop="creditBQ" header-align="center" align="right" label="贷方"></el-table-column>
+                    </el-table-column>
+                    <el-table-column label="本年累计发生额">
+                        <el-table-column prop="debitBN" header-align="center" align="right" label="借方"></el-table-column>
+                        <el-table-column prop="creditBN" header-align="center" align="right" label="贷方"></el-table-column>
+                    </el-table-column>
+                    <el-table-column label="期末余额">
+                        <el-table-column prop="debitQM" header-align="center" align="right" label="借方"></el-table-column>
+                        <el-table-column prop="creditQM" header-align="center" align="right" label="贷方"></el-table-column>
+                    </el-table-column>
                 </el-table>
 
             </div>
@@ -164,7 +171,6 @@
                 tree4: [],//权益
                 tree5: [],//成本
                 tree6: [],//损益
-                year: '',//表头展示年份
                 defaultProps: {
                     children: 'children',
                     label: 'name'
@@ -347,26 +353,11 @@
                 this.dialogTableVisible = true;
                 this.treeAxios(1)
             },
-            objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-                if(columnIndex < 2){
-                    if(row.rowspan){
-                        return {
-                            rowspan: row.rowspan,
-                            colspan: 1
-                        };
-                    }else{
-                        return{
-                            rowspan: 0,
-                            colspan: 0
-                        }
-                    }
-                }
-            },
             axios(){
-                let url1 = addUrl.addUrl('generalLedgerExcel');
+                let url1 = addUrl.addUrl('subjectBalanceExcel');
                 this.url1 = url1 + '?startDate=' + this.startTime + '&endDate='+ this.endTime +  '&startSub=' + this.startSubject + '&endSub=' + this.endSubject
 //                console.log(this.url1);
-                let url = addUrl.addUrl('generalLedger')
+                let url = addUrl.addUrl('subjectBalance')
                 let params = new URLSearchParams();
                 params.append('startDate',this.startTime);
                 params.append('endDate',this.endTime);
@@ -380,16 +371,7 @@
                         let msg = response.data.msg
                         if(status == 200){
                             let data = response.data.value;//列表数据
-                            let arr = [];
-                            let dataList = data.dataList
-
-                            for(let i in dataList){
-                                for(let j in dataList[i]){
-                                    dataList[i][0].rowspan = dataList[i].length
-                                    arr.push(dataList[i][j])
-                                }
-                            }
-                            this.tableData = arr
+                            this.tableData = data.dataList
                             this.loading = false;
                         }else if(status == 400){
                             this.$message.error(msg);
@@ -429,7 +411,6 @@
         created(){
             this.startTime = this.start_ym.substring(0,4) + '-' +this.start_ym.substring(4,6)
             this.endTime = this.current_book_ym.substring(0,4) + '-' +this.current_book_ym.substring(4,6);
-            this.year = this.start_ym.substring(0,4) + '年'
             this.axios()
         },
     }

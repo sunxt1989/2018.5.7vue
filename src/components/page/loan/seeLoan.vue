@@ -5,7 +5,7 @@
                 <h2>查看借款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
                 <el-button v-if="!isReject" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
-                <el-button @click="model(2)"  size="small" type="danger" class="sub1" v-show="showBtn">撤回</el-button>
+                <el-button v-show="showBtn" @click="model(2)"  size="small" type="danger" class="sub1" >撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -146,7 +146,7 @@
                 dialogImageName:'',//展示图片名称
                 dialogImageUrl:'',//展示图片URL
                 isReject:true,//是否是驳回状态 true为否 false为是
-                showBtn:true,//是否显示撤回按钮
+                showBtn:false,//是否显示撤回按钮
 
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
@@ -430,10 +430,14 @@
                     if(this.auditFlg < 2){
                         this.showBtn = false
                         this.isReject = false;
-                    }else{
+                    }else if(this.auditFlg == 2 || this.auditFlg == 3){
                         if(data.userDebitItem.auditPerson == 0){
                             this.showBtn = true
+                        }else{
+
                         }
+                        this.isReject = true;
+                    }else{
                         this.isReject = true;
                     }
 

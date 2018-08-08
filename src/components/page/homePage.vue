@@ -489,6 +489,90 @@
                                     </el-popover>
                                 </div>
                             </div>
+                            <div class="item md" id="detailAccount">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/AccountingTreatment/detailAccount" v-popover:detailAccount>
+                                        明细账
+                                    </router-link>
+                                    <el-popover ref="detailAccount" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('detailAccount')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('detailAccount')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('detailAccount')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
+                            <div class="item md" id="subjectBalance">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/AccountingTreatment/subjectBalance" v-popover:subjectBalance>
+                                        科目余额
+                                    </router-link>
+                                    <el-popover ref="subjectBalance" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('subjectBalance')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('subjectBalance')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('subjectBalance')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
+                            <div class="item md" id="cashDayAccount">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/AccountingTreatment/cashDayAccount" v-popover:cashDayAccount>
+                                        现金日记账
+                                    </router-link>
+                                    <el-popover ref="cashDayAccount" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('cashDayAccount')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('cashDayAccount')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('cashDayAccount')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
+                            <div class="item md" id="bankJournal">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/AccountingTreatment/bankJournal" v-popover:bankJournal>
+                                        银行存款日记账
+                                    </router-link>
+                                    <el-popover ref="bankJournal" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('bankJournal')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('bankJournal')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('bankJournal')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
+                            <div class="item md" id="auxiliarySubjectBalance">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/AccountingTreatment/auxiliarySubjectBalance" v-popover:auxiliarySubjectBalance>
+                                        辅助科目余额
+                                    </router-link>
+                                    <el-popover ref="auxiliarySubjectBalance" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('auxiliarySubjectBalance')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('auxiliarySubjectBalance')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('auxiliarySubjectBalance')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
+                            <div class="item md" id="RedFlush">
+                                <div class="item-content">
+                                    <router-link class="itemLink" to="/RedFlush/RedFlush" v-popover:RedFlush>
+                                        红冲
+                                    </router-link>
+                                    <el-popover ref="RedFlush" placement="top" trigger="hover" :visible-arrow="false">
+                                        <div class="pop">
+                                            <i class="icon iconfont icon-jia red" @click="addClick('RedFlush')"></i>
+                                            <i class="icon iconfont icon-jian red" @click="reduceClick('RedFlush')"></i>
+                                            <i class="icon iconfont icon-shanchu red" @click="deleteClick('RedFlush')"></i>
+                                        </div>
+                                    </el-popover>
+                                </div>
+                            </div>
 
                         </div>
                     </el-row>
@@ -534,6 +618,12 @@
                         <span @click="addItem('voucherList')">查看凭证列表</span>
                         <span @click="addItem('monthlyKnot')">月结</span>
                         <span @click="addItem('generalLedger')">总账</span>
+                        <span @click="addItem('detailAccount')">明细账</span>
+                        <span @click="addItem('subjectBalance')">科目余额</span>
+                        <span @click="addItem('cashDayAccount')">现金日记账</span>
+                        <span @click="addItem('bankJournal')">银行存款日记账</span>
+                        <span @click="addItem('auxiliarySubjectBalance')">辅助科目余额</span>
+                        <span @click="addItem('RedFlush')">红冲列表</span>
                     </div>
                     <div class="news">
                         消息
@@ -769,57 +859,57 @@
 
     }
     #loan {
-        display: block;
+        display: none;
         background: url("../../../static/images/jiekuandan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #loanApprovalList {
-        display: block;
+        display: none;
         background: url("../../../static/images/jiekuandan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #loanConfirmationList {
-        display: block;
+        display: none;
         background: url("../../../static/images/jiekuandan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #repaymentConfirmationList {
-        display: block;
+        display: none;
         background: url("../../../static/images/jiekuandan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #costSheet {
-        display: block;
+        display: none;
         background: url("../../../static/images/feiyongdan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #ReimbursementList {
-        display: block;
+        display: none;
         background: url("../../../static/images/baoxiaodan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #ReimbursementApprovalList {
-        display: block;
+        display: none;
         background: url("../../../static/images/baoxiaodan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #ReimbursementConfirmationList {
-        display: block;
+        display: none;
         background: url("../../../static/images/baoxiaodan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #payroll {
-        display: block;
+        display: none;
         background: url("../../../static/images/gongzidan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #SupplierList {
-        display: block;
+        display: none;
         background: url("../../../static/images/gongzidan.png") no-repeat 0 0;
         background-size: 100%;
     }
     #PurchaseList {
-        display: block;
+        display: none;
         background: url("../../../static/images/caigoudan.png") no-repeat 0 0;
         background-size: 100%;
     }
@@ -936,6 +1026,36 @@
     #generalLedger{
         display: block;
         background: url("../../../static/images/zongzhang.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #detailAccount{
+        display: block;
+        background: url("../../../static/images/mingxizhang.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #subjectBalance{
+        display: block;
+        background: url("../../../static/images/kemuyue.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #cashDayAccount{
+        display: block;
+        background: url("../../../static/images/xianjinrijizhang.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #bankJournal{
+        display: block;
+        background: url("../../../static/images/yinhangrijizhang.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #auxiliarySubjectBalance{
+        display: block;
+        background: url("../../../static/images/kemuyue.png") no-repeat 0 0;
+        background-size: 100%;
+    }
+    #RedFlush{
+        display: block;
+        background: url("../../../static/images/kemuyue.png") no-repeat 0 0;
         background-size: 100%;
     }
 </style>

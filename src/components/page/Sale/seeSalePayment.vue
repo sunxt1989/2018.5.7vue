@@ -6,6 +6,7 @@
                 <router-link :to="{name:'newSalePayment',params:{debitId:sale_id}}" class="back">
                     返回
                 </router-link>
+                <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
             </div>
         </div>
         <div class="w">
@@ -76,6 +77,7 @@
                 money:'',//本次收款
                 sale_id:'',//销售单ID
                 debitId:this.$route.params.debitId,
+                isRedFlush:this.$route.params.isRedFlush,
 
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
@@ -180,6 +182,11 @@
         color: #333;
         position: absolute;
         right: 30px;
+    }
+    .back2{
+        position: absolute;
+        right:20px;
+        font-size:12px;
     }
     .content{
         width: 1120px;

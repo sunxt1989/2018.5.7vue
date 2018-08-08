@@ -66,8 +66,22 @@
         color: #fff;
         background-color: #1c96d3;
     }
+
+    .voucherList .el-table--enable-row-hover .el-table__body .success-row:hover>td {
+        background-color: #e3fcfe;
+    }
+    .voucherList .el-table--enable-row-hover .el-table__body .total-row:hover>td {
+        background-color: #fff4e5;
+    }
+    .voucherList  .el-table .success-row {
+        background: #fff;
+    }
+    .voucherList  .el-table .total-row {
+        background: #fff4e5;
+    }
+
     .littleTable .el-table__header-wrapper table thead tr th{
-        background-color: #f7f6f6;
+        background-color: #efefef;
         color: #333;
     }
     .grayList thead th{

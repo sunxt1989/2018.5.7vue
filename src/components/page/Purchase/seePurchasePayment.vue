@@ -3,9 +3,10 @@
         <div class="w">
             <div class="top">
                 <h2>采购付款单详情</h2>
-                <router-link :to="{name:'newPurchasePayment',params:{debitId:purchase_id}}" class="back">
+                <router-link v-if="!isRedFlush" :to="{name:'newPurchasePayment',params:{debitId:purchase_id}}" class="back">
                     返回
                 </router-link>
+                <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
             </div>
         </div>
         <div class="w">
@@ -76,6 +77,7 @@
                 money:'',//本次付款
                 purchase_id:'',//采购单ID
                 debitId:this.$route.params.debitId,
+                isRedFlush:this.$route.params.isRedFlush,
 
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
@@ -180,6 +182,11 @@
         color: #333;
         position: absolute;
         right: 30px;
+    }
+    .back2{
+        position: absolute;
+        right:20px;
+        font-size:12px;
     }
     .content{
         width: 1120px;

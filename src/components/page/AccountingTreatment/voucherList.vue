@@ -11,7 +11,7 @@
 
             </div>
             <div class="w">
-                <div class="content cf">
+                <div class="content cf" :style="{height:screenHeight}">
                     <el-date-picker
                         class="yearSelect"
                         v-model="year"
@@ -61,27 +61,39 @@
                         </el-tab-pane>
                     </el-tabs>
 
-                    <el-table class="single" :data="tableData"  @selection-change="handleSelectionChange" :default-expand-all="true" height="480px">
+                    <el-table class="single voucherList" :data="tableData"  @selection-change="handleSelectionChange" :default-expand-all="true"  >
                         <el-table-column align="center" type="selection" prop="idStr"></el-table-column>
-                        <el-table-column align="center" type="expand" prop="remarkStr" label="摘要">
+                        <el-table-column align="center" type="expand" prop="remarkStr" label="摘要" width="80px">
                             <template slot-scope="scope">
-                                <el-table :data="scope.row.certificateItemList" class="littleTable">
+                                <el-table :data="scope.row.certificateItemList" border class="littleTable"  :row-class-name="tableRowClassName">
                                     <el-table-column align="center" prop="remark" label="摘要" width="200px"></el-table-column>
-                                    <el-table-column align="center" prop="subjectCode" label="科目">
+                                    <el-table-column align="left" prop="subjectCode" label="科目">
                                         <template slot-scope="prop">
                                             <span v-if="prop.row.remark == '合计：'"></span>
                                             <span v-else-if="prop.row.debitAmount && prop.row.remark != '合计：'">借：{{prop.row.subjectCode}}{{prop.row.subjectName}}</span>
                                             <span v-else>贷：{{prop.row.subjectCode}}{{prop.row.subjectName}}</span>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column align="center" prop="debitAmount" label="借方金额" width="200px"></el-table-column>
-                                    <el-table-column align="center" prop="creditAmount" label="贷方金额" width="200px"></el-table-column>
+                                    <el-table-column align="right" prop="debitAmount" label="借方金额" width="200px"></el-table-column>
+                                    <el-table-column align="right" prop="creditAmount" label="贷方金额" width="200px"></el-table-column>
                                 </el-table>
                             </template>
                         </el-table-column>
                         <el-table-column align="center" type="index"  width="60px"></el-table-column>
-                        <el-table-column align="center" prop="showRow" label="科目">
-
+                        <el-table-column align="right" prop="certificateDateYMD" >
+                            <template slot-scope="scope">
+                                <span>日期：{{scope.row.certificateDateYMD}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="center" prop="certificateNumber" >
+                            <template slot-scope="scope">
+                                <span>凭证字号：{{scope.row.certificateNumber}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="left" prop="billCount" >
+                            <template slot-scope="scope">
+                                <span>附单据{{scope.row.billCount}}张</span>
+                            </template>
                         </el-table-column>
                     </el-table>
 
@@ -113,10 +125,19 @@
                 quarterName: '',
                 year:'',
                 tableData:[],
+                screenHeight: '', //页面初始化高度
                 loading:true
             }
         },
         methods: {
+            tableRowClassName({row, rowIndex}) {
+                if (row.remark == '合计：') {
+                    return 'total-row';
+                }else{
+                    return 'success-row';
+                }
+                return ;
+            },
             stop(){
                 this.$message.error('请先选择需要下载的凭证')
             },
@@ -204,6 +225,24 @@
             }
         },
         computed:mapState(['current_book_ym','start_ym']),
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+            };
+        },
         created(){
             this.url1 = addUrl.addUrl('voucherExcel');
             this.url2 = addUrl.addUrl('voucherPDF');
@@ -238,10 +277,8 @@
     }
     .content{
         width: 1120px;
-        height: 100%;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }

@@ -269,8 +269,8 @@
                             data.assistantSubjectList[numArr[i]].rowspan = numArr[i+1] - numArr[i]
                         }
                     }
-
                     this.tableData2 = data.assistantSubjectList;//辅助科目
+
                     for(let i in data.bankAccountList){
                         if(data.bankAccountList[i].initialAmount){
                             data.bankAccountList[i].initialAmount = number.number(data.bankAccountList[i].initialAmount)

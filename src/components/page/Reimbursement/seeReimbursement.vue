@@ -814,10 +814,13 @@
                         this.isShow = true;
                         this.isReadonly = true;
                         this.isShowShare = false
-                    }else{
+                    }else if(index == 2 || index == 3){
                         if(this.auditPerson == 0){
                             this.showBtn3 = true
                         }
+                        this.isReadonly = true;
+                        this.isShowShare = false
+                    }else{
                         this.isReadonly = true;
                         this.isShowShare = false
                     }
