@@ -59,12 +59,12 @@
         methods:{
             //分页器
             changePage(val){
+                this.loading = true
                 this.currentPage = val;
                 this.axios()
             },
 
             axios(){
-                this.loading = true;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('ReimbursementConfirmationList')
                 params.append('pageNo', this.currentPage);
@@ -76,6 +76,11 @@
                         this.count = data.count;//总条目数
                         this.tableData = this.addUrl(data.list)
                     })
+                    .catch(error=> {
+                        this.loading = false
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             },
             addUrl(list){
 //                console.log(list);
@@ -110,13 +115,18 @@
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;//报销单确认列表数据
 //                    console.log(data);
                     this.count = data.count;//总条目数
                     this.tableData = this.addUrl(data.list)
                 })
+                .catch(error=> {
+                    this.loading = false
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -144,7 +154,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

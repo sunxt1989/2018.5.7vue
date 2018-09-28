@@ -2,9 +2,9 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>修改员工信息</h2>
+                <h2>修改员工工资信息</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">提交</el-button>
+                <el-button v-if="!isCalculation" @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -12,7 +12,7 @@
                 <div class="line">
                     <span>修改员工信息</span>
                 </div>
-                <el-button type="danger" plain size="small" class="share" @click="shareClick">
+                <el-button v-if="!isCalculation" type="danger" plain size="small" class="share" @click="shareClick">
                     <span v-show="!isShare">费用分摊</span>
                     <span v-show="isShare">取消费用分摊</span>
                 </el-button>
@@ -24,7 +24,8 @@
                                 v-for="item in options4"
                                 :key="item.value"
                                 :label="item.name"
-                                :value="item.id">
+                                :value="item.id"
+                                :disabled="isCalculation">
                             </el-option>
                         </el-select>
                     </li>
@@ -32,7 +33,7 @@
                     <li class="sm" v-show="isShare">
                         <span class="tit">部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" @change="inputWithSelectChange(1,$event)">
-                            <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select">
+                            <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select" :disabled="isCalculation">
                                 <el-option
                                     v-for="item in options4"
                                     :key="item.value"
@@ -46,7 +47,7 @@
                     <li class="sm" v-show="isShare">
                         <span class="tit">部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" @change="inputWithSelectChange(2,$event)">
-                            <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select">
+                            <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select" :disabled="isCalculation">
                                 <el-option
                                     v-for="item in options4"
                                     :key="item.value"
@@ -60,7 +61,7 @@
                     <li class="sm" v-show="isShare">
                         <span class="tit">部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" @change="inputWithSelectChange(3,$event)">
-                            <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select">
+                            <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select" :disabled="isCalculation">
                                 <el-option
                                     v-for="item in options4"
                                     :key="item.value"
@@ -74,7 +75,7 @@
                     <li class="sm" v-show="isShare">
                         <span class="tit">部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input4" class="input-with-select" @change="inputWithSelectChange(4,$event)">
-                            <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select">
+                            <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select" :disabled="isCalculation">
                                 <el-option
                                     v-for="item in options4"
                                     :key="item.value"
@@ -88,7 +89,7 @@
                     <li class="sm" v-show="isShare">
                         <span class="tit">部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input5" class="input-with-select" @change="inputWithSelectChange(5,$event)">
-                            <el-select v-model="select5" slot="prepend" placeholder="请选择" class="input-select">
+                            <el-select v-model="select5" slot="prepend" placeholder="请选择" class="input-select" :disabled="isCalculation">
                                 <el-option
                                     v-for="item in options4"
                                     :key="item.value"
@@ -110,35 +111,35 @@
                     </li>
                     <li class="sm">
                         <span class="tit">应发工资</span>
-                        <input class="ipt" type="text" v-model="shouldWages" maxlength="15" @change="changeMoney(0)">
+                        <input class="ipt" type="text" v-model="shouldWages" maxlength="15" @change="changeMoney(0)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit blue">社保缴费工资</span>
-                        <input class="ipt" type="text" v-model="wage_base" maxlength="15" @change="wagesChange">
+                        <input class="ipt" type="text" v-model="wage_base" maxlength="15" @change="wagesChange" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">养老保险</span>
-                        <input class="ipt" type="text" v-model="endowmentInsurancePerson" maxlength="15" @change="changeMoney(1)">
+                        <input class="ipt" type="text" v-model="endowmentInsurancePerson" maxlength="15" @change="changeMoney(1)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">医疗保险</span>
-                        <input class="ipt" type="text" v-model="medicalInsurancePerson" maxlength="15" @change="changeMoney(2)">
+                        <input class="ipt" type="text" v-model="medicalInsurancePerson" maxlength="15" @change="changeMoney(2)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">失业保险</span>
-                        <input class="ipt" type="text" v-model="unemploymentInsurancePerson" maxlength="15" @change="changeMoney(3)">
+                        <input class="ipt" type="text" v-model="unemploymentInsurancePerson" maxlength="15" @change="changeMoney(3)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">工伤保险</span>
-                        <input class="ipt" type="text" v-model="employmentInjuryInsurancePerson" maxlength="15" @change="changeMoney(4)">
+                        <input class="ipt" type="text" v-model="employmentInjuryInsurancePerson" maxlength="15" @change="changeMoney(4)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">生育保险</span>
-                        <input class="ipt" type="text" v-model="maternityInsurancePerson" maxlength="15" @change="changeMoney(5)">
+                        <input class="ipt" type="text" v-model="maternityInsurancePerson" maxlength="15" @change="changeMoney(5)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">住房公积金</span>
-                        <input class="ipt" type="text" v-model="housingProvidentFundPerson" maxlength="15" @change="changeMoney(6)">
+                        <input class="ipt" type="text" v-model="housingProvidentFundPerson" maxlength="15" @change="changeMoney(6)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">五险一金</span>
@@ -151,27 +152,27 @@
                 <ul class="list cf">
                     <li class="sm">
                         <span class="tit">养老保险</span>
-                        <input class="ipt" type="text" v-model="endowmentInsuranceCompany" maxlength="15" @change="changeMoney(8)">
+                        <input class="ipt" type="text" v-model="endowmentInsuranceCompany" maxlength="15" @change="changeMoney(8)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">医疗保险</span>
-                        <input class="ipt" type="text" v-model="medicalInsuranceCompany" maxlength="15" @change="changeMoney(9)">
+                        <input class="ipt" type="text" v-model="medicalInsuranceCompany" maxlength="15" @change="changeMoney(9)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">失业保险</span>
-                        <input class="ipt" type="text" v-model="unemploymentInsuranceCompany" maxlength="15" @change="changeMoney(10)">
+                        <input class="ipt" type="text" v-model="unemploymentInsuranceCompany" maxlength="15" @change="changeMoney(10)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">工伤保险</span>
-                        <input class="ipt" type="text" v-model="employmentInjuryInsuranceCompany" maxlength="15" @change="changeMoney(11)">
+                        <input class="ipt" type="text" v-model="employmentInjuryInsuranceCompany" maxlength="15" @change="changeMoney(11)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">生育保险</span>
-                        <input class="ipt" type="text" v-model="maternityInsuranceCompany" maxlength="15" @change="changeMoney(12)">
+                        <input class="ipt" type="text" v-model="maternityInsuranceCompany" maxlength="15" @change="changeMoney(12)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">住房公积金</span>
-                        <input class="ipt" type="text" v-model="housingProvidentFundCompany" maxlength="15" @change="changeMoney(13)">
+                        <input class="ipt" type="text" v-model="housingProvidentFundCompany" maxlength="15" @change="changeMoney(13)" :readonly="isCalculation">
                     </li>
                     <li class="sm">
                         <span class="tit">五险一金</span>
@@ -230,12 +231,14 @@
                 userName:this.$route.params.userName,//姓名
                 userId:this.$route.params.userId,//用户ID
                 ym:this.$route.params.ym,//当前账期
+                isCalculation:this.$route.params.isCalculation,//是否需已计提
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
                     },
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -456,8 +459,8 @@
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('wageBase')
                 params.append('wage_base', wage_base);
-                params.append('ym', this.currentYM);
-                axios.post(url)
+                params.append('currentYM', this.currentYM);
+                axios.post(url,params)
                     .then(response=> {
 //                        console.log(response);
                         let data = response.data.value
@@ -494,7 +497,21 @@
                 this.$confirm('您是否需要按所填基数自动生成以下选项？','提示',{
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(()=>{
                     this.wageBase(wage_base);
                 }).catch(()=>{
@@ -534,7 +551,6 @@
                         type: 'warning'
                     }).then(() => {
                         this.$router.go(-1)
-                        this.loading = false
                     }).catch(() => {
                         this.loading = false
                     });
@@ -570,10 +586,25 @@
                         this.loading = false;
                         return
                     }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit()
                     }).catch(() => {
@@ -582,6 +613,7 @@
                             message: '已取消'
                         });
                         this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -604,6 +636,7 @@
                             if(departmentJson[i].id == this.select1){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -611,6 +644,7 @@
                     }else if(this.input1 != 0 && this.select1 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -623,6 +657,7 @@
                             if(departmentJson[i].id == this.select2){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -631,6 +666,7 @@
                     }else if(this.input2 != 0 && this.select2 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -643,6 +679,7 @@
                             if(departmentJson[i].id == this.select3){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -650,6 +687,7 @@
                     }else if(this.input3 != 0 && this.select3 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -662,6 +700,7 @@
                             if(departmentJson[i].id == this.select4){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -669,6 +708,7 @@
                     }else if(this.input4 != 0 && this.select4 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -681,6 +721,7 @@
                             if(departmentJson[i].id == this.select5){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -688,6 +729,7 @@
                     }else if(this.input5 != 0 && this.select5 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
                     divideFlg = 1
@@ -739,15 +781,17 @@
                                 type: 'success',
                                 message: '提交成功'
                             });
-                            this.loading = false
+
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
                             this.$message.error(msg);
-                            this.loading = false
                         }
+                        this.isLoading = false;
+                        this.loading = false
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -779,7 +823,7 @@
             params.append('userId',this.userId)
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     let salaryItem = data.salaryItem
                     //设置部门
@@ -807,14 +851,39 @@
                         let divideFlg = salaryItem.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊
                         if(divideFlg ==0){
                             this.isShare = false
-                            this.department = salaryItem.departmentId
+
+                            if(salaryItem.departmentId == '0'){
+                                this.department = salaryItem.projectId
+                            }else{
+                                this.department = salaryItem.departmentId
+                            }
                         }else{
                             this.isShare = true;
-                            this.select1 = salaryItem.departmentId
-                            this.select2 = salaryItem.departmentId2
-                            this.select3 = salaryItem.departmentId3
-                            this.select4 = salaryItem.departmentId4
-                            this.select5 = salaryItem.departmentId5
+                            if(salaryItem.departmentId == '0'){
+                                this.select1 = salaryItem.projectId
+                            }else{
+                                this.select1 = salaryItem.departmentId
+                            }
+                            if(salaryItem.departmentId2 == '0'){
+                                this.select2 = salaryItem.projectId2
+                            }else{
+                                this.select2 = salaryItem.departmentId2
+                            }
+                            if(salaryItem.departmentId3 == '0'){
+                                this.select3 = salaryItem.projectId3
+                            }else{
+                                this.select3 = salaryItem.departmentId3
+                            }
+                            if(salaryItem.departmentId4 == '0'){
+                                this.select4 = salaryItem.projectId4
+                            }else{
+                                this.select4 = salaryItem.departmentId4
+                            }
+                            if(salaryItem.departmentId5 == '0'){
+                                this.select5 = salaryItem.projectId5
+                            }else{
+                                this.select5 = salaryItem.departmentId5
+                            }
 
                             this.input1 = salaryItem.projectDivRate =='null'? 0 :salaryItem.projectDivRate
                             this.input2 = salaryItem.projectDivRate2 =='null'? 0 :salaryItem.projectDivRate2
@@ -856,14 +925,9 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
-        font-size:12px;
-    }
-    .sub2{
-        position: absolute;
-        right:190px;
         font-size:12px;
     }
     .content{

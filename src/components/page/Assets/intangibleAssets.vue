@@ -16,7 +16,7 @@
                         <span v-show="!isShare">折旧分摊</span>
                         <span v-show="isShare">取消折旧分摊</span>
                     </el-button>
-                    <el-button @click="saveShare" size="small" type="primary" class="sub2">保存分摊</el-button>
+                    <el-button @click="saveShare" size="small" type="primary" class="sub2">{{saveName}}</el-button>
                 </div>
 
                 <ul class="list cf">
@@ -114,10 +114,6 @@
                         <input class="ipt" type="text" v-model="className" readonly>
                     </li>
                     <li class="sm">
-                        <span class="tit">部门</span>
-                        <input class="ipt" type="text" v-model="departmentName" readonly>
-                    </li>
-                    <li class="sm">
                         <span class="tit">年限</span>
                         <input class="ipt" type="text" v-model="usefulLife" readonly>
                     </li>
@@ -135,7 +131,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">净值</span>
-                        <input class="ipt" type="text" v-model="salvageMoney" readonly>
+                        <input class="ipt" type="text" v-model="money" readonly>
                     </li>
                     <li class="sm">
                         <span class="tit">入账日期</span>
@@ -160,6 +156,7 @@
     export default{
         data(){
             return{
+                saveName:'保存',//保存按钮名称
                 department:'',//分摊部门/项目
                 input1:0,
                 input2:0,
@@ -177,13 +174,12 @@
                 status:'',//状态 0：仅保存，1：正常使用，2：未使用，3：已折旧完毕，4：处置中，5：处置完毕
                 name:'',//名称
                 className:'',//类别
-                departmentName:'',//部门
                 divideFlg:'',//是否分摊   0为不分摊 1为分摊
                 usefulLife:'',//年限
                 originalMoney:'',//原值
                 usefulMoney:'',//累计折旧
                 salvageRate:'',//净残值率
-                salvageMoney:'',//净值
+                money:'',//净值
                 startDateYMD:'',//入账日期
                 usefulMonths:'',//已折旧月数
 
@@ -383,7 +379,7 @@
                         this.usefulLife = fixedAssets.usefulLife;
                         this.originalMoney = number.number(fixedAssets.originalMoney);
                         this.salvageRate = fixedAssets.salvageRate;
-                        this.salvageMoney = number.number(fixedAssets.salvageMoney);
+                        this.money = number.number(fixedAssets.money);
                         this.startDateYMD = fixedAssets.startDateYMD;
                         this.usefulMonths = fixedAssets.usefulMonths;
                         this.usefulMoney = number.number(fixedAssets.usefulMoney);
@@ -434,6 +430,11 @@
             },
             //分摊按钮
             shareClick(){
+                if(this.isShare){
+                    this.saveName = '保存'
+                }else{
+                    this.saveName = '保存分摊'
+                }
                 this.isShare = !this.isShare
             },
         },
@@ -469,12 +470,11 @@
 
                     this.name = fixedAssets.name;
                     this.className = fixedAssets.className;
-                    this.departmentName = fixedAssets.departmentName;
                     this.divideFlg = fixedAssets.divideFlg;
                     this.usefulLife = fixedAssets.usefulLife;
                     this.originalMoney = number.number(fixedAssets.originalMoney);
                     this.salvageRate = fixedAssets.salvageRate;
-                    this.salvageMoney = number.number(fixedAssets.salvageMoney);
+                    this.money = number.number(fixedAssets.money);
                     this.startDateYMD = fixedAssets.startDateYMD;
                     this.usefulMonths = fixedAssets.usefulMonths;
                     this.usefulMoney = number.number(fixedAssets.usefulMoney);
@@ -483,9 +483,11 @@
                     //判断是否分摊，给部门/项目赋值
                     if(this.divideFlg == 0){
                         this.isShare =false
+                        this.saveName = '保存'
                         this.department = fixedAssets.departmentIdString1
                     }else if(this.divideFlg == 1){
                         this.isShare =true
+                        this.saveName = '保存分摊'
                         this.select1 = fixedAssets.departmentIdString1
                         this.select2 = fixedAssets.departmentIdString2
                         this.select3 = fixedAssets.departmentIdString3

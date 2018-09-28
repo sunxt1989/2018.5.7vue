@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>查看费用单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button  @click="model(1)" size="small" type="danger" class="sub" >保存</el-button>
+                <el-button @click="model(1)" size="small" type="danger" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
@@ -41,7 +41,7 @@
                             <span class="tit"><span class="red">*</span>费用金额</span>
                             <input class="ipt" type="text" v-model="money" @blur="blurMoney">
                         </li>
-                        <li class="sm">
+                        <li class="sm" v-if="current_company_scale == 2">
                             <span class="tit">增值税专用发票税额</span>
                             <input class="ipt" type="text" v-model="taxMoney" @blur="blurTaxMoney">
                         </li>
@@ -115,6 +115,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
     export default{
         data(){
             return{
@@ -162,9 +163,11 @@
                     }
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym','current_company_scale']),
         methods: {
             //发票张数change事件
             receiptCountChange(){
@@ -186,6 +189,7 @@
             },
             //费用大类typeChange事件
             typeChange(){
+                this.loading = true
                 var index= this.type;
                 if(index == 2 || index == 3){
                     this.optionList(index)
@@ -199,9 +203,11 @@
                 else{
                     this.typeShow = false
                     this.destination = false
+                    this.loading = false
                 }
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('修改的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -210,27 +216,49 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false;
                     });
                 }else{
                     if(this.money <= 0){
                         this.$message.error('请正确输入金额');
+                        this.loading = false;
                         return
                     }else if(this.debitDate == ''){
                         this.$message.error('请正确输入日期');
+                        this.loading = false;
                         return
                     }else if(this.type == '' || this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
+                        this.loading = false;
                         return
                     }else if(this.aimType == ''&& this.type == 1){
                         this.$message.error('请正确输入出差目的');
+                        this.loading = false;
+                        return
+                    }else if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('费用发生日期不得早于当前账期');
+                        this.loading = false;
                         return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         var index = this.punch + this.punch2
 //                        console.log(index);
@@ -244,6 +272,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
@@ -255,9 +285,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -265,9 +297,10 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
+                this.loading = false;
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
             },
             onError(){
@@ -350,14 +383,13 @@
                 this.imgName2 = finalName[1] ? finalName[1] : '';
                 this.imgName3 = finalName[2] ? finalName[2] : '';
                 this.imgName4 = finalName[3] ? finalName[3] : '';
-
                 params.append('receiptId',this.id);
                 params.append('type',this.type);
                 params.append('childType1',this.childType1);
                 params.append('money',money);
                 params.append('taxMoney',taxMoney);
                 params.append('aimType',this.aimType);
-                params.append('discription ',this.discription);
+                params.append('discription',this.discription);
                 params.append('receiptCount',this.receiptCount);
                 params.append('receiptDate',this.debitDate);
 
@@ -380,6 +412,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -392,6 +425,12 @@
                             this.$message.error(msg);
                         }
                     })
+                    .catch(error=> {
+                        this.loading = false
+                        this.isLoading = false;
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             },
 
             //上传图片缩略图信息赋值
@@ -445,7 +484,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.options = data.list;
                     this.optionsSmall= data.optionList;
@@ -473,8 +512,12 @@
                         this.typeShow = false
                         this.destination = false
                     }
-
                 })
+                .catch(error=> {
+                    this.loading = false
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
 
     }
@@ -574,7 +617,7 @@
         width:76.7%;
         padding: 3px 10px;
     }
-    .sub{
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;

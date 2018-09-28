@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>借款单审批</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button @click="model(2)" size="small" type="primary" class="sub2">同意</el-button>
+                <el-button @click="model(1)" size="small" type="danger" class="sub1" :loading="isLoading">驳回</el-button>
+                <el-button @click="model(2)" size="small" type="primary" class="sub2" :loading="isLoading">同意</el-button>
             </div>
         </div>
         <div class="w">
@@ -74,7 +74,8 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
+                        <img v-if="!item.auditUserFaceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.auditUserFaceUri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.auditUserName}}</span>
                             ——
@@ -143,11 +144,13 @@
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
             model(n){
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -155,12 +158,29 @@
                         type: 'warning'
                     }).then(() => {
                         this.$router.go(-1)
-                    }).catch(() => {});
+                    }).catch(() => {
+                        this.loading = false;
+                    });
                 }else if(n == 1){
+                    this.isLoading = true;
                     this.$confirm('确定是否驳回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n)
                     }).catch(() => {
@@ -168,12 +188,29 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }else if(n == 2){
+                    this.isLoading = true;
                     this.$confirm('确定是否同意？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n)
                     }).catch(() => {
@@ -181,6 +218,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
@@ -207,18 +246,21 @@
                 var params = new URLSearchParams();
                 var agreeUrl = addUrl.addUrl('loanSheetApprovalAgree')
                 var refuseUrl = addUrl.addUrl('loanSheetApprovalRefuse')
-
-                params.append('debitId',this.debitId);
-                params.append('discription',this.discription2);
                 //判断n=1时为驳回，n=2时为同意
                 if(n == 1){
                     url = refuseUrl
+                    this.discription2 = this.discription2 == '同意' ? '驳回':this.discription2
                 }else if(n == 2){
                     url = agreeUrl
+                    this.discription2 = this.discription2 == '驳回' ? '同意':this.discription2
                 }
+                params.append('debitId',this.debitId);
+                params.append('discription',this.discription2);
+
                 axios.post(url,params)
                     .then(response=>{
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -230,6 +272,12 @@
                             var msg = response.data.msg;
                             this.$message.error(msg);
                         }
+                    })
+                    .catch(error=> {
+//                        console.log(error);
+                        this.loading = false;
+                        this.isLoading = false;
+                        alert('网络错误，不能访问');
                     })
             }
         },
@@ -259,26 +307,33 @@
             axios.post(url,params)
                 .then(response=> {
 //                console.log(response);
-            var data = response.data.value;
+                    var data = response.data.value;
 //            console.log(data);
-            this.options = data.departmentList;
-            this.userDebitAuditRecordList = data.userDebitAuditRecordList;
-            this.discription = data.userDebitItem.discription;
-            this.money = number.number(data.userDebitItem.money);
-            this.creditMoney = number.number(data.userDebitItem.creditMoney);
-            this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
-            this.nowdata = data.userDebitItem.debitDateYMD;
-            this.debitDate = data.userDebitItem.debitDateYMD;
-            this.userName = data.userDebitItem.userName;
-            this.auditFlg = data.userDebitItem.auditFlg;
-            this.attachUrlJson = data.userDebitItem.attachUrlJson;
-            this.departmentId = data.userDebitItem.departmentIdStr;
-            this.loading = false;
+                    this.options = data.departmentList;
+                    let userDebitAuditRecordList = data.userDebitAuditRecordList
 
-            for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
-                this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0,10)
-            }
-        })
+                    this.userDebitAuditRecordList = userDebitAuditRecordList;
+                    this.discription = data.userDebitItem.discription;
+                    this.money = number.number(data.userDebitItem.money);
+                    this.creditMoney = number.number(data.userDebitItem.creditMoney);
+                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
+                    this.nowdata = data.userDebitItem.debitDateYMD;
+                    this.debitDate = data.userDebitItem.debitDateYMD;
+                    this.userName = data.userDebitItem.userName;
+                    this.auditFlg = data.userDebitItem.auditFlg;
+                    this.attachUrlJson = data.userDebitItem.attachUrlJson;
+                    this.departmentId = data.userDebitItem.departmentIdStr;
+                    this.loading = false;
+
+                    for (var i = 0; i < this.userDebitAuditRecordList.length; i++) {
+                        this.userDebitAuditRecordList[i].auditTimeYMDHM = this.userDebitAuditRecordList[i].auditTimeYMDHM.substring(0, 10)
+                    }
+                })
+                .catch(error=> {
+//                        console.log(error);
+                    this.loading = false;
+                    alert('网络错误，不能访问');
+                })
         },
     }
 </script>
@@ -363,12 +418,12 @@
         width:78.7%;
         padding: 3px 10px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

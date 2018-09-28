@@ -13,7 +13,7 @@
                     <el-table-column prop="customName" label="客户" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.type == 1">代销商品</span>
+                            <span v-if="scope.row.type == 1">待销商品</span>
                             <span v-if="scope.row.type == 2">技术服务</span>
                             <span v-if="scope.row.type == 3">技术开发</span>
                             <span v-if="scope.row.type == 4">技术咨询</span>
@@ -68,9 +68,6 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        methods:{
-
-        },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -109,6 +106,7 @@
                     }
                 })
                 .catch(error=> {
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -133,7 +131,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

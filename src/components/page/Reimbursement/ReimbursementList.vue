@@ -3,7 +3,7 @@
         <div class="w cf">
             <div class="top">
                 <h2>报销单列表</h2>
-                <el-select v-model="choice" class='choice' placeholder="未完成列表" @change="changeChoice">
+                <el-select v-model="choice" class="choice" placeholder="未完成列表" @change="changeChoice">
                     <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -147,6 +147,7 @@
         },
         methods:{
             changeChoice(){
+                this.loading = true
                 this.axios()
             },
             //选择记录日期事件
@@ -196,11 +197,26 @@
             },
             //删除提示模态框
             deleteModel(id){
+                this.loading = true
 //                console.log(id);
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -208,11 +224,11 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                    this.loading = false;
                 });
             },
             //删除列表信息
             deleteList(isId){
-                this.loading = true;
                 var debitId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('ReimbursementListDelete')
@@ -238,6 +254,7 @@
 
             //分页器
             changePage(val){
+                this.loading = true
                 this.currentPage = val;
                 this.axios()
             },
@@ -279,8 +296,8 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
-                    var data = response.data.value.list;//借款单列表数据
+                    console.log(response);
+                    var data = response.data.value.list;//报销单列表数据
                     var $count = response.data.value.count;//总条目数
                     let tableDataarr =[];
 //                    console.log(data);
@@ -291,6 +308,7 @@
                     this.tableData = this.addUrl(tableDataarr);
                 })
                 .catch(error=> {
+                    this.loading = false;
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -315,7 +333,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

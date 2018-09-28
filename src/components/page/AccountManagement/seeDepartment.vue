@@ -2,21 +2,24 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>缴税单审批</h2>
+                <h2>查看部门</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">同意</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2">驳回</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
             <div class="content" :style="{height:screenHeight}">
                 <div class="line">
-                    <span>缴税单</span>
+                    <span>查看部门</span>
                 </div>
                 <ul class="list cf">
                     <li class="pt">
-                        <span class="tit">税种</span>
-                        <el-select v-model="taxType" slot="prepend" placeholder="请选择" class="sel" disabled>
+                        <span class="tit">部门名称</span>
+                        <input class="ipt" type="text" v-model="departmentName">
+                    </li>
+                    <li class="pt">
+                        <span class="tit">部门类别</span>
+                        <el-select class="sel" type="text" v-model="departmentType">
                             <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -26,34 +29,19 @@
                         </el-select>
                     </li>
                     <li class="pt">
-                        <span class="tit">总金额</span>
-                        <input class="ipt" type="text" v-model="countMoney" maxlength="14" readonly>
+                        <span class="tit">上级部门</span>
+                        <el-select class="sel" type="text" v-model="fatherDepartmentName">
+                            <el-option
+                                v-for="item in options2"
+                                :key="item.value"
+                                :label="item.departmentName"
+                                :value="item.idStr">
+                            </el-option>
+                        </el-select>
                     </li>
-                    <li class="ptx">
-                        <span class="tit">说明</span>
-                        <textarea class="iptx" v-model="description" maxlength="50"  readonly></textarea>
-                    </li>
-                    <li class="ptx">
-                        <span class="tit">备注</span>
-                        <textarea class="iptx" v-model="remarks" maxlength="50"></textarea>
-                    </li>
-                </ul>
-                <div class="line">
-                    <span>审批记录</span>
-                </div>
-
-                <ul class="approval">
-                    <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
-                        <div class="listHeader">
-                            <span class="listName">{{item.auditUserName}}</span>
-                            <span class="listDepartment" v-if="item.auditUserType != ''">——{{item.auditUserType}}</span>
-                            <span class="listData">{{item.auditTimeStr}}</span>
-                        </div>
-                        <div class="listFooter">
-                            <span class="listState">意见：</span>
-                            <span class="listContent">{{item.discription}}</span>
-                        </div>
+                    <li class="pt">
+                        <span class="tit">创建时间</span>
+                        <input class="ipt" type="text" v-model="createTimeYMD" readonly>
                     </li>
                 </ul>
             </div>
@@ -65,38 +53,29 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import addUrl from '../../../../static/js/addUrl'
-    import number from '../../../../static/js/number'
-    import unNumber from '../../../../static/js/unNumber'
     export default{
         data(){
             return{
-                taxType:'',//税种
+                departmentName:'',//部门名称
+                departmentType:'',//部门类别
+                fatherDepartmentName:'',//上级部门
+                createTimeYMD:'',//创建时间
                 options:[
-                    {value:1,label:'印花税'},
-                    {value:2,label:'土地使用税'},
-                    {value:3,label:'车船使用税'},
-                    {value:4,label:'房产税'},
-                    {value:5,label:'消费税'},
-                    {value:6,label:'残疾人就业保障金'},
-                    {value:7,label:'增值税'},
-                ],
-                countMoney:'0.00',//总金额
-                description:'',//说明
-                remarks:'',//审批备注
-                userDebitAuditRecordList:[],//审批意见列表
+                    {value:'1',label:'管理'},
+                    {value:'2',label:'生产'},
+                    {value:'3',label:'销售'},
+                    {value:'4',label:'研发'},
+                    {value:'5',label:'财务'}
+                ],//部门类别
+                options2:[],//上级部门
 
-                pickerOption1:{
-                    disabledDate(time) {
-                        return time.getTime() > Date.now();
-                    }
-                },
-                id:this.$route.params.debitId,
+                debitId:this.$route.params.debitId,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods: {
-
             model(n){
                 this.loading = true;
                 if(n == 0){
@@ -106,33 +85,60 @@
                         type: 'warning'
                     }).then(() => {
                         this.$router.go(-1)
-                        this.loading = false;
                     }).catch(() => {
-
+                        this.loading = false;
                     });
                 }else{
+                    if(this.departmentName == ''){
+                        this.$message.error('请正确输入部门名称');
+                        this.loading = false;
+                        return
+                    }
+                    if(this.departmentType == ''){
+                        this.$message.error('请正确输入部门类别');
+                        this.loading = false;
+                        return
+                    }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
-                        this.submit(n)
+                        this.submit()
                     }).catch(() => {
                         this.$message({
                             type: 'info',
                             message: '已取消'
                         });
                         this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
-            submit(n){
-                let url = addUrl.addUrl('approvalTaxationSubmit')
-                let params = new URLSearchParams();
+            submit(){
+                this.loading = true;
+                var url = addUrl.addUrl('departmentChange');
+                var params = new URLSearchParams();
 
-                params.append('id',this.id);
-                params.append('remarks',this.remarks);
-                params.append('auditStatus',n);
+                params.append('departmentId',this.debitId);
+                params.append('departmentName',this.departmentName);
+                params.append('departmentType',this.departmentType);
+                params.append('fatherDepartmentId',this.fatherDepartmentName);
 
                 axios({
                     method:'post',
@@ -155,14 +161,36 @@
                             this.$message.error(msg);
                         }
                         this.loading = false;
+                        this.isLoading = false;
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
-
+            axios(){
+                var url = addUrl.addUrl('departmentList')
+                axios.post(url)
+                    .then(response=> {
+                        this.loading = false;
+                        console.log(response);
+                        var data = response.data.value;//列表数据
+                        let departmentList = data.departmentList
+                        let options2 = [];
+                        for(let i in departmentList){
+                            if(departmentList[i].idString != this.debitId){
+                                options2.push(departmentList[i])
+                            }
+                        }
+                        this.options2 = options2
+                    })
+                    .catch(error=> {
+//                    console.log(error);
+                        alert('网络错误，不能访问1');
+                    })
+            },
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -184,25 +212,25 @@
         },
         created(){
             var params = new URLSearchParams();
-            var url = addUrl.addUrl('seeTaxation')
-            params.append('id',this.id);
+            var url = addUrl.addUrl('seeDepartment')
+            params.append('departmentId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
-                    let data = response.data.value;
-                    this.taxType = data.taxPay.taxType
-                    this.countMoney = number.number(data.taxPay.amount)
-                    this.description = data.taxPay.description
-                    this.userDebitAuditRecordList = data.taxPayAuditRecordlist
-
                     this.loading = false;
+                    console.log(response);
+                    var data = response.data.value.department;//部门数据
+                    this.departmentName = data.departmentName
+                    this.departmentType = String(data.departmentType)
+                    this.fatherDepartmentName = data.fatherDepartmentIdStr
+                    this.createTimeYMD = data.createTimeYMD
+                    this.axios()
                 })
                 .catch(error=> {
 //                    console.log(error);
-                    alert('网络错误，不能访问');
+                    alert('网络错误，不能访问1');
                     this.loading = false;
                 })
-        },
+        }
     }
 </script>
 
@@ -225,14 +253,9 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
-        font-size:12px;
-    }
-    .sub2{
-        position: absolute;
-        right:200px;
         font-size:12px;
     }
     .content{
@@ -256,102 +279,48 @@
         margin-top: 20px;
         float: left;
     }
-    .list .sel{
-        width:422px;
-        height:36px;
-    }
-    .list .iptData{
-        width:422px;
-        height:36px;
-    }
     .list .ptx{
         width:100%;
         display: inline-block;
-        height:50px;
+        height:320px;
         text-align: left;
         line-height: 36px;
         margin-top: 20px;
         float: left;
     }
-
     .list li .ipt{
         display: inline-block;
-        width:400px;
+        width:600px;
         height:28px;
         border: 1px solid #ccc;
         border-radius: 3px;
         vertical-align: middle;
         padding: 3px 10px;
     }
-    .list li .iptx{
+    .list li .tex{
         display: inline-block;
-        width:400px;
-        height:50px;
+        width:600px;
+        height:40px;
         border: 1px solid #ccc;
         border-radius: 3px;
         vertical-align: middle;
         padding: 3px 10px;
         resize: none;
     }
-
+    .list li .sel{
+        width:622px;
+        height:36px;
+    }
     .list li .tit{
         font-size:14px;
         display: inline-block;
-        width:250px;
+        width:150px;
         text-align: right;
         margin-right: 20px;
         vertical-align: middle;
     }
-    .approval{
-        width:70%;
-        margin: 20px auto 0;
-        font-size:14px;
+    .list li .data{
+        width:622px;
+        height:36px;
     }
-    .approval li{
-        margin-top: 20px;
-        text-align: left;
-    }
-    .approval li img{
-        display: inline-block;
-        width:50px;
-        height:50px;
-        border-radius: 50%;
-        overflow: hidden;
-        float: left;
-        margin-right: 20px;
-    }
-    .approval li .listHeader{
-        display: inline-block;
-        float: left;
-        width:80%;
-    }
-    .approval li .listHeader .listName{
-
-        margin-right: 10px;
-    }
-    .approval li .listHeader .listDepartment{
-        margin-left: 10px;
-    }
-    .approval li .listHeader .listData{
-        float: right;
-    }
-    .approval li .listFooter{
-        display: inline-block;
-        float: left;
-        width:80%;
-        margin-top: 10px;
-    }
-    .approval li .listFooter .listState{
-        display: inline-block;
-        float: left;
-        margin-right: 10px;
-    }
-    .approval li .listFooter .listContent{
-        width:90%;
-        display: inline-block;
-        float: left;
-        height:50px;
-        overflow: hidden;
-    }
-
 </style>

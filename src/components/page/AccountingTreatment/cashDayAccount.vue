@@ -108,8 +108,7 @@
                 params.append('endSub',this.endSubject);
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -178,7 +177,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -193,7 +192,7 @@
     .sub1{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;

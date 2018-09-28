@@ -1,6 +1,9 @@
 <template>
     <div v-loading.fullscreen.lock="loading">
-        <div class="w cf">
+        <div class="w cf" v-loading="loading2"
+             element-loading-text="月结中，请不要离开页面"
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)">
             <div class="top">
                 <h2>月结</h2>
                 <router-link to="/" class="back">返回</router-link>
@@ -146,7 +149,8 @@
                 process_3_1:0,//固定资产折旧
                 process_3_2:0,//无形资产折旧
                 process_3_3:0,//工资单生成
-                loading:false
+                loading:false,
+                loading2:false
             }
         },
         methods: {
@@ -154,7 +158,21 @@
                 this.$confirm('您确定要对当前账期进行结转？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                    this.axios()
                 }).catch(() => {
@@ -173,9 +191,11 @@
                         let data = response.data
                         let status = data.status
                         let msg = data.msg
-                        var nextYearMonth = String(data.value.nextYearMonth)
-                        let _this = this
+                        let obj = {};
+                        let _this = this;
+                        this.loading2 = true;
                         if(status == 200){
+                            let nextYearMonth = String(data.value.nextYearMonth)
                             this.loading = false
                             this.process_1_1 = data.value.process_1_1
                             this.process_1_2 = data.value.process_1_2
@@ -212,14 +232,15 @@
                                     _this.process_3_1 = 0
                                     _this.process_3_2 = 0
                                     _this.process_3_3 = 0
-                                    _this.$store.commit('accountChange',nextYearMonth)
+                                    obj.current_book_ym = nextYearMonth
+                                    _this.$store.commit('add',obj)
+                                    _this.loading2 = false;
                                 }else{
                                     _this.$message.error('月结失败，请重试')
                                 }
-                            },6000)
-
+                            },5000)
                         }else if(status == 400){
-                            this.loading = false
+                            this.loading = false;
                             this.$message.error(msg)
                         }
 
@@ -265,7 +286,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:31px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

@@ -82,7 +82,7 @@
                         <span class="tit">注册资金</span>
                         <input class="ipt" type="text" v-model="registeredCapital" readonly>
                     </li>
-                    <li class="pt">
+                    <li class="pt" v-if="inviteCode">
                         <span class="tit">邀请码</span>
                         <el-input placeholder="请输入内容" v-model="inviteCode" class="el-ipt" readonly>
                             <el-button slot="append" @click="changeInviteCode">更新邀请码</el-button>
@@ -111,6 +111,10 @@
                     <li class="pt">
                         <span class="tit">增值税缴税周期</span>
                         <input class="ipt" type="text" v-model="addedTaxPeroidType" readonly>
+                    </li>
+                    <li class="pt">
+                        <span class="tit">是否科技型企业</span>
+                        <input class="ipt" type="text" v-model="highTechInfo" readonly>
                     </li>
                     <li class="ptx">
                         <span class="tit">营业执照</span>
@@ -202,6 +206,7 @@
                 inventoryCostType:'',//成本计算方法
                 incomeTaxPeroidType:'',//所得税缴税周期
                 addedTaxPeroidType:'',//增值税缴税周期
+                highTechInfo:'',//是否科技型企业
 
 
                 pickerOption1:{
@@ -281,6 +286,8 @@
                     this.inventoryCostType = data.inventoryCostType
                     this.incomeTaxPeroidType = data.incomeTaxPeroidType
                     this.addedTaxPeroidType = data.addedTaxPeroidType
+                    this.highTechInfo = data.highTechInfo
+
 
                     this.loading = false
                 })
@@ -310,7 +317,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

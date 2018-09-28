@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>个人信息</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">提交</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -12,11 +12,12 @@
 
                 <ul class="list cf">
                     <li class="ptx">
-                        <img :src="imageUrl" alt="">
+                        <img v-if="!imageUrl" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="imageUrl" alt="">
                         <input type="file" class="avatar" @change="changeUrl">
                     </li>
                     <li class="pt">
-                        <span class="tit">姓名</span>
+                        <span class="tit"><span class="red">*</span>姓名</span>
                         <input class="ipt" type="text" v-model="userName" maxlength="50">
                     </li>
                     <li class="pt">
@@ -59,19 +60,19 @@
                 imageUrl:'',//头像图片地址
                 imageName:'',//头像图片名称
 
-                loading:false,
+                loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods: {
-
             changeUrl(e){
-                let file = e.srcElement.files[0]
-                let isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
-                let isLt4M = file.size / 1024 / 1024 < 4;
+                let file = e.srcElement.files[0];
+                console.log(file);
                 let imageUrl = ''
-
                 if(file){
+                    let isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                    let isLt4M = file.size / 1024 / 1024 < 4;
                     if (!isJPG) {
                         this.loading = false;
                         this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
@@ -103,15 +104,16 @@
                 fileReader.readAsDataURL(blob);
             },
             model(n){
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        this.$router.go(-1)
+                        this.$router.push('/')
                     }).catch(() => {
-
+                        this.loading = false;
                     });
                 }else{
                     if(this.userName == ''){
@@ -119,10 +121,25 @@
                         this.loading = false;
                         return
                     }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit()
                     }).catch(() => {
@@ -130,14 +147,14 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
             submit(){
-                this.loading = true;
                 var url = addUrl.addUrl('personalSubmit');
                 var params = new URLSearchParams();
-
                 params.append('userName',this.userName);
                 params.append('gender',this.gender);
                 params.append('remark',this.remark);
@@ -157,7 +174,7 @@
                     .then(response=> {
                         console.log(response);
                         if(response.data.status == 200){
-//                            this.$router.go(-1);
+                            this.$router.push('/');
                             this.$message({
                                 type: 'success',
                                 message: '提交成功'
@@ -167,9 +184,11 @@
                             this.$message.error(msg);
                         }
                         this.loading = false;
+                        this.isLoading = false;
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -203,9 +222,10 @@
                     this.userName = data.userName
                     this.gender = String(data.gender)
                     this.idNumber = data.idNumber
-                    this.email = data.email
+                    this.email = data.email || ''
                     this.remark = data.remark
-                    this.imageUrl = data.faceUri || '../../../../static/images/tit.png'
+                    this.imageUrl = data.faceUri
+                    this.imageName = data.faceUri//当没有更新头像时，将url参数传递给name保证后台判断头像继续使用原头像
 
                     this.loading = false
                 })
@@ -237,7 +257,7 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
@@ -285,6 +305,7 @@
         top:0;
         left:0;
         opacity: 0;
+        cursor: pointer;
     }
     .list li .ipt{
         display: inline-block;

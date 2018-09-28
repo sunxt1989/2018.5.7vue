@@ -38,7 +38,7 @@
                     <el-table-column prop="customName" label="客户" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.type == 1">代销商品</span>
+                            <span v-if="scope.row.type == 1">待销商品</span>
                             <span v-if="scope.row.type == 2">技术服务</span>
                             <span v-if="scope.row.type == 3">技术开发</span>
                             <span v-if="scope.row.type == 4">技术咨询</span>
@@ -75,7 +75,7 @@
 
                     <el-table-column prop="" label="收款" sortable align="center">
                         <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unsendMoney == 0 || scope.row.auditFlg != 4">收款</span>
+                            <span class="black" v-if="scope.row.unreceiveMoney == 0 || scope.row.auditFlg != 4">收款</span>
                             <router-link v-else class="repayment red"
                                          :to="{name:'newSalePayment',params:{debitId:scope.row.idString}}">收款
                             </router-link>
@@ -197,7 +197,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        console.log(response);
                         var data = response.data.value.list;
                         this.count = response.data.value.count;//总条目数
 
@@ -220,10 +220,25 @@
             },
             //删除提示模态框
             deleteModel(id){
+                this.loading = true
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -231,6 +246,7 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                    this.loading = false
                 });
             },
             //删除列表信息
@@ -276,6 +292,7 @@
             },
             //分页器
             changePage(val){
+                this.loading = true
                 this.currentPage = val;
                 this.axios()
             }
@@ -309,7 +326,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value.list;
                     this.count = response.data.value.count;//总条目数
 
@@ -326,6 +343,7 @@
                     }
                 })
                 .catch(error=> {
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -350,7 +368,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -362,7 +380,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

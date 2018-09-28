@@ -9,7 +9,12 @@
         <div class="w">
             <div class="left" :style="{height:screenHeight}">
                 <el-table :data="tableData" class="blueList">
-                    <el-table-column prop="departmentName" label="部门" sortable align="center"></el-table-column>
+                    <el-table-column prop="departmentName" label="部门" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.departmentName }}</span>
+                            <span v-if="scope.row.divideFlg == 1">（分摊）</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="operateUserName" label="申请人" sortable align="center"></el-table-column>
                     <el-table-column prop="supplierName" label="供应商" sortable align="center"></el-table-column>
                     <el-table-column prop="sendMoney" label="付款金额费用" sortable align="center">
@@ -67,7 +72,7 @@
                     .then(response=> {
                         this.loading = false;
 //                        console.log(response);
-                        var data = response.data.value.list;//借款单列表数据
+                        var data = response.data.value.list;//列表数据
 
                         this.count = response.data.value.count;//总条目数
                         var tableDataarr =[];
@@ -110,7 +115,7 @@
                 .then(response=> {
                     this.loading = false;
 //                    console.log(response);
-                    var data = response.data.value.list;//借款单列表数据
+                    var data = response.data.value.list;//列表数据
 
                     var tableDataarr =[];
                     if(data){
@@ -123,6 +128,7 @@
                     }
                 })
                 .catch(error=> {
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -147,7 +153,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

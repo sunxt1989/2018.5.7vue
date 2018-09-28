@@ -73,7 +73,21 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -171,7 +185,7 @@
     .addLink{
         display: inline-block;
         width: 100px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -183,7 +197,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

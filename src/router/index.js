@@ -1,18 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import homePage from '@/components/page/homePage'
+
 //借款单：
 import loan from '@/components/page/loan/loan'//借款单列表
 import newLoan from '@/components/page/loan/newLoan'//新建借款单
 import seeLoan from '@/components/page/loan/seeLoan'//查看借款单
 import repayment from '@/components/page/loan/repayment'//还款单
+import seeRepayment from '@/components/page/loan/seeRepayment'//还款单详情
 import loanApprovalList from '@/components/page/loan/loanApprovalList'//借款单审批列表
 import loanSheetApproval from '@/components/page/loan/loanSheetApproval'//借款单审批
 import loanConfirmationList from '@/components/page/loan/loanConfirmationList'//借款单确认列表
 import loanConfirmation from '@/components/page/loan/loanConfirmation'//借款单确认
 import repaymentConfirmationList from '@/components/page/loan/repaymentConfirmationList'//还款单确认列表
 import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'//还款单确认
-
 //报销
 import costSheet from '@/components/page/Reimbursement/costSheet'//费用单列表
 import newCost from '@/components/page/Reimbursement/newCost'//新建费用单
@@ -36,6 +37,7 @@ import approvalPurchasePayList from '@/components/page/Purchase/approvalPurchase
 import approvalPurchasePay from '@/components/page/Purchase/approvalPurchasePay'//采购单付款审批
 import approvalPurchaseConfirmList from '@/components/page/Purchase/approvalPurchaseConfirmList'//采购单付款确认列表
 import approvalPurchaseConfirm from '@/components/page/Purchase/approvalPurchaseConfirm'//采购单付款确认
+
 //销售
 import saleList from '@/components/page/Sale/saleList'//销售单列表
 import newSale from '@/components/page/Sale/newSale'//新建销售单
@@ -48,6 +50,7 @@ import approvalSalePayList from '@/components/page/Sale/approvalSalePayList'//�
 import approvalSalePay from '@/components/page/Sale/approvalSalePay'//销售单收款审批
 import approvalSaleConfirmList from '@/components/page/Sale/approvalSaleConfirmList'//销售单收款确认列表
 import approvalSaleConfirm from '@/components/page/Sale/approvalSaleConfirm'//销售单收款确认
+import stockList from '@/components/page/Sale/stockList'//库存商品列表
 //交易方
 import SupplierList from '@/components/page/Purchase/SupplierList'//交易方列表
 import newSupplier from '@/components/page/Purchase/newSupplier'//新建交易方
@@ -75,12 +78,19 @@ import approvalBank from '@/components/page/bank/approvalBank'//银行业务审�
 import payroll from '@/components/page/Payroll/payroll'//工资单列表
 import addPayroll from '@/components/page/Payroll/addPayroll'//新增临时员工
 import seePayroll from '@/components/page/Payroll/seePayroll'//修改临时员工
+import record from '@/components/page/Payroll/record'//初始化工资补录
 //账套管理
 import personal from '@/components/page/AccountManagement/personal'//个人信息
 import AccountManagement from '@/components/page/AccountManagement/AccountManagement'//账套管理
 import newAccountManagement from '@/components/page/AccountManagement/newAccountManagement'//新建账套管理
 import changeAccountManagement from '@/components/page/AccountManagement/changeAccountManagement'//修改账套管理
 import seeAccountManagement from '@/components/page/AccountManagement/seeAccountManagement'//查看账套管理
+import changePassword from '@/components/page/AccountManagement/changePassword'//查看账套管理
+import staffList from '@/components/page/AccountManagement/staffList'//员工列表
+import staffChange from '@/components/page/AccountManagement/staffChange'//员工权限详情
+import departmentList from '@/components/page/AccountManagement/departmentList'//部门列表
+import addDepartment from '@/components/page/AccountManagement/addDepartment'//新增部门
+import seeDepartment from '@/components/page/AccountManagement/seeDepartment'//查看部门
 
 //报表
 import ZCFZReport from '@/components/page/Report/ZCFZReport'//资产负债表
@@ -88,13 +98,11 @@ import LRBeport from '@/components/page/Report/LRBeport'//利润表
 import XJLLeport from '@/components/page/Report/XJLLeport'//现金流量表
 
 //税费缴纳
-import TaxationList from '@/components/page/Taxation/TaxationList'//税费缴纳列表
-import newTaxation from '@/components/page/Taxation/newTaxation'//新建缴税单
-import seeTaxation from '@/components/page/Taxation/seeTaxation'//修改缴税单
-import approvalTaxationList from '@/components/page/Taxation/approvalTaxationList'//缴税单审批列表
-import approvalTaxation from '@/components/page/Taxation/approvalTaxation'//缴税单审批
-import approvalTaxationConfirmList from '@/components/page/Taxation/approvalTaxationConfirmList'//缴税单确认单列表
-import approvalTaxationConfirm from '@/components/page/Taxation/approvalTaxationConfirm'//缴税单确认单
+import TaxationList from '@/components/page/Taxation/TaxationList'//税费缴纳
+import taxationHistory from '@/components/page/Taxation/taxationHistory'//税费缴纳历史记录
+import calculation from '@/components/page/Taxation/calculation'//计提企业所得税
+import taxationPay from '@/components/page/Taxation/taxationPay'//缴纳
+
 
 //账务处理
 import Initialization from '@/components/page/AccountingTreatment/Initialization'//账务处理-初始化
@@ -109,7 +117,26 @@ import auxiliarySubjectBalance from '@/components/page/AccountingTreatment/auxil
 
 //红冲
 import RedFlush from '@/components/page/RedFlush/RedFlush' //红冲列表
+
+//辅助业务
+import auxiliaryList from '@/components/page/auxiliary/auxiliaryList' //辅助业务列表
+import newAuxiliary from '@/components/page/auxiliary/newAuxiliary' //新添辅助业务
+import auxiliaryHistoryList from '@/components/page/auxiliary/auxiliaryHistoryList' //历史辅助业务
+import seeAuxiliary from '@/components/page/auxiliary/seeAuxiliary' //查看辅助业务
+import linkedPurchase from '@/components/page/auxiliary/linkedPurchase' //关联采购单
+import linkedSale from '@/components/page/auxiliary/linkedSale' //关联销售单
+import approvalAuxiliaryList from '@/components/page/auxiliary/approvalAuxiliaryList' //辅助业务审批列表
+import approvalAuxiliary from '@/components/page/auxiliary/approvalAuxiliary' //辅助业务审批
+import payments from '@/components/page/auxiliary/payments' //收/付款单
+import approvalPaymentsList from '@/components/page/auxiliary/approvalPaymentsList' // 收/付款审批列表
+import approvalPayments from '@/components/page/auxiliary/approvalPayments' // 收/付款审批
+
+//收容项
+import collectionList from '@/components/page/Collection/collectionList' //收容项列表
+import newCollection from '@/components/page/Collection/newCollection' //新建收容项
+import seeCollection from '@/components/page/Collection/seeCollection' //查看收容项
 Vue.use(Router)
+
 
 export default new Router({
     routes: [
@@ -137,6 +164,11 @@ export default new Router({
             path:'/loan/repayment',
             name:'repayment',
             component:repayment
+        },
+        {
+            path:'/loan/seeRepayment',
+            name:'seeRepayment',
+            component:seeRepayment
         },
         {
             path:'/loan/loanApprovalList',
@@ -270,6 +302,12 @@ export default new Router({
             name:'approvalPurchaseConfirmList',
             component:approvalPurchaseConfirmList
         },
+        {
+            path:'/Sale/stockList',
+            name:'stockList',
+            component:stockList
+        },
+
         {
             path:'/Purchase/approvalPurchaseConfirm',
             name:'approvalPurchaseConfirm',
@@ -442,6 +480,11 @@ export default new Router({
             component:seePayroll
         },
         {
+            path:'/Payroll/record',
+            name:'record',
+            component:record
+        },
+        {
             path:'/AccountManagement/personal',
             name:'personal',
             component:personal
@@ -468,6 +511,36 @@ export default new Router({
             component:seeAccountManagement
         },
         {
+            path:'/AccountManagement/changePassword',
+            name:'changePassword',
+            component:changePassword
+        },
+        {
+            path:'/AccountManagement/staffList',
+            name:'staffList',
+            component:staffList
+        },
+        {
+            path:'/AccountManagement/staffChange',
+            name:'staffChange',
+            component:staffChange
+        },
+        {
+            path:'/AccountManagement/departmentList',
+            name:'departmentList',
+            component:departmentList
+        },
+        {
+            path:'/AccountManagement/addDepartment',
+            name:'addDepartment',
+            component:addDepartment
+        },
+        {
+            path:'/AccountManagement/seeDepartment',
+            name:'seeDepartment',
+            component:seeDepartment
+        },
+        {
             path:'/Report/ZCFZReport',
             name:'ZCFZReport',
             component:ZCFZReport
@@ -488,35 +561,21 @@ export default new Router({
             component:TaxationList
         },
         {
-            path:'/Taxation/newTaxation',
-            name:'newTaxation',
-            component:newTaxation
+            path:'/Taxation/taxationHistory',
+            name:'taxationHistory',
+            component:taxationHistory
         },
         {
-            path:'/Taxation/seeTaxation',
-            name:'seeTaxation',
-            component:seeTaxation
+            path:'/Taxation/calculation',
+            name:'calculation',
+            component:calculation
         },
         {
-            path:'/Taxation/approvalTaxationList',
-            name:'approvalTaxationList',
-            component:approvalTaxationList
+            path:'/Taxation/taxationPay',
+            name:'taxationPay',
+            component:taxationPay
         },
-        {
-            path:'/Taxation/approvalTaxation',
-            name:'approvalTaxation',
-            component:approvalTaxation
-        },
-        {
-            path:'/Taxation/approvalTaxationConfirmList',
-            name:'approvalTaxationConfirmList',
-            component:approvalTaxationConfirmList
-        },
-        {
-            path:'/Taxation/approvalTaxationConfirm',
-            name:'approvalTaxationConfirm',
-            component:approvalTaxationConfirm
-        },
+
         {
             path:'/AccountingTreatment/Initialization',
             name:'Initialization',
@@ -567,7 +626,76 @@ export default new Router({
             name:'RedFlush',
             component:RedFlush
         },
-
-
+        {
+            path:'/auxiliary/auxiliaryList',
+            name:'auxiliaryList',
+            component:auxiliaryList,
+            mode:'history'
+        },
+        {
+            path:'/auxiliary/newAuxiliary',
+            name:'newAuxiliary',
+            component:newAuxiliary
+        },
+        {
+            path:'/auxiliary/auxiliaryHistoryList',
+            name:'auxiliaryHistoryList',
+            component:auxiliaryHistoryList
+        },
+        {
+            path:'/auxiliary/seeAuxiliary',
+            name:'seeAuxiliary',
+            component:seeAuxiliary
+        },
+        {
+            path:'/auxiliary/linkedPurchase',
+            name:'linkedPurchase',
+            component:linkedPurchase
+        },
+        {
+            path:'/auxiliary/linkedSale',
+            name:'linkedSale',
+            component:linkedSale
+        },
+        {
+            path:'/auxiliary/approvalAuxiliaryList',
+            name:'approvalAuxiliaryList',
+            component:approvalAuxiliaryList
+        },
+        {
+            path:'/auxiliary/approvalAuxiliary',
+            name:'approvalAuxiliary',
+            component:approvalAuxiliary
+        },
+        {
+            path:'/auxiliary/payments',
+            name:'payments',
+            component:payments
+        },
+        {
+            path:'/auxiliary/approvalPaymentsList',
+            name:'approvalPaymentsList',
+            component:approvalPaymentsList
+        },
+        {
+            path:'/auxiliary/approvalPayments',
+            name:'approvalPayments',
+            component:approvalPayments
+        },
+        {
+            path:'/Collection/collectionList',
+            name:'collectionList',
+            component:collectionList
+        },
+        {
+            path:'/Collection/newCollection',
+            name:'newCollection',
+            component:newCollection
+        },
+        {
+            path:'/Collection/seeCollection',
+            name:'seeCollection',
+            component:seeCollection
+        },
     ]
 })

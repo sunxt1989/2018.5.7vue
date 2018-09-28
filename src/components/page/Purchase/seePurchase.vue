@@ -4,9 +4,9 @@
             <div class="top">
                 <h2>查看采购单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson">提交</el-button>
-                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn">撤回</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson" :loading="isLoading">提交</el-button>
+                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn" :loading="isLoading">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -104,18 +104,16 @@
                 </ul>
 
                 <ul class="list cf">
-                    <li class="sm" style="width:48.2%;">
+                    <li class="sm" style="width:48.2%; position: relative;">
                         <span class="tit"><span class="red">*</span>供应商</span>
-                        <el-select class='sel' v-model="tradeName" @change="tradeNameChange"
-                                   filterable=""
-                                   allow-create=""
-                                   default-first-option placeholder="请选择或输入" :disabled="isAuditPerson">
+                        <el-select class='sel' v-model="tradeName" :disabled="isAuditPerson">
                             <el-option v-for="item in supplierList"
                                        :key="item.value"
                                        :label="item.tradeName"
-                                       :value="item.tradeIdNumber">
+                                       :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input v-if="!isAuditPerson" class="opt" type="text" v-model="tradeName" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="sm" >
                         <span class="tit" style="width:170px;">统一社会信用代码/身份证</span>
@@ -130,11 +128,11 @@
                         <input class="ipt" type="text" v-model="supplierTelephone" maxlength="15" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系人</span>
+                        <span class="tit">联系人</span>
                         <input class="ipt" type="text" v-model="supplierPerson1" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系电话</span>
+                        <span class="tit">联系电话</span>
                         <input class="ipt" type="text" v-model="supplierPersonPhone1" maxlength="15" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
@@ -192,7 +190,7 @@
                 </div>
                 <el-button type="primary" @click="addClick" class="gridDataAdd" size="small" v-if="!isAuditPerson">添加明细</el-button>
 
-                <el-dialog title="新建明细" :visible.sync="dialogTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="70%">
+                <el-dialog title="新建明细" :visible.sync="dialogTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="1100px">
                     <ul class="newList cf">
                         <li class="sm cf" v-show="isShowLow">
                             <span class="tit3"><span class="red">*</span>设备类别</span>
@@ -211,7 +209,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
@@ -248,7 +246,7 @@
                     <el-button @click="newSave(1)" class="newAgain" size="small">再录一笔</el-button>
                 </el-dialog>
 
-                <el-dialog title="修改明细" :visible.sync="dialogSseTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="70%">
+                <el-dialog title="修改明细" :visible.sync="dialogSseTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="1100px">
                     <ul class="newList cf">
                         <li class="sm cf" v-show="isShowLow">
                             <span class="tit3"><span class="red">*</span>设备类别</span>
@@ -267,7 +265,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
@@ -378,6 +376,24 @@
                         </el-dialog>
                     </div>
                 </div>
+                <div class="line">
+                    <span>审批记录</span>
+                </div>
+                <ul class="approval">
+                    <li class="cf" v-for="item in auditRecordList">
+                        <img v-if="!item.faceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.faceUri" alt="">
+                        <div class="listHeader">
+                            <span class="listName">{{item.auditUserName}}</span>
+                            <span class="listDepartment" v-if="item.auditDepartmentName != ''">——{{item.auditDepartmentName}}</span>
+                            <span class="listData">{{item.simpleAuditTime}}</span>
+                        </div>
+                        <div class="listFooter">
+                            <span class="listState">意见：</span>
+                            <span class="listContent">{{item.discription}}</span>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -389,11 +405,12 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
-
+    import { mapState } from 'vuex'
     export default{
         data(){
             return{
                 n:'',//按钮点击变量
+                purchase:[],//报销数据列表
                 options4:[],//报销部门列表
                 isShare:false,//是否分摊
                 isShowShare:true,//是否显示分摊
@@ -447,6 +464,7 @@
                 purchaseDate:'',//日期
                 totalMoney:'',//含税总价
                 unTotalMoney:'',//不含税总价
+                auditRecordList:[],//审批记录
 
                 newList1:[],//新建明细列表（设备）
                 newList2:[],//新建明细列表（其他）
@@ -516,7 +534,10 @@
                 },
                 isAuditPerson:false,//审批流程 true为已审批 false为无人审批
                 showBtn:false,//是否显示撤回按钮
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -526,12 +547,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
+                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney);
-                this.unTotalMoney1 = number.number(unTotalMoney);
+                this.totalMoney1 = number.number(totalMoney / 100);
+                this.unTotalMoney1 = number.number(unTotalMoney / 100);
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -541,12 +562,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
+                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney);
-                this.unTotalMoney2 = number.number(unTotalMoney);
+                this.totalMoney2 = number.number(totalMoney / 100);
+                this.unTotalMoney2 = number.number(unTotalMoney / 100);
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
@@ -562,8 +583,35 @@
                 }
 //                console.log(this.totalMoney);
 //                console.log(this.unTotalMoney);
+            },
+            tradeName:function(val){
+                let tradeName = val;
+                let supplierList = this.supplierList
+                let purchase = this.purchase
+                if(purchase.supplierName == tradeName){
+                    this.supplierIdNumber = purchase.supplierIdNumber || '';
+                    this.supplierTelephone = purchase.supplierTelephone || '';
+                    this.supplierPerson1 = purchase.supplierPerson1 || '';
+                    this.supplierPerson2 = purchase.supplierPerson2 || '';
+                    this.supplierPersonPhone1 = purchase.supplierPersonPhone1 || '';
+                    this.supplierPersonPhone2 = purchase.supplierPersonPhone2 || '';
+                    this.supplierAddress = purchase.supplierAddress || '';
+                }else {
+                    for (var i = 0; i < supplierList.length; i++) {
+                        if (tradeName == supplierList[i].tradeName || tradeName == supplierList[i].tradeIdNumber) {
+                            this.supplierIdNumber = purchase.supplierIdNumber || '';
+                            this.supplierTelephone = purchase.supplierTelephone || '';
+                            this.supplierPerson1 = purchase.supplierPerson1 || '';
+                            this.supplierPerson2 = purchase.supplierPerson2 || '';
+                            this.supplierPersonPhone1 = purchase.supplierPersonPhone1 || '';
+                            this.supplierPersonPhone2 = purchase.supplierPersonPhone2 || '';
+                            this.supplierAddress = purchase.supplierAddress || '';
+                        }
+                    }
+                }
             }
         },
+        computed:mapState(['current_book_ym']),
         methods: {
             inputWithSelectChange(n,$event){
                 var str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
@@ -586,28 +634,23 @@
             shareClick(){
                 this.isShare = !this.isShare
             },
-            //选择供应商change事件
-            tradeNameChange(){
-                var tradeName = this.tradeName
-                var supplierList = this.supplierList
-//                console.log(supplierList);
-                for(var i = 0; i < supplierList.length; i++){
-                    if(tradeName == supplierList[i].tradeName || tradeName == supplierList[i].tradeIdNumber){
-                        this.supplierIdNumber = supplierList[i].tradeIdNumber;
-                        this.supplierTelephone = supplierList[i].tradeTelephone;
-                        this.supplierPerson1 = supplierList[i].tradePerson1;
-                        this.supplierPerson2 = supplierList[i].tradePerson2;
-                        this.supplierPersonPhone1 = supplierList[i].tradePersonPhone1;
-                        this.supplierPersonPhone2 = supplierList[i].tradePersonPhone2;
-                        this.supplierAddress = supplierList[i].tradeAddress;
-                    }
-                }
-            },
             //采购类别change事件，当选择设备时明细列表进行修改
             typeChange(){
                 var type = this.type;
                 //type=1时 选择了设备，isShowLow = true；
-                console.log(type);
+//                console.log(type);
+                if(this.newList1.length != 0 || this.newList2.length != 0){
+                    this.$confirm('修改采购类别后，采购明细中项目所有采购类别将一同变化，是否清空采购明细列表?','提示',{
+                        confirmButtonText: '是',
+                        cancelButtonText: '否',
+                        type: 'warning'
+                    }).then(() => {
+                        this.newList1 = [];
+                        this.newList2 = [];
+                    }).catch(() => {
+
+                    });
+                }
                 if(type == '1'){
                     this.isShowLow = true
                     this.isShowCount = false
@@ -617,8 +660,26 @@
                 }else{
                     this.isShowLow = false
                     this.isShowCount = true
+                    if(this.newList2){
+                        let totalMoney = 0;
+                        let unTotalMoney = 0;
+                        for(let i in this.newList2){
+                            this.newList2[i].count = 1;
+                            this.newList2[i].money = this.newList2[i].perPrice
+                            this.newList2[i].taxMoney = unNumber.unNumber(this.newList2[i].money) * this.newList2[i].taxRate / 100;
+                            unTotalMoney += unNumber.unNumber(this.newList2[i].money);
+                            totalMoney += unNumber.unNumber(this.newList2[i].taxMoney)
+                        }
+
+                        totalMoney += unTotalMoney;
+                        this.totalMoney2 = number.number(totalMoney);
+                        this.unTotalMoney2 = number.number(unTotalMoney);
+
+                        this.totalMoney = this.totalMoney2
+                        this.unTotalMoney = this.unTotalMoney2
+                    }
                 }
-                console.log(this.isShowCount);
+//                console.log(this.isShowCount);
             },
 
             //before模态框事件：
@@ -925,6 +986,7 @@
                             };
 
                             obj.commodityName = this.newDetailed;//明细
+                            obj.count = this.newNum;//数量
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.taxRate = this.newTaxRate;//税率
                             obj.money = this.newMoney;//不含税金额
@@ -954,7 +1016,21 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     var newList1 = this.newList1;
                     for(var i =0; i < newList1.length; i++){
@@ -978,7 +1054,21 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     var newList2 = this.newList2
                     for(var i =0; i < newList2.length; i++){
@@ -1005,34 +1095,47 @@
                 }
             },
             //改变金额的change事件
-            moneyChange(){
+            moneyChange(n){
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
                 var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
                 //判断一下数量是否为有效填写项目，如果有效，金额 = 数量 * 单价
-                if(!this.isShowCount){
-                    if(!str.test(newNum)){
-                        this.$message.error('请正确输入数量');
-                        this.newNum = 1;
-                        return
-                    }else if(!str2.test(newUnitPrice)){
-                        this.$message.error('请正确输入单价');
-                        this.newUnitPrice = '0.00';
-                        return
+                if(n == 1){
+                    if(!this.isShowCount){
+                        if(!str.test(newNum)){
+                            this.$message.error('请正确输入数量');
+                            this.newNum = 1;
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.taxMoneyChange()
+                    }else{
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.taxMoneyChange()
                     }
-                    this.newUnitPrice  = number.number(newUnitPrice);
-                    this.newMoney = number.number(this.newNum * newUnitPrice /100);
-                    this.taxMoneyChange()
-                }else{
-                    if(!str2.test(newUnitPrice)){
-                        this.$message.error('请正确输入单价');
-                        this.newUnitPrice = '0.00';
-                        return
+                }else if(n == 2){
+                    if(!this.isShowCount){
+                        if(!str2.test(this.newUnitPrice)){
+                            this.$message.error('请正确输入单价');
+                            this.newUnitPrice = '0.00';
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.taxMoneyChange()
+                    }else{
+                        if(!str2.test(this.newUnitPrice)){
+                            this.$message.error('请正确输入单价');
+                            this.newUnitPrice = '0.00';
+                            return
+                        }
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.taxMoneyChange()
                     }
-                    this.newUnitPrice  = number.number(newUnitPrice);
-                    this.newMoney = number.number(newUnitPrice);
-                    this.taxMoneyChange()
                 }
 
             },
@@ -1045,26 +1148,66 @@
             //after模态框事件
 
             model(n){
+                this.loading = true
                 this.n = n;
                 if(n == 0){
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        this.$router.go(-1)
-                    }).catch(() => {
-
-                    });
+                    if(this.isAuditPerson){
+                        this.$router.push({name:'PurchaseList',params:{choice:this.choice,currentPage:this.currentPage}})
+                    }else{
+                        this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning',
+                            beforeClose: (action, instance, done) => {
+                                if (action === 'confirm') {
+                                    instance.confirmButtonLoading = true;
+                                    instance.confirmButtonText = '执行中...';
+                                    setTimeout(() => {
+                                        done();
+                                        setTimeout(() => {
+                                            instance.confirmButtonLoading = false;
+                                        }, 300);
+                                    }, 300);
+                                } else {
+                                    done();
+                                }
+                            }
+                        }).then(() => {
+                            this.$router.go(-1)
+                        }).catch(() => {
+                            this.loading = false
+                        });
+                    }
                 }else if(n == 3){
+                    this.isLoading = true;
                     this.$confirm('确定是否撤回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
-                        this.loading = true;
                         this.back()
-                    })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                        this.loading = false
+                        this.isLoading = true;
+                    });
                 }else{
                     if(this.isShare){
                         let input1 = Number(this.input1)
@@ -1092,14 +1235,6 @@
                         this.$message.error('请正确输入供应商');
                         this.loading = false;
                         return
-                    }else if(this.supplierPerson1 == ''){
-                        this.$message.error('请正确输入联系人');
-                        this.loading = false;
-                        return
-                    }else if(this.supplierPersonPhone1 == ''){
-                        this.$message.error('请正确输入联系电话');
-                        this.loading = false;
-                        return
                     }else if(this.type == ''){
                         this.$message.error('请正确输入采购类别');
                         this.loading = false;
@@ -1109,23 +1244,41 @@
                         this.loading = false;
                         return
                     }else if(this.purchaseDate == ''){
-                        this.$message.error('请正确输入日期');
+                        this.$message.error('请正确输入日期' );
                         this.loading = false;
                         return
-                    }else if(this.totalMoney == ''){
-                        this.$message.error('请正确输入含税总价');
+                    }else if(this.totalMoney == '' || this.totalMoney == '0.00'){
+                        this.$message.error('请添加明细项');
                         this.loading = false;
                         return
-                    }else if(this.unTotalMoney == ''){
-                        this.$message.error('请正确输入不含税总价');
+                    }else if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
+                        this.$message.error('请添加明细项');
                         this.loading = false;
+                        return
+                    }else if(Number(this.purchaseDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('采购日期不得早于当前账期');
+                        this.loading = false
                         return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
 //                        console.log(this.punch);
                         let index = this.punch + this.punch2;
@@ -1139,6 +1292,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -1150,9 +1305,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -1160,9 +1317,10 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
+                this.loading = false
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
             },
             onError(){
@@ -1224,12 +1382,19 @@
                                 message:'撤回成功'
                             })
                             this.loading = false;
+                            this.isLoading = false;
                             this.$router.go(-1);
                         }else if(response.data.status == 400){
                             this.loading = false;
                             this.$message.error(response.data.msg);
                         }
                     })
+                    .catch(error=> {
+                        this.loading = false
+                        this.isLoading = false;
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             },
             submit(n){
 //                console.log(n);
@@ -1257,6 +1422,7 @@
                             if(departmentJson[i].id == this.select1){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -1264,6 +1430,7 @@
                     }else if(this.input1 != '0' && this.select1 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -1276,6 +1443,7 @@
                             if(departmentJson[i].id == this.select2){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -1283,6 +1451,7 @@
                     }else if(this.input2 != '0' && this.select2 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -1296,6 +1465,7 @@
                             if (departmentJson[i].id == this.select3) {
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -1303,6 +1473,7 @@
                     }else if(this.input3 != '0' && this.select3 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -1315,6 +1486,7 @@
                             if(departmentJson[i].id == this.select4){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -1322,6 +1494,7 @@
                     }else if(this.input4 != '0' && this.select4 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
                     if (this.input5 != '0' && this.select5 != '') {
@@ -1333,6 +1506,7 @@
                             if(departmentJson[i].id == this.select5){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -1340,6 +1514,7 @@
                     }else if(this.input5 != '0' && this.select5 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
                 } else {
@@ -1440,6 +1615,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -1454,6 +1630,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -1479,21 +1656,22 @@
         },
         created(){
             var params = new URLSearchParams();
-            var url = addUrl.addUrl('seePurchase')
+            var url = addUrl.addUrl('seePurchase');
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;
                     this.supplierList = data.supplierList;
 //                    console.log(this.supplierList);
                     this.deviceList = data.deviceList;
-
-                    var purchase = data.purchase
-
+                    this.auditRecordList = data.auditRecordList;
+                    let purchase = data.purchase
+                    this.purchase = purchase
                     this.tradeName = purchase.supplierName;
+
                     this.supplierIdNumber = purchase.supplierIdNumber;
                     this.supplierAddress = purchase.supplierAddress;
                     this.supplierTelephone = purchase.supplierTelephone;
@@ -1503,6 +1681,7 @@
                     this.supplierPersonPhone2 = purchase.supplierPersonPhone2;
                     this.taxFlg = String(purchase.taxFlg);
                     this.attachUrlJson = purchase.attachUrlJson;
+
 //                    console.log(this.attachUrlJson);
                     this.purchaseDate = purchase.simplePurchaseDate;
 
@@ -1513,16 +1692,19 @@
                         purchaseItemList[i].money = number.number(purchaseItemList[i].noTaxMoney)
                         purchaseItemList[i].perPrice = number.number(purchaseItemList[i].perPrice)
                         purchaseItemList[i].taxMoney = number.number(purchaseItemList[i].taxMoney)
+                        purchaseItemList[i].id = purchaseItemList[i].idString
                     }
                     if(type == 1){
                         this.isShowLow = true
+                        this.isShowCount = false
                         this.newList1 = purchase.purchaseItemList
                     }else{
                         this.isShowLow = false
+                        this.isShowCount = true
                         this.newList2 = purchase.purchaseItemList
                     }
                     this.type = String(type)
-                    var index = purchase.auditFlg
+                    let index = purchase.auditFlg
                     //当index 0 未提交 1 驳回；
                     if(index < 2){
                         this.isAuditPerson = false;
@@ -1570,7 +1752,6 @@
                         this.input4 = data.purchase.projectDivRate4 || 0
                         this.input5 = data.purchase.projectDivRate5 || 0
                     }
-
 //                    console.log(this.deviceList);
                     this.loading = false
                 })
@@ -1603,12 +1784,12 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;
@@ -1850,5 +2031,67 @@
     .input-select{
         width:200px;
     }
+    .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
+    }
+    .approval{
+        width:100%;
+        margin-top: 20px;
+        font-size:14px;
+    }
+    .approval li{
+        margin-top: 20px;
+        text-align: left;
+    }
+    .approval li img{
+        display: inline-block;
+        width:50px;
+        height:50px;
+        border-radius: 50%;
+        overflow: hidden;
+        float: left;
+        margin-left: 130px;
+        margin-right: 20px;
+    }
+    .approval li .listHeader{
+        display: inline-block;
+        float: left;
+        width:80%;
+    }
+    .approval li .listHeader .listName{
 
+        margin-right: 10px;
+    }
+    .approval li .listHeader .listDepartment{
+        margin-left: 10px;
+    }
+    .approval li .listHeader .listData{
+        float: right;
+    }
+    .approval li .listFooter{
+        display: inline-block;
+        float: left;
+        width:80%;
+        margin-top: 10px;
+    }
+    .approval li .listFooter .listState{
+        display: inline-block;
+        float: left;
+        margin-right: 10px;
+    }
+    .approval li .listFooter .listContent{
+        width:90%;
+        display: inline-block;
+        float: left;
+        height:50px;
+        overflow: hidden;
+    }
 </style>

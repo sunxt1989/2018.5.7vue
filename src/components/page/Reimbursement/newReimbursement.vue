@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>创建报销单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2">提交</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -111,7 +111,7 @@
                         <span class="tit">报销日期</span>
                         <el-date-picker
                             class="data"
-                            v-model="simpleReceiptDate"
+                            v-model="debitDate"
                             type="date"
                             @change="changeTime"
                             value-format="yyyy-MM-dd"
@@ -143,7 +143,7 @@
                         <el-table-column property="idString" label="" align="center" width="30px">
                             <template slot-scope="scope">
                                 <span class="checkbox">
-                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox" >
+                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox listInput" @click="inputcheckboxClick">
                                 <i class="iconfont icon-31xuanze"></i>
                             </span>
                             </template>
@@ -160,7 +160,7 @@
                         </el-table-column>
                     </el-table>
                     <span class="checkbox checkboxAll">
-                        <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox" >
+                        <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox allInput" >
                         <i class="iconfont icon-31xuanze"></i>
                     </span>
                     <span class="all">全选</span>
@@ -168,7 +168,14 @@
                 </el-dialog>
 
                 <el-table class="hkTable grayList" :data="receiptList">
-                    <el-table-column prop="childTypeName" label="类型" sortable align="center"></el-table-column>
+                    <el-table-column prop="childTypeName" label="类型" sortable align="left">
+                        <template slot-scope="scope">
+                            <span>
+                                <img class="typeImg" :src=scope.row.url alt="">
+                                {{scope.row.childTypeName}}
+                            </span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="simpleReceiptDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="discription" label="描述" sortable align="center"></el-table-column>
                     <el-table-column prop="operateUserName" label="姓名" sortable align="center"></el-table-column>
@@ -201,7 +208,8 @@
 
                 originalTypeName:'',//报销名称
                 money:'',//总金额
-                simpleReceiptDate:'',//报销日期
+                debitDate:'',//报销日期
+                simpleReceiptDate:'',//费用发生日期
                 receiptCount:'',//票据张数
                 discription:'',//事由
 
@@ -236,6 +244,7 @@
                 },
                 isTrue:true,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -262,6 +271,7 @@
                 this.isShare = !this.isShare
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -270,7 +280,7 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else{
                     //是否为分摊状态
@@ -296,28 +306,90 @@
                             return
                         }
                     }
+                    if(this.receiptList == ''){
+                        this.$message.error('请添加费用单');
+                        this.loading = false;
+                        return
+                    }
 
+                    //找出费用单列表中时间最早的那一个，之后再和报销时间做对比
+                    let receiptList = this.receiptList;
+                    let simpleReceiptDate = ''//最早日期
+                    for(let i in receiptList){
+                        if(simpleReceiptDate){
+                            if(simpleReceiptDate > Number((receiptList[i].simpleReceiptDate).split('-').join(''))){
+                                simpleReceiptDate = Number((receiptList[i].simpleReceiptDate).split('-').join(''))
+                            }
+                        }else{
+                            simpleReceiptDate = Number((receiptList[i].simpleReceiptDate).split('-').join(''))
+                        }
+                    }
+                    if(this.debitDate == ''){
+                        this.$message.error('请正确输入报销日期');
+                        this.loading = false
+                        return
+                    }else if(simpleReceiptDate > Number(this.debitDate.split('-').join(''))){ //判断选择日期不能早于报销日期
+                        this.$message.error('报销日期不得早于费用发生日期');
+                        this.loading = false
+                        return
+                    }
+
+                    this.isLoading = true;
                     if(n == 1){
                         this.$confirm('确定是否保存？', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
-                            type: 'warning'
+                            type: 'warning',
+                            beforeClose: (action, instance, done) => {
+                                if (action === 'confirm') {
+                                    instance.confirmButtonLoading = true;
+                                    instance.confirmButtonText = '执行中...';
+                                    setTimeout(() => {
+                                        done();
+                                        setTimeout(() => {
+                                            instance.confirmButtonLoading = false;
+                                        }, 300);
+                                    }, 300);
+                                } else {
+                                    done();
+                                }
+                            }
                         }).then(() => {
                             this.submit(1)
+                        }).catch(() =>{
+                            this.loading = false
+                            this.isLoading = false;
                         })
                     }else{
+                        this.isLoading = true;
                         this.$confirm('确定是否提交？', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
-                            type: 'warning'
+                            type: 'warning',
+                            beforeClose: (action, instance, done) => {
+                                if (action === 'confirm') {
+                                    instance.confirmButtonLoading = true;
+                                    instance.confirmButtonText = '执行中...';
+                                    setTimeout(() => {
+                                        done();
+                                        setTimeout(() => {
+                                            instance.confirmButtonLoading = false;
+                                        }, 300);
+                                    }, 300);
+                                } else {
+                                    done();
+                                }
+                            }
                         }).then(() => {
                             this.submit(2)
+                        }).catch(() =>{
+                            this.loading = false
+                            this.isLoading = false;
                         })
                     }
                 }
             },
             submit(n){
-                this.loading = true;
                 var params = new URLSearchParams();
                 var money = unNumber.unNumber(this.money);
                 var departmentJson = [] ;
@@ -342,6 +414,7 @@
                         if(departmentJson.indexOf(item1[0]) == 0){ //判断是否有重复填写部门/项目的情况
                             this.$message.error('分摊部门/项目不能相同，请重新选择');
                             this.loading = false;
+                            this.isLoading = false;
                             return
                         }else{
                             departmentJson.push(item1[0])
@@ -350,6 +423,7 @@
                     }else if(this.input1 != 0 && this.select1 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -361,6 +435,7 @@
                         if(departmentJson.indexOf(item2[0]) == 0){ //判断是否有重复填写部门/项目的情况
                             this.$message.error('分摊部门/项目不能相同，请重新选择');
                             this.loading = false;
+                            this.isLoading = false;
                             return
                         }else{
                             departmentJson.push(item2[0])
@@ -368,6 +443,7 @@
                     }else if(this.input2 != 0 && this.select2 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -379,6 +455,7 @@
                         if(departmentJson.indexOf(item3[0]) == 0){ //判断是否有重复填写部门/项目的情况
                             this.$message.error('分摊部门/项目不能相同，请重新选择');
                             this.loading = false;
+                            this.isLoading = false;
                             return
                         }else{
                             departmentJson.push(item3[0])
@@ -387,6 +464,7 @@
                     }else if(this.input3 != 0 && this.select3 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -398,6 +476,7 @@
                         if(departmentJson.indexOf(item4[0]) == 0){ //判断是否有重复填写部门/项目的情况
                             this.$message.error('分摊部门/项目不能相同，请重新选择');
                             this.loading = false;
+                            this.isLoading = false;
                             return
                         }else{
                             departmentJson.push(item4[0])
@@ -405,6 +484,7 @@
                     }else if(this.input4 != 0 && this.select4 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -416,6 +496,7 @@
                         if(departmentJson.indexOf(item5[0]) == 0){ //判断是否有重复填写部门/项目的情况
                             this.$message.error('分摊部门/项目不能相同，请重新选择');
                             this.loading = false;
+                            this.isLoading = false;
                             return
                         }else{
                             departmentJson.push(item5[0])
@@ -423,6 +504,7 @@
                     }else if(this.input5 != 0 && this.select5 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
                 } else {
@@ -440,7 +522,7 @@
                 params.append('discription',this.discription);
                 params.append('money',money);
                 params.append('departmentJson',departmentJson);
-                params.append('applicationDate',this.simpleReceiptDate);
+                params.append('applicationDate',this.debitDate);
                 params.append('originalReceiptIds',this.originalReceiptIds);
                 params.append('receiptCount',this.receiptCount);
                 params.append('originalType',this.originalType);
@@ -448,9 +530,10 @@
                 axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
-                            this.$router.go(-1);
+                            this.$router.push('/Reimbursement/ReimbursementList');
                             this.$message({
                                 type: 'success',
                                 message: '已成功'
@@ -459,7 +542,13 @@
                             var msg = response.data.msg;
                             this.$message.error(msg);
                         }
-                    });
+                    })
+                    .catch(error=> {
+                        this.loading = false
+                        this.isLoading = false;
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
             },
             //选择记录日期事件
             changeTime(){
@@ -475,54 +564,104 @@
             },
             //删除消费明细列表项
             deleteList(id){
-                var list = this.receiptList;
-                var arr = this.originalReceiptIdArr;
-                var money = unNumber.unNumber(this.money)
+                this.loading = true
+                let list = this.receiptList;
+                let arr = this.originalReceiptIdArr;
+                let money = unNumber.unNumber(this.money)
 
-                //将临时删除的明细项存入临时列表nowList，当添加时将临时列表加入进去
-                for(var i=0; i <list.length; i++){
-                    if(id == list[i].idString){
-                        money -= list[i].money;
-                        this.receiptCount -= list[i].receiptCount;
-                        list.splice(i,1)
+                this.$confirm('是否删除该信息?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
                     }
-                }
-                for(var i = 0; i < arr.length; i++){
-                    if(id == arr[i]){
-                        arr.splice(i,1)
+                }).then(() => {
+                    //将临时删除的明细项存入临时列表nowList，当添加时将临时列表加入进去
+                    for(var i=0; i <list.length; i++){
+                        if(id == list[i].idString){
+                            money -= list[i].money;
+                            this.receiptCount -= list[i].receiptCount;
+                            list.splice(i,1)
+                        }
                     }
-                }
-                this.money = number.number(money);
-                this.receiptList = list;
-                this.originalReceiptIdArr = arr;
+                    for(var i = 0; i < arr.length; i++){
+                        if(id == arr[i]){
+                            arr.splice(i,1)
+                        }
+                    }
+                    this.money = number.number(money);
+                    this.receiptList = list;
+                    this.originalReceiptIdArr = arr;
+                    this.loading = false
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '取消删除'
+                    });
+                    this.loading = false
+                });
             },
             //点击添加按钮，弹出费用列表
             addClick(){
+                $("input[name=checked]").prop('checked', false);//将所有选项按钮设置为反位
+                $('.inputcheckbox').prop('checked', false);//将全选按钮设置为反位
                 this.loading = true;
-                var params = new URLSearchParams();
-                var url = addUrl.addUrl('newReimbursementList')
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('newReimbursementList')
                 params.append('type',this.type);
-                axios.post('http://192.168.2.190:8080/web/vue/expense/enableReceiptList.html', params)
+                axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
 //                        console.log(response);
-                        var arr = this.originalReceiptIdArr;
-                        var data = response.data.value;
-//                        console.log(data);
+                        let arr = this.originalReceiptIdArr;
+                        let data = response.data.value;
+                        let newArr1 = [];
+                        let newArr2 = [];
                         if(data){
-                            for(var i = 0; i < arr.length; i++){
-                                for(var ii = 0; ii < data.length; ii++){
-                                    data[ii].showMoney = number.number(data[ii].money)
-                                    if(arr[i] == data[ii].idString){
-                                        data.splice(ii,1)
+                            if(arr.length == 0){
+                                for(let ii = 0; ii < data.length; ii++){
+                                    newArr2.push(data[ii])
+                                }
+                            }else{
+                                for (let i in arr) {
+                                    newArr1[arr[i]] = true
+                                }
+                                for(let ii in data){
+                                    if(!newArr1[data[ii].idString]){
+                                        newArr2.push(data[ii])
                                     }
                                 }
                             }
+                            for(let i in newArr2){
+                                newArr2[i].showMoney = number.number(newArr2[i].money)
+                            }
                         }
-                        this.gridData = data;
+                        this.gridData = newArr2;
+                        this.dialogTableVisible = true;
 //                        console.log(this.gridData);
                     });
-                this.dialogTableVisible = true;
+
+            },
+            //取消全选按钮事件
+            inputcheckboxClick(){
+                let input = $('.listInput')
+                input.each(function(i){
+                    if(!$(this).prop('checked')){
+                        $(".allInput").prop('checked',false)
+                    }
+                })
             },
             //全选按钮change事件
             checkAllChange(e){
@@ -558,10 +697,22 @@
                     }
                     this.money = number.number(money);
                     this.originalReceiptIdArr = str;
-                    this.receiptList = receiptList;
+                    this.receiptList = this.modifyList(receiptList);
                     this.gridData = gridData;
                 }
                 this.dialogTableVisible = false;
+            },
+            modifyList(list){
+//                console.log(list);
+                for(var i = 0; i < list.length; i++){
+                    list[i].showMoney = number.number(list[i].money)
+                    if(list[i].type <=3){
+                        list[i].url = 'static/images/expense/originalReceipt'+ list[i].type + '-'+ list[i].childType1 +'.png'
+                    }else{
+                        list[i].url = 'static/images/expense/originalReceipt'+ list[i].type + '.png'
+                    }
+                }
+                return list
             },
         },
         mounted(){
@@ -585,36 +736,24 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newReimbursement')
-//            console.log(this.ids);
             params.append('originalReceiptId',this.ids);
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     this.options = data.departmentList;
 
                     var tableDataarr =[];
-                    if(data.receiptList){
-                        for(var i =0; i < data.receiptList.length; i++){
-//                            console.log(data.receiptList[i]);
-                            data.receiptList[i].showMoney = number.number(data.receiptList[i].money);
-                            tableDataarr.push(data.receiptList[i])
-                        }
-                        this.receiptList = tableDataarr;
-                    }else{
-                        this.receiptList = data.receiptList
-                    }
-
+                    this.receiptList = this.modifyList(data.receiptList);
                     this.originalReceiptIds = data.applicationReceiptIds;
-
                     this.simpleReceiptDate = data.application.simpleReceiptDate;
+                    this.debitDate = this.simpleReceiptDate;
                     this.originalTypeName = data.application.originalTypeName;
                     this.money = number.number(data.application.money);
                     this.receiptCount = data.application.receiptCount;
                     this.originalType = data.application.originalType;
-
 
                     this.originalReceiptIdArr = this.originalReceiptIds.split(',')
                 })
@@ -710,15 +849,12 @@
         border-radius: 3px;
         padding: 3px 10px;
     }
-
-
-
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;
@@ -802,6 +938,10 @@
     }
     .input-select{
         width:200px;
+    }
+    .grayList .typeImg{
+        width:22px;
+        height:22px;
     }
 
 </style>

@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>查看项目</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub" >保存</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
@@ -60,7 +60,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">项目负责人</span>
-                        <el-select class="sel" v-model="projectPerson" placeholder="请选择" >
+                        <el-select class="sel" v-model="projectPerson" placeholder="请选择">
                             <el-option
                                 v-for="item in options3"
                                 :key="item.value"
@@ -79,6 +79,7 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
     export default{
         data() {
             return{
@@ -88,10 +89,7 @@
                 endDate:'',//结束日期
                 projectType:'',//类型
                 options:[
-                    {value:'1',label:'自主研发'},
-                    {value:'2',label:'合作研发'},
-                    {value:'3',label:'委托研发'},
-                    {value:'4',label:'集中研发'}
+                    {value:'1',label:'自主研发'}
                 ],
                 projectStatus:'',//状态
                 options2:[
@@ -103,9 +101,11 @@
                 timeInterval:'',//起始时间和结束时间数组
                 debitId:this.$route.params.debitId,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym']),
         methods: {
             //选择记录日期事件
             changeTime(){
@@ -120,6 +120,7 @@
                 }
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -128,7 +129,7 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else{
                     if (this.projectNumber == '') {
@@ -160,11 +161,25 @@
                         this.loading = false;
                         return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios();
                     }).catch(() => {
@@ -172,6 +187,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -191,6 +208,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -205,6 +223,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -235,7 +254,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     this.options3 = data.userList;
                     this.endDate = data.project.endDate
@@ -244,7 +263,7 @@
                     this.projectNumber = data.project.projectNumber
                     this.projectStatus = data.project.projectStatus
                     this.projectType = data.project.projectType
-                    this.projectPerson = data.project.projectManageId
+                    this.projectPerson = (data.project.projectManageId != 0) ? data.project.projectManageId : '';
                     this.timeInterval = [data.project.startDate,data.project.endDate]
                     this.loading = false
                 })
@@ -337,7 +356,7 @@
         margin-right: 20px;
         vertical-align: middle;
     }
-    .sub{
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;

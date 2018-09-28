@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-      <topH></topH>
+  <div id="app" v-loading.fullscreen.lock="loading">
+      <top-h></top-h>
       <router-view/>
       <bg></bg>
   </div>
@@ -8,10 +8,23 @@
 
 <script>
     import $ from 'jquery'
-    import topH from '@/components/common/topH'
+    import topH from '@/components/common/top-h'
     import bg from '@/components/common/bg'
+    import { mapState } from 'vuex'
     export default {
         name: 'App',
+        data(){
+          return{
+              loading:true,
+          }
+        },
+        watch:{
+            //判断首页公共参数获取到后改变loading
+            start_ym:function(val){
+                this.loading = false;
+            }
+        },
+        computed:mapState(['start_ym']),
         components: {
             topH,
             bg
@@ -140,9 +153,7 @@
         padding: 0;
         float: left;
     }
-    .el-tabs__item{
-        padding:0 28px
-    }
+
     .newSupplier .el-radio{
         width:400px;
         font-size:18px;
@@ -153,4 +164,16 @@
         font-size:18px;
         font-weight: bold;
     }
+    .el-date-editor.el-input.yearData{
+        width:12%;
+        display: inline-block;
+        float: left;
+        margin-top: 10px;
+    }
+    .homePage-checkbox .el-checkbox__input{
+        position: absolute;
+        bottom:-4px;
+        left:-2px;
+    }
+
 </style>

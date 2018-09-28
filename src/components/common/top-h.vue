@@ -1,7 +1,7 @@
 <template>
-    <el-header height="40px">
+    <el-header v-loading.fullscreen.lock="loading" height="40px">
         <div class="w">
-            <div class="companyName dropdown ">
+            <div class="companyName dropdown">
                 <el-select v-model="bookId" class="companySel" @change="changeBookId">
                     <el-option
                         v-for="item in accounts"
@@ -11,17 +11,21 @@
                     </el-option>
                 </el-select>
             </div>
+            <div class="account" @keyup.enter="sub">
+                当前账期：{{account}}
+            </div>
             <div class="userName dropdown">
                 <el-dropdown  @command="handleCommand">
                     <div>
-                        <img class="headPortrait img-circle" src="../../../static/images/gongjuxiang.png" alt="" >
+                        <img class="headPortrait img-circle" :src=faceUri alt="" >
                         <i class="icon iconfont icon-fanhui4"></i>
-                        <span class="dropdown-toggle">用户名称{{count}}</span>
+                        <span class="dropdown-toggle" v-if="name">{{name}}</span>
+                        <span class="dropdown-toggle" v-else>用户名称</span>
                     </div>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="1">个人信息</el-dropdown-item>
                         <el-dropdown-item command="2">账套管理</el-dropdown-item>
-                        <el-dropdown-item command="3"><a :href=password class="link">修改密码</a></el-dropdown-item>
+                        <el-dropdown-item command="3">修改密码</el-dropdown-item>
                         <el-dropdown-item command="4">安全退出</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -35,17 +39,26 @@
     import addUrl from '../../../static/js/addUrl'
     import { mapState,mapMutations } from 'vuex';
     export default {
-        name:'topH',
+        name:'top-h',
         data(){
             return{
                 bookId:'',//当前账套
                 accounts:[],//账套列表
+                account:'2018年9月',//当前账期
+                name:'',//用户名称
+                faceUri:'',//用户头像
                 password:'',//修改密码路径
+                loading:false
+            }
+        },
+        watch:{
+            current_book_ym:function(val){
+                this.account = String(val).substring(0,4) + '年'+ String(val).substring(4,6) + '月';//当前账期
             }
         },
         methods: {
-            mapMutations(){
-
+            sub(){
+                console.log('@');
             },
             //安全退出
             handleCommand(command) {
@@ -54,7 +67,9 @@
                     this.$router.push('/AccountManagement/personal')
                 }else if(command == '2'){
                     this.$router.push('/AccountManagement/AccountManagement')
-                }else if(command == '4'){
+                }else if(command == '3'){
+                    this.$router.push('/AccountManagement/changePassword')
+                } else if(command == '4'){
                     this.$confirm('确定是否安全退出？','提示',{
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -81,7 +96,6 @@
                     .then(response=> {
                         console.log(response);
                         this.axios(1);
-                        this.loading = false
                     })
                     .catch(error=> {
                         this.loading = false
@@ -95,35 +109,64 @@
                     .then(response=> {
                         console.log(response);
                         let data = response.data.value
-                        this.accounts = data.accounts
-
-                        this.bookId = data.current_book_id;
-                        let obj = {}
-                        let start_ym = data.current_start_date.substring(0,7)//账套开账时间
-                        let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
-
-                        obj.start_ym = start_ym.split('-').join('');
-                        obj.current_book_ym = current_book_ym;
-
-                        console.log(obj);
-                        this.$store.commit('add',obj)
-
-                        if(n == 1){
-                            this.$router.push('/')
+                        if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
+                            let url2 = addUrl.addUrl('initialize')
+                            window.location.href = url2;
+                            return
                         }else{
-                            this.$router.push('/')
+                            this.accounts = data.accounts
+                            this.bookId = data.current_book_id;
+                            this.name = data.name;
+                            this.faceUri = data.faceUri ? data.faceUri : 'static/images/gongjuxiang.png';
+                            let obj = {}
+                            let start_ym = data.current_start_date.substring(0,7)//账套开账时间
+                            let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
+                            let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
+                            let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
+                            let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
+                            let menu_json = (data.book_user.menu_json == '') ? ['#loan','#bookkeeping'] : (data.book_user.menu_json).split(',');//默认配置桌面功能显示借款单，记账
+                            let auth_json = data.book_user.auth_json
+                            let current_account_standard = data.current_account_standard //会计准则判定 1：小企业 2：企业
+                            let current_company_scale = data.current_company_scale //当前账套纳税人性质 1 小规模纳税人 2 一般纳税人
+                            let current_book_level = data.current_book_level//用户类型 0 普通用户 1：代记账会计 2：代记账管理人员
+                            let user_type = data.user_type//账套等级 0 演示帐套 1 一般帐套 3 代记账帐套
+                            let isAccountBookkeeping = (user_type > 0 && current_book_level == 3)? true : false//是否为代记账，true 为是代记账账套 false 为普通账套
+
+                            obj.start_ym = start_ym.split('-').join('');
+                            obj.current_book_ym = current_book_ym;
+                            obj.isBossFlg = isBossFlg;
+                            obj.isFinanceFlg = isFinanceFlg;
+                            obj.isCashierFlg = isCashierFlg;
+                            obj.menuArr = menu_json;
+                            obj.auth_json = auth_json;
+                            obj.current_account_standard = current_account_standard;
+                            obj.current_company_scale = current_company_scale;
+                            obj.user_type = user_type;
+                            obj.current_book_level = current_book_level;
+                            obj.isAccountBookkeeping = isAccountBookkeeping
+                            console.log(obj);
+                            this.$store.commit('add',obj);
+                            this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
+                            if(n == 1){
+                                window.location.reload()
+                            }else{
+                                this.loading = false
+                                this.$router.push('/')
+                            }
                         }
-                        this.loading = false
                     })
                     .catch(error=> {
-                        this.loading = false
-//                    console.log(error);
-                        alert('网络错误，不能访问');
+                        console.log('@');
+//                        alert('请您重新登录')
+//                        let url = addUrl.addUrl('logout')
+//                        window.location.href = url
                     });
             },
 
         },
-        computed:mapState(["count"]),
+        computed:{
+            ...mapState(["current_book_ym"]),
+        },
         created(){
             this.password = addUrl.addUrl('password')
             this.axios();
@@ -145,6 +188,17 @@
         display: inline-block;
         position: relative;
         font-size:18px;
+        margin-right:50px ;
+        float: left;
+    }
+    .account{
+        width:200px;
+        height:40px;
+        line-height: 40px;
+        display: inline-block;
+        font-size:16px;
+        color: #fff;
+        float: left;
     }
     .dropdown-toggle{
         color: #fff;
@@ -160,17 +214,21 @@
         float: left;
     }
     .companySel{
+        width:300px;
         background-color: #1a96d4;
         color: #fff;
+        overflow: hidden;
+        white-space:nowrap;
+        text-overflow: ellipsis;
     }
     .companySel .el-input--suffix{
-        height: 32px;
+        height: 40px;
     }
     .companySel .el-input--suffix .el-input__inner{
         background-color: #1a96d4;
         color: #fff;
         border: none;
-        height: 32px;
+        height: 40px;
     }
     .iconfont{
         color: #fff;

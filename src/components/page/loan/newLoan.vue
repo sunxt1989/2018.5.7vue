@@ -2,9 +2,9 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>新建费用单</h2>
+                <h2>新建借款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button  @click="model(1)" size="small" type="danger" class="sub" >提交审批</el-button>
+                <el-button :loading="isLoading" @click="model(1)" size="small" type="danger" class="sub" >提交审批</el-button>
             </div>
         </div>
         <div class="w">
@@ -84,21 +84,19 @@
                     </ul>
                 </div>
             </div>
-
         </div>
     </div>
-
 </template>
-
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex';
     export default{
         data(){
             return{
-                money:0,//金额
+                money:'0.00',//金额
                 debitDate:'',//上传日期（格式修改后的）
                 departmentId:'',//部门
                 options:[],//部门详情
@@ -108,7 +106,6 @@
                 dialogVisible: false,//dialog是否打开状态
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
-
 
                 allBase:[],//所有base64格式的地址
                 allName:[],//所有namen名称
@@ -126,11 +123,19 @@
                     }
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym']),
         methods: {
             blur:function(){
+                let str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
+                if(!str.test(this.money)){
+                    this.$message.error('请正确输入金额')
+                    this.money = '0.00'
+                    return
+                }
                 this.money = number.number(this.money)
             },
             model(n){
@@ -145,24 +150,38 @@
 
                     });
                 }else{
-                    if(this.money <= 0){
+                    if(this.money == '0.00'){
                         this.$message.error('请正确输入金额');
-                        this.loading = false;
                         return
                     }else if(this.debitDate == ''){
                         this.$message.error('请正确输入借款日期');
-                        this.loading = false;
                         return
                     }else if(this.departmentId == ''){
                         this.$message.error('请正确输入借款部门');
-                        this.loading = false;
+                        return
+                    }else if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('借款日期不得早于当前账期');
                         return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         if(this.punch != 0){
                             this.submitUpload();
@@ -174,6 +193,7 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.isLoading = false;
                     });
                 }
             },
@@ -185,9 +205,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -195,7 +217,7 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
@@ -219,7 +241,6 @@
                 };
                 fileReader.readAsDataURL(blob);
             },
-
             myUpload(content){
 //                console.log(content);
                 var file = content.file;
@@ -235,9 +256,9 @@
             },
             submit(){
                 this.loading = true;
-                var params = new URLSearchParams();
-                var money = unNumber.unNumber(this.money);
-                var url = addUrl.addUrl('newLoanSubmit')
+                let params = new URLSearchParams();
+                let money = unNumber.unNumber(this.money);
+                let url = addUrl.addUrl('newLoanSubmit');
 
                 this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
                 this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
@@ -276,20 +297,23 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
                                 message: '提交成功'
                             });
+                            this.isLoading = false;
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
                             this.$message.error(msg);
+                            this.isLoading = false;
                         }
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -302,6 +326,7 @@
             },
 
         },
+
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -324,9 +349,22 @@
             var url = addUrl.addUrl('newLoan')
             axios.post(url)
                 .then(response=> {
+                    console.log(response);
                     this.loading = false
-                    var data = response.data.value;
+                    let data = response.data.value;
                     this.options = data;
+                    let date = new Date();
+                    if(date.getMonth()+1 < 10){
+                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.debitDate += '-0' + date.getDate()
+                    }else{
+                        this.debitDate += '-' + date.getDate()
+                    }
                 })
                 .catch(error=> {
                     this.loading = false;
@@ -357,7 +395,7 @@
         right:20px;
         font-size:12px;
     }
-    .sub{
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;
@@ -402,19 +440,19 @@
         border-radius: 3px;
         padding: 3px 10px;
     }
-    .data{
+    .right .data{
         width:500px;
     }
-    .department{
+    .right .department{
         width:500px;
     }
-    .upload{
+    .right .upload{
         height:auto;
     }
-    .dialog{
+    .right .dialog{
         text-align: center;
     }
-    .dialogImageName{
+    .right .dialogImageName{
         font-size:16px;
     }
 </style>

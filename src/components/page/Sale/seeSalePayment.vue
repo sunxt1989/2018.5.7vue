@@ -3,7 +3,7 @@
         <div class="w">
             <div class="top">
                 <h2>销售收款单详情</h2>
-                <router-link :to="{name:'newSalePayment',params:{debitId:sale_id}}" class="back">
+                <router-link v-if="!isRedFlush" :to="{name:'newSalePayment',params:{debitId:sale_id,advanceId:advanceId}}" class="back">
                     返回
                 </router-link>
                 <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
@@ -22,6 +22,18 @@
                     <li class="pt">
                         <span class="tit">本次收款</span>
                         <input class="ipt" type="text" v-model="money" readonly>
+                    </li>
+                    <li class="pt" v-if="isShow">
+                        <span class="tit">收款方式</span>
+                        <input class="ipt" type="text" v-model="payType" readonly>
+                    </li>
+                    <li class="pt" v-if="isShow">
+                        <span class="tit">银行账户</span>
+                        <input class="ipt" type="text" v-model="bankName" readonly>
+                    </li>
+                    <li class="pt" v-if="isShow">
+                        <span class="tit">确认时间</span>
+                        <input class="ipt" type="text" v-model="createDate" readonly>
                     </li>
                     <li class="ptx">
                         <div class="upload cf">
@@ -49,7 +61,8 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.audit_user_uri" alt="">
+                        <img v-if="!item.audit_user_uri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.audit_user_uri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.audit_user_name}}</span>
                             <span class="listDepartment" v-if="item.audit_user_type != ''">——{{item.audit_user_type}}</span>
@@ -78,6 +91,7 @@
                 sale_id:'',//销售单ID
                 debitId:this.$route.params.debitId,
                 isRedFlush:this.$route.params.isRedFlush,
+                advanceId:this.$route.params.advanceId,
 
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
@@ -85,19 +99,18 @@
                 dialogImageName:'',//展示图片名称
                 dialogImageUrl:'',//展示图片URL
 
+                payType:'',//付款方式
+                bankName:'',//银行账户
+                createDate:'',//确认时间
+                isShow:false,//是否展示付款方式等信息
+
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
             model(){
-                this.$confirm('是否返回？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.$router.go(-1)
-                }).catch(() => {});
+                this.$router.go(-1)
             },
             //上传图片缩略图信息赋值
             handlePictureCardPreview(file) {
@@ -133,14 +146,35 @@
                 .then(response=> {
                     this.loading = false
                     if(response.data.status == 200){
-//                        console.log(response);
-                        var data = response.data.value;
+                        console.log(response);
+                        let data = response.data.value;
+                        let receive = data.receive
                         this.unreceiveMoney = number.number(data.sale.unreceiveMoney)
-                        this.money = number.number(data.receive.receive_money)
-                        this.attachUrlJson = data.receive.attach_urls
-                        this.userDebitAuditRecordList = data.receive.record_list
+                        this.money = number.number(receive.receive_money)
+                        this.attachUrlJson = receive.attach_urls
+                        let userDebitAuditRecordList = receive.record_list
+
+                        let audit_flg = receive.audit_flg//销售收款单详情状态
+                        let pay_type = receive.pay_type
+
+                        if(audit_flg == 4){// 4：通过
+                            this.isShow = true
+                            if(pay_type == 2){
+                                this.payType = '银行收款'
+                            }else if(pay_type == 1){
+                                this.payType = '现金收款'
+                            }else{
+                                this.payType = ''
+                            }
+                        }else{
+                            this.isShow = false
+                        }
+                        this.bankName = receive.bank_name
+                        this.createDate = receive.create_date
+
+                        this.userDebitAuditRecordList = userDebitAuditRecordList
                         this.sale_id = data.sale.idString
-                        for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
+                        for(let i = 0; i < this.userDebitAuditRecordList.length; i++){
                             this.userDebitAuditRecordList[i].time = this.userDebitAuditRecordList[i].time.substring(0,10)
                         }
                     }else{
@@ -171,7 +205,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

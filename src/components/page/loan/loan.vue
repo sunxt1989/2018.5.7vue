@@ -78,11 +78,10 @@
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString}}" class="see">
+                                    <router-link :to="{name:'seeLoan',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
                                         <i class="icon iconfont icon-kanguo blue"></i>
                                     </router-link>
                                 </span>
-
                                 <span class="operation">
                                     <i v-if='scope.row.auditFlg == 0' @click='deleteModel(scope.row.idString)'
                                        class="icon iconfont icon-shanchu red"></i>
@@ -168,10 +167,10 @@
                     choice: '0,1,2,3,4,5,6',
                     label: '未完成列表'
                 }],
-                choice:'0,1,2,3,4,5,6',
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,
                 tableData: [],//借款单列表数据
                 count:0,//总条目数
-                currentPage:1,//当前页数
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
@@ -235,7 +234,21 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -310,6 +323,8 @@
             };
         },
         created(){
+            if(!this.choice)this.choice='0,1,2,3,4,5,6';
+            if(!this.currentPage)this.currentPage = 1;
             var params = new URLSearchParams();
             var url = addUrl.addUrl('loan')
             params.append('periodType','');
@@ -366,7 +381,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -378,7 +393,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

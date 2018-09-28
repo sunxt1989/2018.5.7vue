@@ -5,7 +5,6 @@
                 <h2>账务处理-初始化</h2>
                 <h4 class="currentYM">当前账期：{{currentYM}}</h4>
                 <router-link to="/" class="back">返回</router-link>
-
             </div>
             <div class="w">
                 <div class="content cf">
@@ -233,16 +232,16 @@
             let url = addUrl.addUrl('Initialization');
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value
                     let currentYM = this.current_book_ym;
 
+                    this.currentYM = currentYM.substring(0,4) + '年' + currentYM.substring(4,6) + '月'
+                    console.log(this.currentYM);
                     this.year = currentYM.substring(0,4)
                     this.ymName = currentYM.substring(4,6)
                     this.moonName1 = String(this.ymName) + '月前累计借方'
                     this.moonName2 = this.ymName + '月前累计贷方'
-                    this.currentYM = currentYM
-
 
                     let subjectList = data.subjectList//科目列表
                     this.tableData11 = subjectList[0]
@@ -262,8 +261,9 @@
                         }
                     }
                     for(let i = 0; i < numArr.length; i++){
-                        if((Number(numArr[i]) + 1) == data.assistantSubjectList.length){
-                            data.assistantSubjectList[numArr[i]].rowspan = 1
+                        if(i == numArr.length - 1){
+                            console.log(data.assistantSubjectList.length - numArr[i]);
+                            data.assistantSubjectList[numArr[i]].rowspan = data.assistantSubjectList.length - numArr[i]
                         }
                         if(numArr[i+1] - numArr[i] > 0){
                             data.assistantSubjectList[numArr[i]].rowspan = numArr[i+1] - numArr[i]
@@ -355,7 +355,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:31px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

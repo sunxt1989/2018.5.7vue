@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>交易方详情</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button  @click="model(1)" size="small" type="primary" class="sub" >保存</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
@@ -24,7 +24,7 @@
                         <input class="ipt" type="text" v-model="tradeName" :disabled="!isState">
                     </li>
                     <li class="sm" v-show="tradeType">
-                        <span class="tit"><span class="red">*</span>统一社会信用代码</span>
+                        <span class="tit">统一社会信用代码</span>
                         <input class="ipt" type="text" v-model="tradeIdNumber" maxlength="18" :disabled="!isState">
                     </li>
 
@@ -46,11 +46,11 @@
                         <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="15">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系人</span>
+                        <span class="tit">联系人</span>
                         <input class="ipt" type="text" v-model="tradePerson1">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系电话</span>
+                        <span class="tit">联系电话</span>
                         <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="15">
                     </li>
                     <li class="sm">
@@ -89,7 +89,6 @@
                     <i class="icon iconfont icon-sanjiao2" v-show="!isShowList"></i>
                 </div>
                 <el-table v-show="isShowList" :data="option1" class="grayList">
-                    <el-table-column prop="index" label="序号" sortable align="center"></el-table-column>
                     <el-table-column prop="simplePurchaseDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
@@ -125,7 +124,6 @@
                 </el-table>
 
                 <el-table v-show="!isShowList" :data="option2" class="grayList">
-                    <el-table-column prop="supplierName" label="序号" sortable align="center"></el-table-column>
                     <el-table-column prop="simpleSaleDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
@@ -157,6 +155,7 @@
     import axios from 'axios'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
+    import addUrl from '../../../../static/js/addUrl'
 
     export default{
         data(){
@@ -189,6 +188,7 @@
                 isShowList:true,// 是否显示采购列表 false显示销售列表
                 isState:false,// 是否为未交易状态，如果是则允许修改所以内容
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -201,10 +201,8 @@
                 }
             },
             model(n){
-                var str1=/[A-Z0-9]{18}/;
-                var tradeIdNumber = this.tradeIdNumber;
-                var str2 = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
-                var IDnumber = this.IDnumber;
+                this.loading = true
+                var str3 = /^\d+$/;//判断是否为纯数字
                 var bankCode = this.bankCode;
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
@@ -214,52 +212,48 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else{
                     if(this.tradeType){
                         if(this.tradeName == ''){
                             this.$message.error('请正确输入公司名称');
-                            this.loading = false;
-                            return
-                        }else if(!(str1.test(tradeIdNumber))){
-                            this.$message.error('请正确输入统一社会信用代码');
-                            this.loading = false;
+                            this.loading = false
                             return
                         }
                     }else{
                         if(this.userName == ''){
                             this.$message.error('请正确输入姓名');
-                            this.loading = false;
+                             this.loading = false
                             return
-                        }else if(IDnumber != '') {
-                            if (!(str2.test(IDnumber))) {
-                                this.$message.error('请正确输入身份证号');
-                                this.loading = false;
-                                return
-                            }
                         }
                     }
-                    if(this.tradePerson1 == ''){
-                        this.$message.error('请正确输入联系人');
-                        this.loading = false;
-                        return
-                    }else if(typeof this.tradePersonPhone1 != 'number' && this.tradePersonPhone1.length != 11){
-                        this.$message.error('请正确输入联系电话');
-                        this.loading = false;
-                        return
-                    }else if(bankCode != ''){
+                    if(bankCode != ''){
                         if(bankCode.length != 18 && typeof bankCode != 'number'){
                             this.$message.error('请正确输入银行卡号');
-                            this.loading = false;
+                             this.loading = false
                             return
                         }
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios();
                     }).catch(() => {
@@ -267,6 +261,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -278,7 +274,6 @@
                 var customFlg = 0 //客户
 
                 var identity = this.identity
-
                 if(this.tradeType){
                     tradeName = this.tradeName
                     tradeIdNumber = this.tradeIdNumber
@@ -296,9 +291,10 @@
                         supplierFlg = 1
                     }
                 }
-//
 //                console.log(this.debitId);
-                var params = new URLSearchParams();
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('saveSupplier')
+
                 params.append('id',this.debitId);
                 params.append('tradeName',tradeName);
                 params.append('tradeIdNumber',tradeIdNumber);
@@ -313,10 +309,10 @@
                 params.append('customFlg',customFlg);
                 params.append('tradeType',tradeType);
 
-
-                axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/save.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -331,6 +327,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -356,11 +353,12 @@
         },
         created(){
 //            console.log(this.debitId);
-            var params = new URLSearchParams();
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('seeSupplier')
             params.append('id',this.debitId);
-            axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/detail.html',params)
+            axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     this.loading = false;
                     var data = response.data.value
                     var bankInfo = data.tradeCompany.bankInfo;//银行账户信息
@@ -370,13 +368,13 @@
                     var customFlg = data.tradeCompany.customFlg;//是否是客户： 0 不是； 1 是
                     var supplierFlg = data.tradeCompany.supplierFlg;//是否是供应商： 0 不是； 1 是
 
-                    this.tradeAddress = data.tradeCompany.tradeAddress;//地址
+                    this.tradeAddress = data.tradeCompany.tradeAddress || '';//地址
 
-                    this.tradePerson1 = data.tradeCompany.tradePerson1;//联系人
-                    this.tradePersonPhone1 = data.tradeCompany.tradePersonPhone1;//联系电话
-                    this.tradePerson2 = data.tradeCompany.tradePerson2;//紧急联系人
-                    this.tradePersonPhone2 = data.tradeCompany.tradePersonPhone2;//紧急联系电话
-                    this.tradeTelephone = data.tradeCompany.tradeTelephone;//固定电话
+                    this.tradePerson1 = data.tradeCompany.tradePerson1 || '';//联系人
+                    this.tradePersonPhone1 = data.tradeCompany.tradePersonPhone1 || '';//联系电话
+                    this.tradePerson2 = data.tradeCompany.tradePerson2 || '';//紧急联系人
+                    this.tradePersonPhone2 = data.tradeCompany.tradePersonPhone2 || '';//紧急联系电话
+                    this.tradeTelephone = data.tradeCompany.tradeTelephone || '';//固定电话
 
                     var option1 = [];
                     var option2 = [];
@@ -503,7 +501,7 @@
         vertical-align: middle;
     }
 
-    .sub{
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;

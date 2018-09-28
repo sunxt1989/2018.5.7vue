@@ -66,12 +66,17 @@
                         <el-table-column align="center" type="expand" prop="remarkStr" label="摘要" width="80px">
                             <template slot-scope="scope">
                                 <el-table :data="scope.row.certificateItemList" border class="littleTable"  :row-class-name="tableRowClassName">
-                                    <el-table-column align="center" prop="remark" label="摘要" width="200px"></el-table-column>
+                                    <el-table-column align="center" prop="serviceName" label="摘要" width="200px">
+                                        <template slot-scope="scope">
+                                            <span>{{scope.row.serviceName}}</span>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column align="left" prop="subjectCode" label="科目">
                                         <template slot-scope="prop">
-                                            <span v-if="prop.row.remark == '合计：'"></span>
-                                            <span v-else-if="prop.row.debitAmount && prop.row.remark != '合计：'">借：{{prop.row.subjectCode}}{{prop.row.subjectName}}</span>
+                                            <span v-if="prop.row.serviceName == '合计：'"></span>
+                                            <span v-else-if="prop.row.debitAmount && prop.row.serviceName != '合计：'">借：{{prop.row.subjectCode}}{{prop.row.subjectName}}</span>
                                             <span v-else>贷：{{prop.row.subjectCode}}{{prop.row.subjectName}}</span>
+                                            <span v-if="prop.row.relationName">({{prop.row.relationName}})</span>
                                         </template>
                                     </el-table-column>
                                     <el-table-column align="right" prop="debitAmount" label="借方金额" width="200px"></el-table-column>
@@ -131,7 +136,7 @@
         },
         methods: {
             tableRowClassName({row, rowIndex}) {
-                if (row.remark == '合计：') {
+                if (row.serviceName == '合计：') {
                     return 'total-row';
                 }else{
                     return 'success-row';
@@ -142,7 +147,6 @@
                 this.$message.error('请先选择需要下载的凭证')
             },
             handleSelectionChange(val){
-                console.log(val);
                 let multipleSelection = ''
                 for(let i in val){
                     if(i == 0){
@@ -160,7 +164,6 @@
                     this.url3 = this.url2 + '?ym=' + this.indexYM + '&ids=' + multipleSelection
                     this.url4 = this.url1 + '?ym=' + this.indexYM + '&ids=' + multipleSelection
                 }
-                console.log(this.url3);
             },
             //年change事件
             changeYear(){
@@ -174,7 +177,7 @@
             //月change事件
             ymClick() {
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
+                if(Number(this.indexYM) < Number(this.start_ym)){
                     this.$message.error('对不起，当前日期没有数据')
                 }else{
                     this.axios()
@@ -183,10 +186,10 @@
 
             axios(){
                 this.loading = true
-
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('voucherList');
-                params.append('ym',this.currentYM)
+
+                params.append('ym',this.indexYM);
                 axios.post(url,params)
                     .then(response=> {
                         console.log(response);
@@ -206,12 +209,17 @@
                                     creditAll += Number(certificateItemList[j].creditAmount) * 100
                                     certificateItemList[j].creditAmount = number.number(certificateItemList[j].creditAmount)
                                 }
+                                //判断如果不是第一行时摘要全部为空，如果第一行serviceName为空时，就用remark
                                 if(j != 0){
-                                    certificateItemList[j].remark = ''
+                                    certificateItemList[j].serviceName = ''
+                                }else{
+                                    if(certificateItemList[j].serviceName == ''|| certificateItemList[j].serviceName == null){
+                                        certificateItemList[j].serviceName = certificateItemList[j].remark
+                                    }
                                 }
                             }
                             certificateItemList.push({
-                                remark:'合计：',debitAmount:number.number(debitAll / 100),creditAmount: number.number(creditAll / 100)
+                                serviceName:'合计：',debitAmount:number.number(debitAll / 100),creditAmount: number.number(creditAll / 100)
                             })
 
                         }
@@ -246,8 +254,7 @@
         created(){
             this.url1 = addUrl.addUrl('voucherExcel');
             this.url2 = addUrl.addUrl('voucherPDF');
-
-            let currentYM = this.current_book_ym;
+            let currentYM = String(this.current_book_ym);
             this.year = currentYM.substring(0,4)
             this.ymName = currentYM.substring(4,6)
             this.currentYM = currentYM
@@ -255,7 +262,6 @@
             if(currentYM){
                 this.axios()
             }else{
-                console.log('返回首页');
                 this.loading = false
             }
 
@@ -303,7 +309,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:31px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -318,7 +324,7 @@
     .sub1{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -331,7 +337,7 @@
     .sub2{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;

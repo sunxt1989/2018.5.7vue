@@ -48,28 +48,27 @@
             }
         },
         methods:{
-            //执行ajax重新获取借款单列表数据
-            axios(){
-                var url = addUrl.addUrl('projectList')
-                axios.post(url)
-                    .then(response=> {
-//                        console.log(response);
-                        this.tableData = response.data.value.list;//借款单列表数据
-//                        console.log(this.tableData);
-                        this.loading = false;
-                    })
-                    .catch(error=> {
-//                        console.log(error);
-                        alert('网络错误，不能访问');
-                        this.loading = false;
-                    })
-            },
             //删除提示模态框
             deleteModel(id){
+                console.log(id);
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -91,7 +90,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        console.log(response);
                         let status = response.data.status
                         if(status == 200){
                             this.$message({
@@ -105,9 +104,23 @@
                         }
                     })
                     .catch(error=> {
-                        this.loading = false;
-//                        console.log(error);
+//                    console.log(error);
                         alert('网络错误，不能访问');
+                        this.loading = false;
+                    })
+            },
+            axios(){
+                var url = addUrl.addUrl('projectList')
+                axios.post(url)
+                    .then(response=> {
+                        console.log(response);
+                        this.tableData = response.data.value.list;
+                        this.loading = false;
+                    })
+                    .catch(error=> {
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                        this.loading = false;
                     })
             }
         },
@@ -130,18 +143,7 @@
             };
         },
         created(){
-            var url = addUrl.addUrl('projectList')
-            axios.post(url)
-                .then(response=> {
-//                    console.log(response);
-                    this.tableData = response.data.value.list;//借款单列表数据
-                    this.loading = false;
-                })
-                .catch(error=> {
-//                    console.log(error);
-                    alert('网络错误，不能访问');
-                    this.loading = false;
-                })
+          this.axios()
         },
     }
 </script>
@@ -163,7 +165,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -175,7 +177,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

@@ -26,12 +26,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <!--<el-pagination-->
-                    <!--@current-change="changePage"-->
-                    <!--background-->
-                    <!--layout="prev, pager, next"-->
-                    <!--:total='count'>-->
-                <!--</el-pagination>-->
             </div>
         </div>
     </div>
@@ -52,39 +46,6 @@
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
-        },
-        methods:{
-            //分页器
-//            changePage(val){
-//                this.currentPage = val;
-//                this.axios()
-//            },
-            axios(){
-                var url = addUrl.addUrl('approvalPurchaseConfirmList')
-                var params = new URLSearchParams();
-                params.append('pageNo',this.currentPage);
-                axios.post(url,params)
-                    .then(response=> {
-                        this.loading = false;
-//                        console.log(response);
-                        var data = response.data.value;//列表数据
-//                        console.log(data);
-                        var tableDataarr =[];
-                        if(data){
-                            for(var i =0; i < data.length; i++){
-                                data[i].showsReceiveMoney = number.number(data[i].receiveMoney)
-                                tableDataarr.push(data[i])
-                            }
-//                            console.log(tableDataarr);
-                            this.tableData = tableDataarr;
-                        }
-
-                    })
-                    .catch(error=> {
-//                        console.log(error);
-                        alert('网络错误，不能访问');
-                    })
-            },
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -125,6 +86,7 @@
                     }
                 })
                 .catch(error=> {
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -149,7 +111,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

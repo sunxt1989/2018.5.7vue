@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>报销单确认</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-if="!isBoss" size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button @click="model(2)" v-if="!isBoss" size="small" type="primary" class="sub2">确认</el-button>
+                <el-button @click="model(1)" v-if="isCashier" size="small" type="danger" class="sub1" :loading="isLoading">驳回</el-button>
+                <el-button @click="model(2)" v-if="isCashier" size="small" type="primary" class="sub2" :loading="isLoading">确认</el-button>
             </div>
         </div>
         <div class="w">
@@ -152,7 +152,8 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in auditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
+                        <img v-if="!item.faceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.faceUri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.auditUserName}}</span>
                             ——
@@ -185,13 +186,13 @@
                                 :key="item.value"
                                 :label="item.payTypeItem"
                                 :value="item.value"
-                                :disabled="isBoss">
+                                :disabled="!isSettlement">
                             </el-option>
                         </el-select>
                     </li>
                     <li>
                         <span>银行账户</span>
-                        <el-select class="bankCode" v-model="bankCode" placeholder="请选择" :disabled="isTrue">
+                        <el-select class="bankCode" v-model="bankCode" placeholder="请选择" :disabled="isTrue && isSettlement">
                             <el-option
                                 v-for="item in bankAccountList"
                                 :key="item.value"
@@ -209,12 +210,12 @@
                             :picker-options="pickerOptions1"
                             placeholder="选择日期"
                             value-format="yyyy-MM-dd"
-                            :disabled="isBoss">
+                            :disabled="!isCashier">
                         </el-date-picker>
                     </li>
                     <li>
                         <span>可选审批意见</span>
-                        <el-select class="bankCode" v-model="opinion" placeholder="请选择" @change="opinionChange" :disabled="isBoss">
+                        <el-select class="bankCode" v-model="opinion" placeholder="请选择" @change="opinionChange" :disabled="!isCashier">
                             <el-option
                                 v-for="item in opinionList"
                                 :key="item.value"
@@ -226,7 +227,7 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="isBoss">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="!isCashier">
                             </textarea>
                     </li>
                 </ul>
@@ -237,7 +238,9 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex';
     export default {
         data () {
             return {
@@ -283,9 +286,9 @@
                 debitDate:'',//日期
                 discription2:'同意',//审批意见
                 originalReceiptIds:'',//费用单id字符串（用逗号拼接）
-                payType:'1',//付款类型
+                payType:'2',//付款类型
                 payTypeList:[
-                    {value:'1',payTypeItem:'现金收款'},{value:'2',payTypeItem:'银行收款'}
+                    {value:'1',payTypeItem:'现金支付'},{value:'2',payTypeItem:'银行支付'}
                 ],//付款类型
                 opinion:'同意',//select框
                 opinionList:[
@@ -296,14 +299,17 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                isBoss:true,
-                isTrue:true,
+                isCashier:false,//是否是出纳
+                isSettlement:false,//是否结算
+                isTrue:false,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
             model(n){
+                this.loading = true
                 if (n == 0) {
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -312,12 +318,54 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                        this.loading = false
                     });
-                } else {
-                    this.$confirm('确定是否提交？', '提示', {
+                }else{
+                    let msg = ''
+                    if(n == 1){
+                        msg = '确定是否驳回'
+                    }else{
+                        msg = '确定是否确认'
+                        if(this.debitDate == ''){
+                            this.$message.error('请选择确认日期')
+                             this.loading = false
+                            return
+                        }
+                        if(this.payType == '2' && this.bankCode == '' && this.isSettlement){
+                            this.$message.error('请选择银行账户')
+                             this.loading = false
+                            return
+                        }
+                        //判断选择日期不能早于报销日期
+                        if(Number(this.simpleReceiptDate.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
+                            this.$message.error('确认日期不得早于报销日期');
+                             this.loading = false
+                            return
+                        }
+                    }
+                    this.isLoading = true;
+                    this.$confirm(msg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n)
                     }).catch(() => {
@@ -325,6 +373,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -346,25 +396,28 @@
                 var url = '';
                 var confirmApplictionUrl = addUrl.addUrl('ReimbursementConfirmationConfirmAppliction')
                 var refuseUrl = addUrl.addUrl('ReimbursementConfirmationRefuse')
-
                 var payMoney = unNumber.unNumber(this.payMoney)
-
+                //判断n=1时为驳回，n=2时为确认
+                if(n == 1){
+                    url = refuseUrl
+                    this.discription2 = this.discription2 == '同意' ? '驳回':this.discription2
+                }else if(n == 2){
+                    url = confirmApplictionUrl
+                    this.discription2 = this.discription2 == '驳回' ? '同意':this.discription2
+                }
                 params.append('id',this.debitId);
                 params.append('discription',this.discription2);
                 params.append('payType',this.payType);
                 params.append('bankCode',this.bankCode);
                 params.append('payMoney',payMoney);
                 params.append('payDate',this.debitDate);
-                //判断n=1时为驳回，n=2时为确认
-                if(n == 1){
-                    url = refuseUrl
-                }else if(n == 2){
-                    url = confirmApplictionUrl
-                }
+
+//                console.log(url);
                 axios.post(url,params)
                     .then(response=>{
                         this.loading = false;
-//                        console.log(response);
+                        this.isLoading = false;
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -376,6 +429,12 @@
                             this.$message.error(msg);
                         }
                     })
+                    .catch(error=> {
+                        this.loading = false;
+                        this.isLoading = false;
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             },
 
             addUrl(list){
@@ -391,6 +450,7 @@
                 return list
             },
         },
+        computed:mapState(['isCashierFlg']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -416,7 +476,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     this.originalTypeName = data.application.originalTypeName
@@ -430,18 +490,32 @@
                     this.reimbursementDepartment = data.application.departmentIdString
                     this.settlementMethod = data.application.settlementMethod
                     this.auditPerson = data.application.auditPerson
-                    this.bankCode = data.application.bankCode
                     this.bankName = data.application.bankName
                     this.auditFlg = data.application.auditFlg
-                    var cashFlg = data.cashFlg;
                     this.payMoney = number.number(data.payMoney)
                     this.offsetAmount = number.number(data.offsetAmount)
                     //判断用户是否为出纳 1为出纳
-                    if(cashFlg == 1){
-                        this.isBoss = false
+                    if(this.isCashierFlg){
+                        this.isCashier = true;
+                        this.isTrue = false
+                    }else{
+                        this.isCashier = false;
+                        this.isTrue = true
                     }
+
+                    //判断需报销金额是否为0
+                    if(data.payMoney == 0){
+                        this.isSettlement = false
+                    }else if(data.payMoney != 0 && !this.isCashierFlg){
+                        this.isSettlement = false
+                    }else{
+                        this.isSettlement = true
+                    }
+
                     this.bankAccountList = data.bankAccountList;
-                    this.auditRecordList = data.auditRecordList
+                    let auditRecordList = data.auditRecordList
+
+                    this.auditRecordList = auditRecordList
 
                     this.receiptList = this.addUrl(data.receiptList);
 
@@ -479,7 +553,24 @@
                             this.isShowShareItem5 = false
                         }
                     }
+                    let date = new Date()
+                    if(date.getMonth()+1 < 10){
+                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.debitDate += '-0' + date.getDate()
+                    }else{
+                        this.debitDate += '-' + date.getDate()
+                    }
                 })
+                .catch(error=> {
+                    this.loading = false;
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -512,7 +603,6 @@
     }
     .list{
         width:100%;
-        text-align: left;
     }
     .list li{
         display: inline-block;
@@ -520,6 +610,7 @@
         text-align: left;
         line-height: 36px;
         margin-top: 20px;
+        float: left;
     }
     .list .sm{
         width:50%;
@@ -574,12 +665,24 @@
         width:78.7%;
         padding: 3px 10px;
     }
-    .sub1{
+    .list li .input-with-select{
+        font-size:14px;
+        width:322px;
+        text-align: right;
+    }
+    .list .hd{
+        width:100%;
+    }
+
+    .input-select{
+        width:200px;
+    }
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

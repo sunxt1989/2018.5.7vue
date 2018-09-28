@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>查看借款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button v-if="!isReject" @click="model(1)" size="small" type="danger" class="sub">提交审批</el-button>
-                <el-button v-show="showBtn" @click="model(2)"  size="small" type="danger" class="sub1" >撤回</el-button>
+                <el-button v-if="!isReject" @click="model(1)" size="small" type="danger" class="sub" :loading="isLoading">提交审批</el-button>
+                <el-button v-show="showBtn" @click="model(2)"  size="small" type="danger" class="sub1" :loading="isLoading">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -48,7 +48,8 @@
                         <input class="ipt" type="text" value="驳回" v-if="auditFlg == 1" readonly>
                         <input class="ipt" type="text" value="待审核" v-if="auditFlg == 2" readonly>
                         <input class="ipt" type="text" value="待出纳确认" v-if="auditFlg == 3" readonly>
-                        <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4" readonly>
+                        <input class="ipt" type="text" value="待还款" v-if="auditFlg == 4 && unCreditMoney != 0" readonly>
+                        <input class="ipt" type="text" value="已还款" v-if="auditFlg == 4 && unCreditMoney == '0.00'" readonly>
                         <input class="ipt" type="text" value="待审核" v-if="auditFlg == 5" readonly>
                         <input class="ipt" type="text" value="待审核" v-if="auditFlg == 6" readonly>
                         <input class="ipt" type="text" value="已红冲" v-if="auditFlg == 7" readonly>
@@ -103,7 +104,8 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in userDebitAuditRecordList">
-                        <img :src="item.auditUserFaceUri" alt="">
+                        <img v-if="!item.auditUserFaceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.auditUserFaceUri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.auditUserName}}</span>
                             ——
@@ -125,6 +127,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex';
     export default{
         name:'seeLoan',
         data(){
@@ -139,6 +142,8 @@
                 options:[],//部门详情
                 discription:'',//事由
                 debitId:this.$route.params.debitId,
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
 
@@ -168,9 +173,11 @@
                     }
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym']),
         methods:{
             back(){
                 var params = new URLSearchParams();
@@ -184,33 +191,69 @@
                                 type:'success',
                                 message:'撤回成功'
                             })
+
                         }else if(response.data.status == 400){
                             this.$message.error(response.data.msg);
                         }
+                        this.loading = false;
+                        this.isLoading = false;
+                    })
+                    .catch(error=> {
+//                        console.log(error);
+                        this.loading = false;
+                        this.isLoading = false;
+                        alert('网络错误，不能访问');
                     })
             },
             blur:function(){
                 this.money = number.number(this.money)
             },
             model(n){
+                this.loading = true;
                 if(n == 0){
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        this.$router.go(-1)
-                    }).catch(() => {
-
-                    });
+                    if(!this.isReject){
+                        this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.push({name:'loan',params:{choice:this.choice,currentPage:this.currentPage}})
+                        }).catch(() => {
+                            this.loading = false;
+                        });
+                    }else{
+                        this.$router.push({name:'loan',params:{choice:this.choice,currentPage:this.currentPage}})
+                    }
                 }else if(n == 2) {
+                    this.isLoading = true;
                     this.$confirm('确定是否撤回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.back()
-                    })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                        this.loading = false;
+                        this.isLoading = false;
+                    });
                 }else{
                     if(this.money <= 0){
                         this.$message.error('请正确输入金额');
@@ -224,12 +267,30 @@
                         this.$message.error('请正确输入借款部门');
                         this.loading = false;
                         return
+                    }else if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('借款日期不得早于当前账期');
+                        this.loading = false;
+                        return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         var index = this.punch + this.punch2;
 //                        console.log(index);
@@ -243,6 +304,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
@@ -254,9 +317,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -264,10 +329,11 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
+                this.loading = false;
             },
             onError(){
                 this.loading = false
@@ -367,6 +433,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -378,6 +445,12 @@
                             var msg = response.data.msg;
                             this.$message.error(msg);
                         }
+                    })
+                    .catch(error=> {
+                        this.loading = false;
+                        this.isLoading = false;
+//                        console.log(error);
+                        alert('网络错误，不能访问');
                     })
             },
             //上传图片缩略图信息赋值
@@ -412,10 +485,12 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
-                    this.userDebitAuditRecordList = data.userDebitAuditRecordList;
+                    let userDebitAuditRecordList = data.userDebitAuditRecordList
+
+                    this.userDebitAuditRecordList = userDebitAuditRecordList;
                     this.discription = data.userDebitItem.discription;
                     this.money = number.number(data.userDebitItem.money);
                     this.creditMoney = number.number(data.userDebitItem.creditMoney);
@@ -468,7 +543,12 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub{
+        position: absolute;
+        right:110px;
+        font-size:12px;
+    }
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
@@ -540,11 +620,7 @@
         width:76.7%;
         padding: 3px 10px;
     }
-    .sub{
-        position: absolute;
-        right:110px;
-        font-size:12px;
-    }
+
     .approval{
         width:100%;
         margin-top: 20px;

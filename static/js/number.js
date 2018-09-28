@@ -2,9 +2,8 @@
  * Created by who on 2018/6/19.
  */
 function number(value){
-
     value = String(value);
-    if(!value) return '0.00';
+    if(!value || value == '' || value == null || value == 'undefined') return '0.00';
 
     if(value.includes(',')){
         value = value.split(',').join('')

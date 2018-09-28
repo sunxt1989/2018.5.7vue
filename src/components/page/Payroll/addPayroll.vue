@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>新增临时员工</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">提交</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -233,6 +233,7 @@
                     },
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -448,15 +449,15 @@
                     this.insuranceSumCompany = number.number(insuranceSumCompany/100)
                 }
             },
-            //社保基数生成时间
+            //社保基数生成事件
             wageBase(wage_base){
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('wageBase')
                 params.append('wage_base', wage_base);
-                params.append('ym', this.currentYM);
-                axios.post(url)
+                params.append('currentYM', this.currentYM);
+                axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let data = response.data.value
                         this.endowmentInsurancePerson = number.number(data.endowmentInsurancePerson)
                         this.medicalInsurancePerson = number.number(data.medicalInsurancePerson)
@@ -491,7 +492,21 @@
                 this.$confirm('您是否需要按所填基数自动生成以下选项？','提示',{
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(()=>{
                     this.wageBase(wage_base);
                 }).catch(()=>{
@@ -531,7 +546,6 @@
                         type: 'warning'
                     }).then(() => {
                         this.$router.go(-1)
-                        this.loading = false
                     }).catch(() => {
                         this.loading = false
                     });
@@ -568,10 +582,25 @@
                         this.loading = false;
                         return
                     }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit()
                     }).catch(() => {
@@ -580,6 +609,7 @@
                             message: '已取消'
                         });
                         this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -601,6 +631,7 @@
                             if(departmentJson[i].id == this.select1){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -608,6 +639,7 @@
                     }else if(this.input1 != 0 && this.select1 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -620,6 +652,7 @@
                             if(departmentJson[i].id == this.select2){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -628,6 +661,7 @@
                     }else if(this.input2 != 0 && this.select2 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -640,6 +674,7 @@
                             if(departmentJson[i].id == this.select3){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -647,6 +682,7 @@
                     }else if(this.input3 != 0 && this.select3 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -659,6 +695,7 @@
                             if(departmentJson[i].id == this.select4){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -666,6 +703,7 @@
                     }else if(this.input4 != 0 && this.select4 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
 
@@ -678,6 +716,7 @@
                             if(departmentJson[i].id == this.select5){
                                 this.$message.error('分摊部门/项目不能相同，请重新选择');
                                 this.loading = false;
+                                this.isLoading = false;
                                 return
                             }
                         }
@@ -685,6 +724,7 @@
                     }else if(this.input5 != 0 && this.select5 == ''){
                         this.$message.error('请正确选择部门/项目');
                         this.loading = false;
+                        this.isLoading = false;
                         return
                     }
                     divideFlg = 1
@@ -729,6 +769,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -743,6 +784,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -804,14 +846,9 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
-        font-size:12px;
-    }
-    .sub2{
-        position: absolute;
-        right:190px;
         font-size:12px;
     }
     .content{

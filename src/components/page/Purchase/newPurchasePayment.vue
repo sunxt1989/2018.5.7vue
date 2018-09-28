@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>新建采购付款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">提交</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -62,7 +62,7 @@
                     <el-table-column property="showMoney" label="金额"  align="center"></el-table-column>
                     <el-table-column property="attachCount" label="附件" align="center">
                         <template slot-scope="scope">
-                            <router-link :to="{name:'seePurchasePayment',params:{debitId:scope.row.sendId}}" class="see">
+                            <router-link :to="{name:'seePurchasePayment',params:{debitId:scope.row.sendId,advanceId:advanceId}}" class="see">
                                 {{scope.row.attachCount}}
                             </router-link>
                         </template>
@@ -109,8 +109,10 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                debitId:this.$route.params.debitId,
+                debitId:this.$route.params.debitId,//采购单id
+                advanceId:this.$route.params.advanceId,//关联的辅助业务id
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -127,15 +129,21 @@
                 this.money = number.number(this.money)
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        this.$router.push('/Purchase/PurchaseList')
+                        //判断返回方向，如果从关联采购单来时advanceId会有参数
+                        if(this.advanceId){
+                            this.$router.push('/auxiliary/auxiliaryList')
+                        }else{
+                            this.$router.push('/Purchase/PurchaseList')
+                        }
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else{
                     if(this.money == ''){
@@ -143,10 +151,30 @@
                         this.loading = false;
                         return
                     }
+                    if(unNumber.unNumber(this.unPayMoney) < unNumber.unNumber(this.money)){
+                        this.$message.error('输入金额不得大于待付款');
+                        this.loading = false;
+                        return
+                    }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
 //                        console.log(this.punch);
                         if(this.punch != 0){
@@ -159,6 +187,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -170,9 +200,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -180,7 +212,7 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
@@ -239,6 +271,7 @@
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
                 params.append('purchase_id',this.debitId);
+                params.append('advance_id',this.advanceId);
                 params.append('pay_money',money);
 
                 params.append('imgUrl1',this.imgUrl1);
@@ -250,7 +283,6 @@
                 params.append('imgUrl4',this.imgUrl4);
                 params.append('imgName4',this.imgName4);
 
-
                 axios({
                     method:'post',
                     url:url,
@@ -260,10 +292,13 @@
                     }
                 },params)
                     .then(response=> {
-
 //                        console.log(response);
                         if(response.data.status == 200){
-                            this.$router.go(-1);
+                            if(this.advanceId){
+                                this.$router.push('/auxiliary/auxiliaryList')
+                            }else{
+                                this.$router.push('/Purchase/PurchaseList')
+                            }
                             this.$message({
                                 type: 'success',
                                 message: '提交成功'
@@ -273,16 +308,15 @@
                             this.$message.error(msg);
                         }
                         this.loading = false;
+                        this.isLoading = false;
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
             },
-
-        },
-        watch:{
 
         },
         mounted(){
@@ -306,11 +340,11 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newPurchasePayment')
-//            console.log(this.debitId);
             params.append('purchaseId',this.debitId);
+            params.append('advanceId',this.advanceId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.unPayMoney = number.number(data.unPayMoney)
                     var list = data.list
@@ -323,7 +357,6 @@
                 })
                 .catch(error=> {
                     this.loading = false
-
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 });
@@ -350,7 +383,7 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;

@@ -3,9 +3,9 @@
         <div class="w cf">
             <div class="top">
                 <h2>固定资产列表</h2>
-                <h4 class="choice">当前账期：2018年1月</h4>
+                <h4 class="choice">当前账期：{{nowDate}}</h4>
                 <router-link to="/" class="back">返回</router-link>
-                <el-button @click="model"  size="small" type="primary" class="sub">计提当月摊销</el-button>
+                <el-button @click="model"  size="small" type="primary" class="sub">计提当月折旧</el-button>
             </div>
         </div>
         <div class="w">
@@ -13,11 +13,11 @@
                 <el-table :data="tableData" class="blueList">
                     <el-table-column prop="fixedAssetsNumber" label="编号" sortable align="center"></el-table-column>
                     <el-table-column prop="className" label="类别" sortable align="center"></el-table-column>
-                    <el-table-column prop="departmentName" label="部门/费用" sortable align="center">
+                    <el-table-column prop="departmentName" label="部门/项目" sortable align="center">
                         <template slot-scope="scope">
-                            <span>{{ scope.row.departmentName }}
-                                <span v-if="scope.row.divideFlg == 1">(分摊)</span>
-                            </span>
+                            <span v-if="scope.row.departmentName">{{ scope.row.departmentName }}</span>
+                            <span v-else>{{ scope.row.projectName }}</span>
+                            <span v-if="scope.row.divideFlg == 1">(分摊)</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" label="名称" sortable align="center" width="220px"></el-table-column>
@@ -26,9 +26,9 @@
                             <span>{{ scope.row.showOriginalMoney }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="salvageMoney" label="净值" sortable align="center">
+                    <el-table-column prop="money" label="净值" sortable align="center">
                         <template slot-scope="scope">
-                            <span>{{ scope.row.showSalvageMoney }}</span>
+                            <span>{{ scope.row.showMoney }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="usefulMonths" label="已折旧月" sortable align="center"></el-table-column>
@@ -52,12 +52,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <!--<el-pagination-->
-                    <!--@current-change="changePage"-->
-                    <!--background-->
-                    <!--layout="prev, pager, next"-->
-                    <!--:total='count'>-->
-                <!--</el-pagination>-->
             </div>
         </div>
     </div>
@@ -66,28 +60,23 @@
     import axios from 'axios'
     import number from '../../../../static/js/number'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
     export default {
         data() {
             return {
                 tableData:[],
-                count:0,//总条目数
-                currentPage:1,//当前页数
                 loading:true,
+                nowDate:'',
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
-            //分页器
-            changePage(val){
-                this.currentPage = val;
-                this.loading = true;
-                this.axios()
-            },
             model(){
+                this.loading = true;
                 var url = addUrl.addUrl('fixedAssetsListCalculation')
                 axios.post(url)
                     .then(response=> {
-                        this.loading = false;
+                        console.log(response);
                         if(response.data.status == 200){
                             let msg = response.data.msg;
                             this.$message.success(msg);
@@ -95,6 +84,7 @@
                         }else if(response.data.status == 400){
                             let msg = response.data.msg;
                             this.$message.error(msg);
+                            this.loading = false;
                         }
                     })
             },
@@ -109,12 +99,18 @@
                         let tableData = data.list;
                         for(let i in tableData){
                             tableData[i].showOriginalMoney =  number.number(tableData[i].originalMoney)
-                            tableData[i].showSalvageMoney =  number.number(tableData[i].salvageMoney)
+                            tableData[i].showMoney =  number.number(tableData[i].money)
                         }
                         this.tableData = tableData
                     })
+                    .catch(error=> {
+                        this.loading = false;
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             }
         },
+        computed:mapState(['current_book_ym']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -134,20 +130,27 @@
             };
         },
         created(){
+            let str = String(this.current_book_ym)
+            this.nowDate = str.substring(0,4) + '年' + str.substring(4,6) + '月'
             var url = addUrl.addUrl('fixedAssetsList')
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     let tableData = data.list;
                     for(let i in tableData){
                         tableData[i].showOriginalMoney =  number.number(tableData[i].originalMoney)
-                        tableData[i].showSalvageMoney =  number.number(tableData[i].salvageMoney)
+                        tableData[i].showMoney =  number.number(tableData[i].money)
                     }
                     this.tableData = tableData
                 })
+                .catch(error=> {
+                    this.loading = false;
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -202,7 +205,7 @@
         text-decoration: none;
     }
     .choice {
-        width:180px;
+        width:200px;
         display: inline-block;
         position: absolute;
         top:20px;

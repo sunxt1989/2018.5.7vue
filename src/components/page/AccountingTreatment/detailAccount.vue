@@ -119,15 +119,13 @@
                 let str = /^\d+$/;//判断只允许输入正整数
                     if(!str.test(this.startSubject)){
                         this.$message.error('科目区间只允许输入正整数');
-                        this.startSubject = 0;
+                        this.startSubject = '';
                         return
                     }
             },
-
             //科目选择保存按钮
             treeSave(){
-                let subject = '';
-                subject = parseInt(this.$refs.Tree.getCheckedKeys()[0])
+                let subject =(this.$refs.Tree.getCheckedKeys()[0] == undefined)? '': parseInt(this.$refs.Tree.getCheckedKeys()[0])
                 this.startSubject = subject
                 this.dialogTableVisible = false;
             },
@@ -149,19 +147,17 @@
 
             //获取tree结构的axios请求
             treeAxios(){
-                console.log('treeAxios');
                 let url = addUrl.addUrl('tree')
                 let params = new URLSearchParams();
                 params.append('type','0');
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;//列表数据
 //                        console.log(data);
                         this.tree = data.zNodes
-                    })
-                    .catch(error=> {
+                        this.loading = false;
+                    }).catch(error=> {
 //                        console.log(error);
                         alert('网络错误，不能访问');
                         this.loading = false;
@@ -169,10 +165,10 @@
             },
             //打开科目区间选择模态框
             addClick(){
+                this.loading = true;
                 this.dialogTableVisible = true;
                 this.treeAxios()
             },
-
             axios(){
                 let url1 = addUrl.addUrl('detailAccountExcel');
                 this.url1 = url1 + '?startDate=' + this.startTime + '&endDate='+ this.endTime +  '&subjectCode=' + this.startSubject
@@ -184,10 +180,9 @@
                 params.append('subjectCode',this.startSubject);
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
                         console.log(response);
-                        let status = response.data.status
-                        let msg = response.data.msg
+                        let status = response.data.status;
+                        let msg = response.data.msg;
                         if(status == 200){
                             let data = response.data.value;//列表数据
                             this.tableData = data.dataList;
@@ -228,6 +223,7 @@
             };
         },
         created(){
+            console.log(this.start_ym);
             this.startTime = this.start_ym.substring(0,4) + '-' +this.start_ym.substring(4,6)
             this.endTime = this.current_book_ym.substring(0,4) + '-' +this.current_book_ym.substring(4,6);
             this.axios()
@@ -252,7 +248,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -267,7 +263,7 @@
     .sub1{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;

@@ -6,7 +6,7 @@ function unNumber(value){
     if(value.includes(',')){
         value = value.split(',').join('')
     }
-    return Number(value)
+    return Number(value) || 0
 }
 export default{
     unNumber

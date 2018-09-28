@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>固定资产详情</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-show="this.status < 3" size="small" type="primary" class="sub1">处置</el-button>
-                <el-button @click="model(2)" v-show="this.status == 4" size="small" type="primary" class="sub1">处置完成</el-button>
+                <el-button @click="model(1)" v-show="this.status < 3" size="small" type="primary" class="sub1" :loading="isLoading">处置</el-button>
+                <el-button @click="model(2)" v-show="this.status == 4" size="small" type="primary" class="sub1" :loading="isLoading">处置完成</el-button>
             </div>
         </div>
         <div class="w">
@@ -18,7 +18,7 @@
                         <span v-show="!isShare">折旧分摊</span>
                         <span v-show="isShare">取消折旧分摊</span>
                     </el-button>
-                    <el-button @click="saveShare" size="small" type="primary" class="sub2">保存分摊</el-button>
+                    <el-button @click="saveShare" size="small" type="primary" class="sub2">{{saveName}}</el-button>
                 </div>
 
                 <ul class="list cf">
@@ -116,10 +116,6 @@
                         <input class="ipt" type="text" v-model="className" readonly>
                     </li>
                     <li class="sm">
-                        <span class="tit">部门</span>
-                        <input class="ipt" type="text" v-model="departmentName" readonly>
-                    </li>
-                    <li class="sm">
                         <span class="tit">年限</span>
                         <input class="ipt" type="text" v-model="usefulLife" readonly>
                     </li>
@@ -137,7 +133,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">净值</span>
-                        <input class="ipt" type="text" v-model="salvageMoney" readonly>
+                        <input class="ipt" type="text" v-model="money" readonly>
                     </li>
                     <li class="sm">
                         <span class="tit">入账日期</span>
@@ -148,13 +144,13 @@
                         <input class="ipt" type="text" v-model="usefulMonths" readonly>
                     </li>
 
-                    <li class="sm" v-show="isHandle">
+                    <li class="sm" v-show="isHandle || isFinish">
                         <span class="tit2">价税合计金额</span>
                         <input class="ipt" type="text" v-model="dealTotalMoney" :readonly="isFinish" @change="numberMoney(1)">
                     </li>
-                    <li class="sm" v-show="isHandle">
+                    <li class="sm" v-show="isHandle || isFinish">
                         <span class="tit2">税率</span>
-                        <el-select class="sel" v-model="dealTaxRate" placeholder="请选择" :readonly="isFinish">
+                        <el-select class="sel" v-model="dealTaxRate" placeholder="请选择" :disabled="isFinish">
                             <el-option
                                 v-for="item in options2"
                                 :key="item.value"
@@ -163,11 +159,11 @@
                             </el-option>
                         </el-select>
                     </li>
-                    <li class="sm" v-show="isHandle">
+                    <li class="sm" v-show="isHandle || isFinish">
                         <span class="tit2">处置费用</span>
                         <input class="ipt" type="text" v-model="dealCost" :readonly="isFinish" @change="numberMoney(2)">
                     </li>
-                    <li class="sm" v-show="isHandle">
+                    <li class="sm" v-show="isHandle || isFinish">
                         <span class="tit2">处置日期</span>
                         <el-date-picker
                             class="iptData"
@@ -190,9 +186,11 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
     export default{
         data(){
             return{
+                saveName:'保存',//保存按钮名称
                 department:'',//分摊部门/项目
                 input1:0,
                 input2:0,
@@ -210,7 +208,6 @@
                 status:'',//状态 0：仅保存，1：正常使用，2：未使用，3：已折旧完毕，4：处置中，5：处置完毕
                 name:'',//名称
                 className:'',//类别
-                departmentName:'',//部门
                 divideFlg:'',//是否分摊   0为不分摊 1为分摊
                 usefulLife:'',//年限
                 originalMoney:'',//原值
@@ -244,6 +241,7 @@
                     },
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -266,39 +264,76 @@
                 this.dealCost = number.number(dealCost);
             },
             model(n){
+                this.loading = true;
                 if(n == 0) {
-                    this.$confirm('是否返回？', '提示', {
+                    if(this.isFinish){
+                        this.$router.go(-1)
+                    }else{
+                        this.$confirm('是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.go(-1)
+                        }).catch(() => {
+                            this.loading = false;
+                        });
+                    }
+                }else if(n == 1){
+                    let current_book_ym = Number(this.current_book_ym)
+                    let startDateYMD = Number(this.startDateYMD.split('-').join('').substring(0,6));
+                    if(startDateYMD == current_book_ym){
+                        this.$message.error('当月入账不得处置');
+                        this.loading = false;
+                        return
+                    }
+                    this.isLoading = true;
+                    this.$confirm('是否处置？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        this.$router.go(-1)
-                    }).catch(() => {
-
-                    });
-                }else if(n == 1){
-                    this.loading = true;
-                    let params = new URLSearchParams()
-                    let url = addUrl.addUrl('fixedAssetsHandle')
-                    params.append('fixedId',this.debitId);
-                    axios.post(url,params)
-                        .then(response=> {
-//                            console.log(response);
-                            let status = response.data.status
-                            let msg = response.data.msg
-                            if(status == 200){
-                                this.$message.success(msg);
-                                this.loading = false;
-                                this.axios();
-                            }else if(status == 400){
-                                this.$message.error(msg);
-                                this.loading = false;
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
                             }
-                        })
+                        }
+                    }).then(() => {
+                        let params = new URLSearchParams()
+                        let url = addUrl.addUrl('fixedAssetsHandle')
+                        params.append('fixedId',this.debitId);
+                        axios.post(url,params)
+                            .then(response=> {
+//                            console.log(response);
+                                let status = response.data.status;
+                                let msg = response.data.msg;
+                                if(status == 200){
+                                    this.$message.success(msg);
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                    this.axios();
+                                }else if(status == 400){
+                                    this.$message.error(msg);
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                }
+                            })
+                    }).catch(() => {
+                        this.loading = false;
+                        this.isLoading = false;
+                    });
+
                 }else if(n == 2){
-                    this.loading = true;
-                    let dealTotalMoney = unNumber.unNumber(this.dealTotalMoney)
-                    let dealCost = unNumber.unNumber(this.dealCost)
+                    let dealTotalMoney = unNumber.unNumber(this.dealTotalMoney);
+                    let dealCost = unNumber.unNumber(this.dealCost);
 
                     if(dealTotalMoney == 0){
                         this.$message.error('请正确填写价税合计金额');
@@ -310,34 +345,60 @@
                         this.loading = false;
                         return
                     }
-
-                    let params = new URLSearchParams()
-                    let url = addUrl.addUrl('fixedAssetsHandleFinish')
-                    params.append('fixedId',this.debitId);
-                    params.append('dealDate',this.dealDateYMD);
-                    params.append('dealTaxRate',this.dealTaxRate);
-                    params.append('dealTotalMoney',dealTotalMoney);
-                    params.append('dealCost',dealCost);
-//                    console.log(url);
-                    axios.post(url,params)
-                        .then(response=> {
-//                            console.log(response);
-                            let status = response.data.status
-                            let msg = response.data.msg
-                            if(status == 200){
-                                this.$router.go(-1)
-                                this.$message.success(msg);
-                                this.loading = false;
-                                this.axios();
-                            }else if(status == 400){
-                                this.$message.error(msg);
-                                this.loading = false;
+                    this.isLoading = true;
+                    this.$confirm('是否处置完成？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
                             }
-                        })
+                        }
+                    }).then(() => {
+                        let params = new URLSearchParams()
+                        let url = addUrl.addUrl('fixedAssetsHandleFinish')
+                        params.append('fixedId',this.debitId);
+                        params.append('dealDate',this.dealDateYMD);
+                        params.append('dealTaxRate',this.dealTaxRate);
+                        params.append('dealTotalMoney',dealTotalMoney);
+                        params.append('dealCost',dealCost);
+//                    console.log(url);
+                        axios.post(url,params)
+                            .then(response=> {
+//                            console.log(response);
+                                let status = response.data.status
+                                let msg = response.data.msg
+                                if(status == 200){
+                                    this.$router.go(-1)
+                                    this.$message.success(msg);
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                    this.axios();
+                                }else if(status == 400){
+                                    this.$message.error(msg);
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                }
+                            })
+                    }).catch(() => {
+                        this.loading = false;
+                        this.isLoading = false;
+                    });
                 }
             },
             //保存分摊按钮
             saveShare(){
+                this.loading = true;
                 let departmentJson =[];
                 let options = this.options;
 
@@ -480,7 +541,6 @@
                         let msg = response.data.msg
                         if(status == 200){
                             this.$message.success(msg);
-                            this.loading = false;
                             this.axios();
                         }else if(status == 400){
                             this.$message.error(msg);
@@ -508,7 +568,7 @@
                         this.usefulLife = fixedAssets.usefulLife;
                         this.originalMoney = number.number(fixedAssets.originalMoney);
                         this.salvageRate = fixedAssets.salvageRate;
-                        this.salvageMoney = number.number(fixedAssets.salvageMoney);
+                        this.money = number.number(fixedAssets.money);
                         this.startDateYMD = fixedAssets.startDateYMD;
                         this.usefulMonths = fixedAssets.usefulMonths;
                         this.usefulMoney = number.number(fixedAssets.usefulMoney);
@@ -576,10 +636,15 @@
             },
             //分摊按钮
             shareClick(){
+                if(this.isShare){
+                    this.saveName = '保存'
+                }else{
+                    this.saveName = '保存分摊'
+                }
                 this.isShare = !this.isShare
             },
         },
-
+        computed:mapState(['current_book_ym']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -604,19 +669,18 @@
             var url = addUrl.addUrl('fixedAssets')
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     let fixedAssets = data.fixedAssets
 
                     this.name = fixedAssets.name;
                     this.className = fixedAssets.className;
-                    this.departmentName = fixedAssets.departmentName;
                     this.divideFlg = fixedAssets.divideFlg;
                     this.usefulLife = fixedAssets.usefulLife;
                     this.originalMoney = number.number(fixedAssets.originalMoney);
                     this.salvageRate = fixedAssets.salvageRate;
-                    this.salvageMoney = number.number(fixedAssets.salvageMoney);
+                    this.money = number.number(fixedAssets.money);
                     this.startDateYMD = fixedAssets.startDateYMD;
                     this.usefulMonths = fixedAssets.usefulMonths;
                     this.usefulMoney = number.number(fixedAssets.usefulMoney);
@@ -625,9 +689,11 @@
                     //判断是否分摊，给部门/项目赋值
                     if(this.divideFlg == 0){
                         this.isShare =false
+                        this.saveName = '保存'
                         this.department = fixedAssets.departmentIdString1
                     }else if(this.divideFlg == 1){
                         this.isShare =true
+                        this.saveName = '保存分摊'
                         this.select1 = fixedAssets.departmentIdString1
                         this.select2 = fixedAssets.departmentIdString2
                         this.select3 = fixedAssets.departmentIdString3
@@ -687,7 +753,7 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;

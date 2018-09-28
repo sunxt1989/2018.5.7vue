@@ -72,7 +72,8 @@
                 </div>
                 <ul class="approval">
                     <li class="cf" v-for="item in auditRecordList">
-                        <img :src="item.faceUri" alt="">
+                        <img v-if="!item.faceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.faceUri" alt="">
                         <div class="listHeader">
                             <span class="listName">{{item.auditUserName}}</span>
                             <span class="listDepartment" v-if="item.auditUserType != ''">——{{item.auditUserType}}</span>
@@ -132,6 +133,7 @@
         },
         methods: {
             model(){
+                this.loading = true;
                 this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -139,7 +141,7 @@
                 }).then(() => {
                     this.$router.go(-1)
                 }).catch(() => {
-
+                    this.loading = false;
                 });
             }
         },
@@ -184,7 +186,9 @@
                     this.initialAmount2 = number.number(bankTransfer.remarkEndAmount)
                     this.bankCode2 = bankTransfer.bankCodeRemark
 
-                    this.auditRecordList = data.auditRecordList
+                    let auditRecordList = data.auditRecordList
+
+                    this.auditRecordList = auditRecordList
 //                    console.log(this.auditRecordList);
                     let type = bankTransfer.type
 
@@ -248,7 +252,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

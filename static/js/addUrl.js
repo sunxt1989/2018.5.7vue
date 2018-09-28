@@ -2,7 +2,10 @@
  * Created by who on 2018/7/4.
  */
 function addUrl(name){
-    var url = 'http://192.168.2.190:8080/web';
+    var url = 'http://192.168.2.105:8881/web';
+    //var url = 'http://192.168.2.190:8080/web';
+    //var url = 'http://192.168.2.191:8080/web';
+    //var url = 'http://www.cloudaccounting.cn'
 
     //借款单列表
     if(name == 'loan'){
@@ -53,7 +56,7 @@ function addUrl(name){
         return url + '/vue/payment/audit/debit/cashier/list.html'
     }
     //借款单确认
-    if(name == 'loanConfirmationList'){
+    if(name == 'loanConfirmation'){
         return url + '/vue/debit/item/debit/show.html'
     }
 
@@ -69,13 +72,17 @@ function addUrl(name){
     if(name == 'repayment'){
         return url + '/vue/debit/credit/create.html'
     }
+    //还款单详情
+    if(name == 'seeRepayment'){
+        return url + '/vue/debit/item/credit/show.html'
+    }
     //还款单提交
     if(name == 'repaymentSubmit'){
         return url + '/vue/debit/edit/credit/submit.html'
     }
     //还款单确认
-    if(name == 'repaymentConfirmation'){
-        return url + '/vue/debit/credit/show.html'
+    if(name == 'seeRepayment'){
+        return url + '/vue/debit/item/credit/show.html'
     }
     //还款单确认同意
     if(name == 'repaymentConfirmationAgree'){
@@ -83,10 +90,10 @@ function addUrl(name){
     }
     //还款单确认驳回
     if(name == 'repaymentConfirmationRefuse'){
-        return url + '/vuepayment/item/credit/refuse.html'
+        return url + '/vue/payment/item/credit/refuse.html'
     }
     //还款单确认列表
-    if(name == 'repaymentConfirmationRefuse'){
+    if(name == 'repaymentConfirmationList'){
         return url + '/vue/payment/audit/credit/list.html'
     }
 
@@ -133,6 +140,10 @@ function addUrl(name){
     //查看报销单
     if(name == 'seeReimbursement'){
         return url + '/vue/application/check.html'
+    }
+    //报销单下载
+    if(name == 'saveReimbursement'){
+        return url + '/vue/application/download/item.html'
     }
     //查看报销单费用列表
     if(name == 'seeReimbursementList'){
@@ -504,6 +515,18 @@ function addUrl(name){
     if(name == 'update'){
         return url + '/vue/salary/update.html'
     }
+    //工资-查看工资补录页面获取参数
+    if(name == 'record'){
+        return url + '/vue/salary/init/additional/recording.html'
+    }
+    //工资-工资补录计提
+    if(name == 'calculation'){
+        return url + '/vue/salary/init/counting/drawing.html'
+    }
+    //工资-工资补录发放
+    if(name == 'provide'){
+        return url + '/vue/salary/init/entering/provide.html'
+    }
     //个人信息查看
     if(name == 'personal'){
         return url + '/vue/user/user/info.html'
@@ -543,6 +566,10 @@ function addUrl(name){
     //首页登录接口
     if(name == 'login'){
         return url + '/vue/user/get/info/all.html'
+    }
+    //跳转到初始化页面
+    if(name == 'initialize'){
+        return url + '/agent/init/index.html'
     }
     //切换账套
     if(name == 'change'){
@@ -609,43 +636,19 @@ function addUrl(name){
 
     //缴税单获取参数
     if(name == 'Taxation'){
-        return url + '/vue/taxpay/show/list.html'
+        return url + '/vue/taxpay/get/initial/data.html'
     }
     //查看缴税单列表
     if(name == 'TaxationList'){
         return url + '/vue/taxpay/get/list.html'
     }
-    //缴税单保存
-    if(name == 'TaxationSave'){
-        return url + '/vue/taxpay/save.html'
+    //查看缴税单列表
+    if(name == 'history'){
+        return url + '/vue/taxpay/view/history.html'
     }
-    //缴税单提交
-    if(name == 'TaxationSubmit'){
-        return url + '/vue/taxpay/submit.html'
-    }
-    //删除缴税单
-    if(name == 'TaxationDelete'){
-        return url + '/vue/taxpay/delete.html'
-    }
-    //查看缴税单
-    if(name == 'seeTaxation'){
-        return url + '/vue/taxpay/get/item.html'
-    }
-    //缴税单审批列表
-    if(name == 'approvalTaxationList'){
-        return url + '/vue/taxpay/audit/get/list.html'
-    }
-    //缴税单审批提交
-    if(name == 'approvalTaxationSubmit'){
-        return url + '/vue/taxpay/audit/approve.html'
-    }
-    //缴税单确认列表
-    if(name == 'approvalTaxationConfirmList'){
-        return url + '/vue/taxpay/cashier/get/list.html'
-    }
-    //缴税单确认提交
-    if(name == 'approvalTaxationConfirmSubmit'){
-        return url + '/vue/taxpay/cashier/approve.html'
+    //缴税-操作确认（计提-免征-结转-缴纳）
+    if(name == 'operation'){
+        return url + '/vue/taxpay/handleAP.html'
     }
     //账务处理查看初始化数据
     if(name == 'Initialization'){
@@ -777,7 +780,194 @@ function addUrl(name){
     if(name == 'salePaymentRedFlushSubmit'){
         return url + '/vue/hedging/sale/receive.html'
     }
-
+    //交易方列表
+    if(name == 'SupplierList'){
+        return url + '/vue/tradeCompany/list.html'
+    }
+    //交易方删除
+    if(name == 'SupplierDelete'){
+        return url + '/vue/tradeCompany/delete.html'
+    }
+    //交易方删除
+    if(name == 'seeSupplier'){
+        return url + '/vue/tradeCompany/detail.html'
+    }
+    //交易方保存
+    if(name == 'saveSupplier'){
+        return url + '/vue/tradeCompany/save.html'
+    }
+    //修改密码保存
+    if(name == 'changePassword'){
+        return url + '/vue/user/update/password/submit.html'
+    }
+    //登录页面跳转
+    if(name == 'toLogin'){
+        return url + '/login.html'
+    }
+    //员工列表
+    if(name == 'staffList'){
+        return url + '/vue/manage/book/users.html'
+    }
+    //删除员工
+    if(name == 'staffDelete'){
+        return url + '/vue/manage/book/user/delete.html'
+    }
+    //员工权限详情
+    if(name == 'seeStaff'){
+        return url + '/vue/manage/book/user/item.html'
+    }
+    //员工修改权限
+    if(name == 'changeStaff'){
+        return url + '/vue/manage/book/user/edit.html'
+    }
+    //部门列表
+    if(name == 'departmentList'){
+        return url + '/vue/manage/book/department/list.html'
+    }
+    //删除部门
+    if(name == 'departmentDelete'){
+        return url + '/vue/manage/book/department/delete.html'
+    }
+    //修改部门
+    if(name == 'departmentChange'){
+        return url + '/vue/manage/book/department/edit.html'
+    }
+    //查看部门
+    if(name == 'seeDepartment'){
+        return url + '/vue/manage/book/department/item.html'
+    }
+    //库存商品列表
+    if(name == 'stockList'){
+        return url + '/vue/sale/goods/list.html'
+    }
+    //辅助业务列表
+    if(name == 'auxiliaryList'){
+        return url + '/vue/auxiliary/list.html'
+    }
+    //获取新建辅助科目参数
+    if(name == 'auxiliaryShow'){
+        return url + '/vue/auxiliary/add/show.html'
+    }
+    //提交辅助科目业务
+    if(name == 'auxiliarySubmit'){
+        return url + '/vue/auxiliary/submit.html'
+    }
+    //获取辅助科目业务详情
+    if(name == 'seeAuxiliary'){
+        return url + '/vue/auxiliary/item.html'
+    }
+    //可关联采购单列表
+    if(name == 'linkedPurchase'){
+        return url + '/vue/auxiliary/purchase/list.html'
+    }
+    //可关联销售单列表
+    if(name == 'linkedSale'){
+        return url + '/vue/auxiliary/sale/list.html'
+    }
+    //辅助业务待审核列表
+    if(name == 'approvalAuxiliaryList'){
+        return url + '/vue/auxiliary/audit/list.html'
+    }
+    //辅助业务审核同意
+    if(name == 'approvalAuxiliaryAgree'){
+        return url + '/vue/auxiliary/audit/agree.html'
+    }
+    //辅助业务审核驳回
+    if(name == 'approvalAuxiliaryRefuse'){
+        return url + '/vue/auxiliary/audit/refuse.html'
+    }
+    //获取新建收付款参数
+    if(name == 'payments'){
+        return url + '/vue/auxiliary/payment/add/show.html'
+    }
+    //获取新建收付款参数
+    if(name == 'paymentsSubmit'){
+        return url + '/vue/auxiliary/payment/submit.html'
+    }
+    //收付款待审核列表
+    if(name == 'approvalPaymentsList'){
+        return url + '/vue/auxiliary/payment/audit/list.html'
+    }
+    //获取收付款详情
+    if(name == 'approvalPayments'){
+        return url + '/vue/auxiliary/payment/item.html'
+    }
+    //同意收付款
+    if(name == 'approvalPaymentsAgree'){
+        return url + '/vue/auxiliary/payment/audit/agree.html'
+    }
+    //驳回收付款
+    if(name == 'approvalPaymentsRefuse'){
+        return url + '/vue/auxiliary/payment/audit/refuse.html'
+    }
+    //账套管理-更改账套的菜单配置
+    if(name == 'changeMenu'){
+        return url + '/vue/user/book/update/menu.html'
+    }
+    //消息-消息列表
+    if(name == 'newsList'){
+        return url + '/vue/notice/list.html'
+    }
+    //消息-读取消息
+    if(name == 'newsListRead'){
+        return url + '/vue/notice/read.html'
+    }
+    //资讯-资讯列表
+    if(name == 'toolList'){
+        return url + '/vue/news/list.html'
+    }
+    //研发支出辅助账
+    if(name == 'develop'){
+        return url + '/support/account/show/one.html'
+    }
+    //辅助账汇总表
+    if(name == 'summary'){
+        return url + '/support/account/show/two.html'
+    }
+    //费用情况归集表
+    if(name == 'costCollection'){
+        return url + '/support/account/show/three.html'
+    }
+    //收容业务列表
+    if(name == 'collectionList'){
+        return url + '/vue/accept/business/list.html'
+    }
+    //收容业务详情
+    if(name == 'collection'){
+        return url + '/vue/accept/business/item.html'
+    }
+    //收容业务配置
+    if(name == 'collectionSetting'){
+        return url + '/vue/accept/business/setting/item.html'
+    }
+    //收容业务保存
+    if(name == 'collectionSave'){
+        return url + '/vue/accept/business/save.html'
+    }
+    //收容业务提交
+    if(name == 'collectionSubmit'){
+        return url + '/vue/accept/business/submit.html'
+    }
+    //代记账-添加老板
+    if(name == 'addBoss'){
+        return url + '/agent/manager/boss/add.html'
+    }
+    //代记账-发票抵扣
+    if(name == 'invoiceDeduction'){
+        return url + '/agent/bill/list/show.html'
+    }
+    //代记账-录单
+    if(name == 'recordSheet'){
+        return url + '/invoice/entry/list/show.html'
+    }
+    //代记账-记账
+    if(name == 'bookkeeping'){
+        return url + '/invoice/all/list/show.html'
+    }
+    //代记账-工资单
+    if(name == 'payrollAccountBookkeeping'){
+        return url + '/djz/salary/salary/show/list.html'
+    }
 
 }
 export default{

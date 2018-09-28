@@ -4,9 +4,9 @@
             <div class="top">
                 <h2>查看销售单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson">提交</el-button>
-                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn">撤回</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson" :loading="isLoading">提交</el-button>
+                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn" :loading="isLoading">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -30,20 +30,18 @@
                 </ul>
 
                 <ul class="list cf">
-                    <li class="sm" style="width:48.2%;">
+                    <li class="sm" style="width:48.2%;position: relative;">
                         <span class="tit"><span class="red">*</span>客户</span>
-                        <el-select class='sel' v-model="tradeName" @change="tradeNameChange"
-                                   filterable=""
-                                   allow-create=""
-                                   default-first-option placeholder="请选择或输入" :disabled="isAuditPerson">
+                        <el-select class='sel' v-model="tradeName" :disabled="isAuditPerson">
                             <el-option v-for="item in customList"
                                        :key="item.value"
                                        :label="item.tradeName"
-                                       :value="item.tradeIdNumber">
+                                       :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input v-if="!isAuditPerson" class="opt" type="text" v-model="tradeName" maxlength="18" placeholder="请选择或输入">
                     </li>
-                    <li class="sm" >
+                    <li class="sm">
                         <span class="tit" style="width:170px;">统一社会信用代码/身份证</span>
                         <input class="ipt" type="text" v-model="customIdNumber" maxlength="18" :readonly="isAuditPerson">
                     </li>
@@ -56,11 +54,11 @@
                         <input class="ipt" type="text" v-model="customTelephone" maxlength="15" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系人</span>
+                        <span class="tit">联系人</span>
                         <input class="ipt" type="text" v-model="customPerson1" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系电话</span>
+                        <span class="tit">联系电话</span>
                         <input class="ipt" type="text" v-model="customPersonPhone1" maxlength="15" :readonly="isAuditPerson">
                     </li>
                     <li class="sm">
@@ -118,7 +116,7 @@
                 </div>
                 <el-button type="primary" @click="addClick" class="gridDataAdd" size="small" v-if="!isAuditPerson">添加明细</el-button>
 
-                <el-dialog title="新建明细" :visible.sync="dialogTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="70%">
+                <el-dialog title="新建明细" :visible.sync="dialogTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="1100px">
                     <ul class="newList cf">
                         <li class="sm cf" v-show="isShowLow">
                             <span class="tit3"><span class="red">*</span>库存商品</span>
@@ -141,7 +139,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
@@ -178,7 +176,7 @@
                     <el-button @click="newSave(1)" class="newAgain" size="small">再录一笔</el-button>
                 </el-dialog>
 
-                <el-dialog title="修改明细" :visible.sync="dialogSseTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="70%">
+                <el-dialog title="修改明细" :visible.sync="dialogSseTableVisible" :before-close="beforeCloseDialog" showConfirmButton="true" width="1100px">
                     <ul class="newList cf">
                         <li class="sm cf" v-show="isShowLow">
                             <span class="tit3"><span class="red">*</span>库存商品</span>
@@ -195,13 +193,13 @@
                             <span class="tit3">单位</span>
                             <input class="ipt" type="text" v-model="newUnit">
                         </li>
-                        <li class="sm cf">
-                            <span class="tit3" v-show="isShowLow">库存数量</span>
+                        <li class="sm cf" v-show="isShowLow">
+                            <span class="tit3" >库存数量</span>
                             <input class="ipt" type="text" v-model="countStock" readonly>
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount">
+                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
@@ -312,6 +310,24 @@
                         </el-dialog>
                     </div>
                 </div>
+                <div class="line">
+                    <span>审批记录</span>
+                </div>
+                <ul class="approval">
+                    <li class="cf" v-for="item in auditRecordList">
+                        <img v-if="!item.faceUri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.faceUri" alt="">
+                        <div class="listHeader">
+                            <span class="listName">{{item.auditUserName}}</span>
+                            <span class="listDepartment" v-if="item.auditDepartmentName != ''">——{{item.auditDepartmentName}}</span>
+                            <span class="listData">{{item.simpleAuditTime}}</span>
+                        </div>
+                        <div class="listFooter">
+                            <span class="listState">意见：</span>
+                            <span class="listContent">{{item.discription}}</span>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -323,11 +339,12 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
-
+    import { mapState } from 'vuex'
     export default{
         data(){
             return{
                 n:'',//按钮点击变量
+                sale:[],//销售数据列表
                 options4:[],//报销部门列表
                 isShare:false,//是否分摊
                 isShowShare:true,//是否显示分摊
@@ -346,7 +363,7 @@
                 customPersonPhone2:'',//紧急联系电话
                 type:'1',//销售类别类别
                 options:[//销售类别列表
-                    {value:'1',label:'代销商品'},
+                    {value:'1',label:'待销商品'},
                     {value:'2',label:'技术服务'},
                     {value:'3',label:'技术开发'},
                     {value:'4',label:'技术咨询'},
@@ -373,10 +390,11 @@
 
                 totalMoney2:'',//含税总价2
                 unTotalMoney2:'',//不含税总价2
+                auditRecordList:[],//审批记录
 
 
                 //模态框内明细列表
-                merchandiseInventoryList:[],//明细列表，代销商品
+                merchandiseInventoryList:[],//明细列表，待销商品
                 inventoryId:'',//库存商品编号(明细列表)
                 className:'',//库存商品名称(明细列表)
                 newUnit:'',//单位(明细列表)
@@ -433,6 +451,7 @@
                 },
                 isAuditPerson:false,//审批流程 true为已审批 false为无人审批
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -442,12 +461,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
+                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney);
-                this.unTotalMoney1 = number.number(unTotalMoney);
+                this.totalMoney1 = number.number(totalMoney / 100);
+                this.unTotalMoney1 = number.number(unTotalMoney / 100);
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -457,12 +476,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
+                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney);
-                this.unTotalMoney2 = number.number(unTotalMoney);
+                this.totalMoney2 = number.number(totalMoney / 100);
+                this.unTotalMoney2 = number.number(unTotalMoney / 100);
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
@@ -476,30 +495,55 @@
                     this.totalMoney = this.totalMoney2
                     this.unTotalMoney = this.unTotalMoney2
                 }
-            }
-        },
-        methods: {
-            //选择客户change事件
-            tradeNameChange(){
-                var tradeName = this.tradeName
-                var customList = this.customList
-                for(var i = 0; i < customList.length; i++){
-                    if(tradeName == customList[i].tradeName || tradeName == customList[i].tradeIdNumber){
-                        this.customIdNumber = customList[i].tradeIdNumber;
-                        this.customTelephone = customList[i].tradeTelephone;
-                        this.customPerson1 = customList[i].tradePerson1;
-                        this.customPerson2 = customList[i].tradePerson2;
-                        this.customPersonPhone1 = customList[i].tradePersonPhone1;
-                        this.customPersonPhone2 = customList[i].tradePersonPhone2;
-                        this.address = customList[i].tradeAddress;
+            },
+            tradeName:function(val){
+                let tradeName = val;
+                let customList = this.customList
+                let sale = this.sale
+                //做一步判断看tradeName是否和初始axios传参一致，如果一致参数赋值按照sale赋值
+                if(sale.customName == tradeName){
+                    this.customIdNumber = sale.customIdNumber || '';
+                    this.customTelephone = sale.customTelephone || '';
+                    this.customPerson1 = sale.customPerson1 || '';
+                    this.customPerson2 = sale.customPerson2 || '';
+                    this.customPersonPhone1 = sale.customPersonPhone1 || '';
+                    this.customPersonPhone2 = sale.customPersonPhone2 || '';
+                    this.address = sale.address || '';
+                }else{
+                    for(var i = 0; i < customList.length; i++){
+                        if(tradeName == customList[i].tradeName || tradeName == customList[i].tradeIdNumber){
+                            console.log(customList[i]);
+                            this.customIdNumber = customList[i].tradeIdNumber == 'undefined' ? '' : customList[i].tradeIdNumber;
+                            this.customTelephone = customList[i].tradeTelephone == 'undefined' ? '' : customList[i].tradeTelephone;
+                            this.customPerson1 = customList[i].tradePerson1 == 'undefined' ? '' : customList[i].tradePerson1;
+                            this.customPerson2 = customList[i].tradePerson2 == 'undefined' ? '' : customList[i].tradePerson2;
+                            this.customPersonPhone1 = customList[i].tradePersonPhone1 == 'undefined' ? '' : customList[i].tradePersonPhone1;
+                            this.customPersonPhone2 = customList[i].tradePersonPhone2 == 'undefined' ? '' : customList[i].tradePersonPhone2;
+                            this.address = customList[i].tradeAddress == 'undefined' ? '' : customList[i].tradeAddress;
+                        }
                     }
                 }
-            },
+            }
+        },
+        computed:mapState(['current_book_ym']),
+        methods: {
             //销售类别change事件，当选择设备时明细列表进行修改
             typeChange(){
                 var type = this.type;
-                //type=1时 选择了代销商品，isShowLow = true；
+                //type=1时 选择了待销商品，isShowLow = true；
 //                console.log(type);
+                if(this.newList1.length != 0 || this.newList2.length != 0){
+                    this.$confirm('修改销售类别后，销售明细中项目所有销售类别将一同变化，是否清空销售明细列表?','提示',{
+                        confirmButtonText: '是',
+                        cancelButtonText: '否',
+                        type: 'warning'
+                    }).then(() => {
+                        this.newList1 = [];
+                        this.newList2 = [];
+                    }).catch(() => {
+
+                    });
+                }
                 if(type == '1'){
                     this.isShowLow = true
                     this.isShowCount = false
@@ -574,11 +618,11 @@
                         this.loading = false;
                         return
                     }
-                    //判断代销商品是否在明细中重复选择
+                    //判断待销商品是否在明细中重复选择
                     if(newList1 != ''){
                         for(let i in newList1){
                             if(inventoryId == newList1[i].inventoryId){
-                                this.$message.error('代销商品不可重复选择');
+                                this.$message.error('待销商品不可重复选择');
                                 this.loading = false;
                                 return
                             }
@@ -800,11 +844,11 @@
                         this.loading = false;
                         return
                     }
-                    //判断代销商品是否在明细中重复选择，如果修改的是愿条目通过id判断则不受影响
+                    //判断待销商品是否在明细中重复选择，如果修改的是愿条目通过id判断则不受影响
                     if(newList1 != ''){
                         for(let i in newList1){
                             if(inventoryId == newList1[i].inventoryId && id != newList1[i].id){
-                                this.$message.error('代销商品不可重复选择');
+                                this.$message.error('待销商品不可重复选择');
                                 this.loading = false;
                                 return
                             }
@@ -866,6 +910,7 @@
                             };
 
                             obj.commodityName = this.newDetailed;//明细
+                            obj.count = this.newNum;//明细
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.taxRate = this.newTaxRate;//税率
                             obj.money = this.newMoney;//不含税金额
@@ -896,7 +941,21 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     var newList1 = this.newList1;
                     for(var i =0; i < newList1.length; i++){
@@ -919,7 +978,21 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     var newList2 = this.newList2
                     for(var i =0; i < newList2.length; i++){
@@ -951,7 +1024,7 @@
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
-                var newUnitPrice = unNumber.unNumber(this.newUnitPrice);
+                var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
                 if(n == 1){
                     if(!this.isShowCount){
                         if(!str.test(newNum)){
@@ -959,32 +1032,32 @@
                             this.newNum = 1;
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice);
-                        this.newMoney = number.number(this.newNum * newUnitPrice);
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
                         this.taxMoneyChange()
                     }else{
-                        this.newUnitPrice  = number.number(newUnitPrice);
-                        this.newMoney = number.number(newUnitPrice);
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(newUnitPrice / 100);
                         this.taxMoneyChange()
                     }
                 }else if(n == 2){
                     if(!this.isShowCount){
-                        if(!str2.test(newUnitPrice)){
+                        if(!str2.test(this.newUnitPrice)){
                             this.$message.error('请正确输入单价');
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice);
-                        this.newMoney = number.number(this.newNum * newUnitPrice);
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
                         this.taxMoneyChange()
                     }else{
-                        if(!str2.test(newUnitPrice)){
+                        if(!str2.test(this.newUnitPrice)){
                             this.$message.error('请正确输入单价');
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice);
-                        this.newMoney = number.number(newUnitPrice);
+                        this.newUnitPrice  = number.number(newUnitPrice / 100);
+                        this.newMoney = number.number(newUnitPrice / 100);
                         this.taxMoneyChange()
                     }
                 }
@@ -998,28 +1071,47 @@
             //after模态框事件
 
             model(n){
+                this.loading = true
                 this.n = n;
                 if(n == 0){
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
+                    if(this.isAuditPerson){
                         this.$router.go(-1)
-                    }).catch(() => {
-
-                    });
+                    }else{
+                        this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.go(-1)
+                        }).catch(() => {
+                            this.loading = false
+                        });
+                    }
                 }else if(n == 3){
+                    this.isLoading = true;
                     this.$confirm('确定是否撤回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.loading = true;
                         this.back()
                     })
                 }else{
-
                     if(this.department == ''){
                         this.$message.error('请选择部门/项目');
                         this.loading = false;
@@ -1027,14 +1119,6 @@
                     }
                     if(this.tradeName == ''){
                         this.$message.error('请正确输入客户');
-                        this.loading = false;
-                        return
-                    }else if(this.customPerson1 == ''){
-                        this.$message.error('请正确输入联系人');
-                        this.loading = false;
-                        return
-                    }else if(this.customPersonPhone1 == ''){
-                        this.$message.error('请正确输入联系电话');
                         this.loading = false;
                         return
                     }else if(this.type == ''){
@@ -1049,20 +1133,38 @@
                         this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
-                    }else if(this.totalMoney == ''){
-                        this.$message.error('请正确输入含税总价');
+                    }else if(this.totalMoney == '' || this.totalMoney == '0.00'){
+                        this.$message.error('请添加明细项');
                         this.loading = false;
                         return
-                    }else if(this.unTotalMoney == ''){
-                        this.$message.error('请正确输入不含税总价');
+                    }else if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
+                        this.$message.error('请添加明细项');
                         this.loading = false;
+                        return
+                    }else if(Number(this.saleDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('销售日期不得早于当前账期');
+                        this.loading = false
                         return
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         let index = this.punch + this.punch2;
 //                        console.log(this.punch);
@@ -1077,6 +1179,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -1091,13 +1195,19 @@
                                 type:'success',
                                 message:'撤回成功'
                             })
-                            this.loading = false;
+
                             this.$router.go(-1);
                         }else if(response.data.status == 400){
-                            this.loading = false;
                             this.$message.error(response.data.msg);
                         }
-                    })
+                        this.loading = false;
+                        this.isLoading = false;
+                    }) .catch(error=> {
+                    this.loading = false
+                    this.isLoading = false;
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
             },
             submitUpload(n){
 //                console.log(n);
@@ -1108,9 +1218,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -1118,7 +1230,7 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
@@ -1176,34 +1288,35 @@
             },
             submit(n){
                 this.loading = true;
-                var params = new URLSearchParams();
-                var type = this.type;
-                var saleItems = '';
-                var discription = '';
-                var newUrl = [];
-                var newName = [];
-                var finalUrl = [];
-                var finalName = [];
-                var totalMoney = unNumber.unNumber(this.totalMoney)
-                var unTotalMoney = unNumber.unNumber(this.unTotalMoney)
-                var taxMoney = totalMoney - unTotalMoney //总税额
+                let params = new URLSearchParams();
+                let type = this.type;
+                let saleItems = '';
+                let discription = '';
+                let newUrl = [];
+                let newName = [];
+                let finalUrl = [];
+                let finalName = [];
+                let totalMoney = unNumber.unNumber(this.totalMoney)
+                let unTotalMoney = unNumber.unNumber(this.unTotalMoney)
+                let taxMoney = totalMoney - unTotalMoney //总税额
 
-                var newList1 = this.newList1;
-                for(var i = 0; i < newList1.length; i++){
+                let newList1 = this.newList1;
+                for(let i = 0; i < newList1.length; i++){
                     newList1[i].perPrice = unNumber.unNumber(newList1[i].perPrice)
                     newList1[i].money = unNumber.unNumber(newList1[i].money)
                     newList1[i].taxMoney = unNumber.unNumber(newList1[i].taxMoney)
                 }
-                var newList2 = this.newList2;
-                for(var ii = 0; ii < newList2.length; ii++){
+                let newList2 = this.newList2;
+                for(let ii = 0; ii < newList2.length; ii++){
+                    newList2[ii].inventoryId = '0';
                     newList2[ii].perPrice = unNumber.unNumber(newList2[ii].perPrice)
                     newList2[ii].money = unNumber.unNumber(newList2[ii].money)
                     newList2[ii].taxMoney = unNumber.unNumber(newList2[ii].taxMoney)
                 }
 
                 //区分上传插件
-                var urlList = this.attachUrlJson
-                for(var j = 0; j < urlList.length; j++){
+                let urlList = this.attachUrlJson
+                for(let j = 0; j < urlList.length; j++){
                     if(urlList[j]){
                         newUrl.push(urlList[j].url)
                         newName.push(urlList[j].name)
@@ -1217,7 +1330,7 @@
                 if(type == '1'){
                     discription = newList1[0].className
                     saleItems = JSON.stringify(newList1)
-                }else if(type == '2'){
+                }else{
                     discription = newList2[0].className
                     saleItems = JSON.stringify(newList2)
                 }
@@ -1260,9 +1373,9 @@
                 params.append('imgUrl4',this.imgUrl4);
                 params.append('imgName4',this.imgName4);
 
-                var url = '';
-                var saveUrl = addUrl.addUrl('newSaleSave')
-                var submitUrl = addUrl.addUrl('newSaleSubmit')
+                let url = '';
+                let saveUrl = addUrl.addUrl('newSaleSave')
+                let submitUrl = addUrl.addUrl('newSaleSubmit')
                 if(n == 1){
                     url = saveUrl
                 }else if(n == 2){
@@ -1279,6 +1392,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -1287,12 +1401,13 @@
                                 message: '提交成功'
                             });
                         }else if(response.data.status == 400){
-                            var msg = response.data.msg;
+                            let msg = response.data.msg;
                             this.$message.error(msg);
                         }
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -1317,21 +1432,23 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('seeSale')
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('seeSale')
 //            console.log(this.debitId);
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
-                    var data = response.data.value;
+                    console.log(response);
+                    let data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;
                     this.customList = data.customList;
                     this.merchandiseInventoryList = data.merchandiseInventoryList;
+                    this.auditRecordList = data.auditRecordList;
 
-                    var sale = data.sale
-                    this.department = sale.departmentIdString;
+                    let sale = data.sale
+                    this.sale = sale
+                    this.department = String(sale.departmentIdString);
                     this.tradeName = sale.customName;
                     this.customIdNumber = sale.customIdNumber;
                     this.address = sale.address;
@@ -1344,7 +1461,7 @@
                     this.attachUrlJson = sale.attachUrlJson;
 //                    console.log(this.attachUrlJson);
                     this.saleDate = sale.simpleSaleDate;
-                    var type = sale.type;
+                    let type = sale.type;
                     var saleItemList = sale.saleItemList
 
                     for(let i = 0; i < saleItemList.length; i++){
@@ -1354,12 +1471,15 @@
                         saleItemList[i].className = saleItemList[i].inventoryGoodsName
                         saleItemList[i].inventoryId = saleItemList[i].inventoryGoodsIdString
                         saleItemList[i].commodityName = saleItemList[i].discription
+                        saleItemList[i].id = saleItemList[i].idString
                     }
                     if(type == 1){
                         this.isShowLow = true
+                        this.isShowCount = false
                         this.newList1 = saleItemList
                     }else{
                         this.isShowLow = false
+                        this.isShowCount = true
                         this.newList2 = saleItemList
                     }
                     this.type = String(type)
@@ -1370,13 +1490,12 @@
                         this.isShowShare = true;
                         this.isReadonly = false;
                     }else{
-
                         this.isAuditPerson = true
                         this.isShowShare = false;
                         this.isReadonly = true;
                     }
 
-                    if(index == 2 || index == 3 && sale.auditPerson == 0){
+                    if( (index == 2 || index == 3) && sale.auditPerson == 0){
                         this.showBtn = true
                     }
 
@@ -1411,12 +1530,12 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;
@@ -1658,5 +1777,67 @@
     .input-select{
         width:200px;
     }
+    .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
+    }
+    .approval{
+        width:100%;
+        margin-top: 20px;
+        font-size:14px;
+    }
+    .approval li{
+        margin-top: 20px;
+        text-align: left;
+    }
+    .approval li img{
+        display: inline-block;
+        width:50px;
+        height:50px;
+        border-radius: 50%;
+        overflow: hidden;
+        float: left;
+        margin-left: 130px;
+        margin-right: 20px;
+    }
+    .approval li .listHeader{
+        display: inline-block;
+        float: left;
+        width:80%;
+    }
+    .approval li .listHeader .listName{
 
+        margin-right: 10px;
+    }
+    .approval li .listHeader .listDepartment{
+        margin-left: 10px;
+    }
+    .approval li .listHeader .listData{
+        float: right;
+    }
+    .approval li .listFooter{
+        display: inline-block;
+        float: left;
+        width:80%;
+        margin-top: 10px;
+    }
+    .approval li .listFooter .listState{
+        display: inline-block;
+        float: left;
+        margin-right: 10px;
+    }
+    .approval li .listFooter .listContent{
+        width:90%;
+        display: inline-block;
+        float: left;
+        height:50px;
+        overflow: hidden;
+    }
 </style>

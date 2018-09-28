@@ -34,7 +34,12 @@
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
 
                 <el-table :data="tableData" class="blueList" show-summary :summary-method="getTotal">
-                    <el-table-column prop="departmentName" label="部门" sortable align="center"></el-table-column>
+                    <el-table-column prop="departmentName" label="部门" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.departmentName }}</span>
+                            <span v-if="scope.row.divideFlg == 1">（分摊）</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="supplierName" label="供应商" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
@@ -96,7 +101,7 @@
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seePurchase',params:{debitId:scope.row.idString}}" class="see">
+                                    <router-link :to="{name:'seePurchase',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
                                         <i class="icon iconfont icon-bianji blue"></i></router-link>
                                 </span>
                                 <span class="operation">
@@ -171,10 +176,11 @@
                     choice: '0,1,2,3,4,5,6',
                     label: '未完成列表'
                 }],
-                choice:'0,1,2,3,4,5,6',
+
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,//当前页数
                 tableData: [],//采购单列表数据
                 count:0,//总条目数
-                currentPage:1,//当前页数
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
@@ -229,16 +235,32 @@
 //                        console.log(this.tableData);
                     })
                     .catch(error=> {
+                        this.loading = false
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
             //删除提示模态框
             deleteModel(id){
+                this.loading = true
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -246,11 +268,11 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                    this.loading = false
                 });
             },
             //删除列表信息
             deleteList(isId){
-                this.loading = true;
                 var debitId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('PurchaseListDelete')
@@ -291,6 +313,7 @@
             },
             //分页器
             changePage(val){
+                this.loading = false
                 this.currentPage = val;
                 this.axios()
             }
@@ -314,8 +337,10 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('PurchaseList')
+            if(!this.choice)this.choice='0,1,2,3,4,5,6';
+            if(!this.currentPage)this.currentPage = 1;
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('PurchaseList')
             params.append('periodType','');
             params.append('auditFlg',this.choice);
             params.append('startDate',this.startDate);
@@ -325,12 +350,12 @@
                 .then(response=> {
                     this.loading = false;
 //                    console.log(response);
-                    var data = response.data.value.list
+                    let data = response.data.value.list
                     this.count = response.data.value.count;//总条目数
 
                     let tableDataarr =[];
                     if(data){
-                        for(var i =0; i < data.length; i++){
+                        for(let i =0; i < data.length; i++){
                             data[i].showSendMoney = number.number(data[i].sendMoney)
                             data[i].showTotalMoney = number.number(data[i].totalMoney)
                             tableDataarr.push(data[i])
@@ -365,7 +390,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -377,7 +402,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

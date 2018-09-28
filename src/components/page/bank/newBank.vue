@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>新建银行账户</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" >保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" >启用</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" :loading="isLoading">启用</el-button>
             </div>
         </div>
         <div class="w">
@@ -28,7 +28,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">账户余额</span>
-                        <input class="ipt" type="text" v-model="initialAmount" @change="changMoney">
+                        <input class="ipt" type="text" v-model="initialAmount" readonly>
                     </li>
                 </ul>
             </div>
@@ -48,9 +48,10 @@
                 bankName:'',//银行名称
                 bankChildName:'',//开户行
                 bankCode:'',//银行卡号
-                initialAmount:'',//账户余额
+                initialAmount:'0.00',//账户余额
 
                 loading:false,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -64,17 +65,8 @@
                     return
                 }
             },
-            changMoney(){
-                let initialAmount = this.initialAmount;
-                let str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
-                if(!str.test(initialAmount)){
-                    this.$message.error('请正确输入账户余额');
-                    this.initialAmount = '0.00';
-                    return
-                }
-                this.initialAmount = number.number(initialAmount)
-            },
             model(n){
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -83,6 +75,7 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
+                        this.loading = false;
                     });
                 }else{
                     if (this.bankName == '') {
@@ -99,29 +92,44 @@
                         this.loading = false;
                         return
                     }
-                    if(this.initialAmount == ''){
-                        this.$message.error('请正确输入账户余额');
-                        this.loading = false;
-                        return
+                    this.isLoading = true;
+                    let message = ''
+                    if(n == 1){
+                        message = '确定是否保存？'
+                    }else if(n == 2){
+                        message = '确定是否启用？'
                     }
-
-                    this.$confirm('确定是否保存？', '提示', {
+                    this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n);
-                        this.loading = true;
                     }).catch(() => {
                         this.$message({
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
             axios(n){
-
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('bankSave')
 
@@ -130,19 +138,18 @@
                 params.append('bankName',this.bankName);
                 params.append('bankChildName',this.bankChildName);
                 params.append('bankCode',this.bankCode);
-                params.append('initialAmount',unNumber.unNumber(this.initialAmount));
-
+                params.append('initialAmount','0');
                 params.append('bookStatus',(n - 1));
-
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '保存成功'
+                                message: '成功'
                             });
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
@@ -151,6 +158,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -256,12 +264,12 @@
         margin-right: 20px;
         vertical-align: middle;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

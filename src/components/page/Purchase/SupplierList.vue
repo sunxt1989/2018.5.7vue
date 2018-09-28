@@ -64,7 +64,7 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
-
+    import addUrl from '../../../../static/js/addUrl'
     export default {
         data() {
             return {
@@ -78,12 +78,13 @@
         methods:{
             //执行ajax重新获取借款单列表数据
             axios(){
-                var params = new URLSearchParams();
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('SupplierList')
                 params.append('pageNo',this.currentPage);
-                axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/list.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        console.log(response);
                         var data = response.data.value.list;//借款单列表数据
 
                         this.count = response.data.value.count;//总条目数
@@ -91,21 +92,37 @@
                         for(var i =0; i < data.length; i++){
                             tableDataarr.push(data[i])
                         }
-//                        console.log(tableDataarr);
+//                    console.log(tableDataarr);
                         this.tableData = tableDataarr;
 
                     })
                     .catch(error=> {
-//                        console.log(error);
+                        this.loading = false
+//                    console.log(error);
                         alert('网络错误，不能访问');
                     })
             },
             //删除提示模态框
             deleteModel(id){
+                this.loading = true
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -113,16 +130,17 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                    this.loading = false
                 });
             },
             //删除列表信息
             deleteList(isId){
-                this.loading = true;
-                var debitId = isId;
-                var params = new URLSearchParams();
+                let debitId = isId;
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('SupplierDelete')
                 params.append('id',debitId);
 
-                axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/delete.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
 //                        console.log(response);
@@ -140,6 +158,7 @@
             },
             //分页器
             changePage(val){
+                this.loading = false
                 this.currentPage = val;
                 this.axios()
             }
@@ -163,27 +182,7 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            params.append('pageNo',this.currentPage);
-            axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/list.html',params)
-                .then(response=> {
-                    this.loading = false;
-//                    console.log(response);
-                    var data = response.data.value.list;//借款单列表数据
-
-                    this.count = response.data.value.count;//总条目数
-                    var tableDataarr =[];
-                    for(var i =0; i < data.length; i++){
-                        tableDataarr.push(data[i])
-                    }
-//                    console.log(tableDataarr);
-                    this.tableData = tableDataarr;
-
-                })
-                .catch(error=> {
-//                    console.log(error);
-                    alert('网络错误，不能访问');
-                })
+            this.axios()
         },
     }
 </script>
@@ -205,7 +204,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -217,7 +216,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

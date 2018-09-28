@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>采购付款单确认</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-show="isBoss" size="small" type="primary" class="sub1">确认</el-button>
-                <el-button @click="model(2)" v-show="isBoss" size="small" type="danger" class="sub2">驳回</el-button>
+                <el-button @click="model(1)" v-show="isCashier" size="small" type="danger" class="sub1" :loading="isLoading" >驳回</el-button>
+                <el-button @click="model(2)" v-show="isCashier" size="small" type="primary" class="sub2" :loading="isLoading" >确认</el-button>
             </div>
         </div>
         <div class="w">
@@ -53,7 +53,8 @@
                     </div>
                     <ul class="approval">
                         <li class="cf" v-for="item in userDebitAuditRecordList">
-                            <img :src="item.audit_user_uri" alt="">
+                            <img v-if="!item.audit_user_uri" src="../../../../static/images/tit.png" alt="">
+                            <img v-else :src="item.audit_user_uri" alt="">
                             <div class="listHeader">
                                 <span class="listName">{{item.audit_user_name}}</span>
                                 <span class="listDepartment" v-if="item.audit_user_type != ''">——{{item.audit_user_type}}</span>
@@ -74,7 +75,7 @@
                                     :key="item.value"
                                     :label="item.payTypeItem"
                                     :value="item.value"
-                                    :disabled="isBoss">
+                                    :disabled="!isCashier">
                                 </el-option>
                             </el-select>
                         </li>
@@ -90,7 +91,7 @@
                             </el-select>
                         </li>
                         <li>
-                            <span>日期</span>
+                            <span>确认日期</span>
                             <el-date-picker
                                 class="bankCode"
                                 v-model="debitDate"
@@ -98,12 +99,12 @@
                                 :picker-options="pickerOptions1"
                                 placeholder="选择日期"
                                 value-format="yyyy-MM-dd"
-                                :disabled="isBoss">
+                                :disabled="!isCashier">
                             </el-date-picker>
                         </li>
                         <li>
                             <span>可选审批意见</span>
-                            <el-select class="bankCode" v-model="opinion" placeholder="请选择" @change="opinionChange" :disabled="isBoss">
+                            <el-select class="bankCode" v-model="opinion" placeholder="请选择" @change="opinionChange" :disabled="!isCashier">
                                 <el-option
                                     v-for="item in opinionList"
                                     :key="item.value"
@@ -114,7 +115,7 @@
                         </li>
                         <li class="opinionItem">
                             <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="isBoss">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="!isCashier">
                             </textarea>
                         </li>
                     </ul>
@@ -237,11 +238,11 @@
                             <input class="ipt" type="text" v-model="supplierTelephone" maxlength="15" readonly>
                         </li>
                         <li class="sm">
-                            <span class="tit"><span class="red">*</span>联系人</span>
+                            <span class="tit">联系人</span>
                             <input class="ipt" type="text" v-model="supplierPerson1" readonly>
                         </li>
                         <li class="sm">
-                            <span class="tit"><span class="red">*</span>联系电话</span>
+                            <span class="tit">联系电话</span>
                             <input class="ipt" type="text" v-model="supplierPersonPhone1" maxlength="15" readonly>
                         </li>
                         <li class="sm">
@@ -348,7 +349,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
-
+    import { mapState } from 'vuex';
     export default{
         data(){
             return{
@@ -356,15 +357,15 @@
                 radio:'付款单审批',
                 unPayMoney:'',//待付款
                 money:'',//本次付款
-                payType:'1',//结算方式
+                payType:'2',//结算方式
                 payTypeList:[
                     {value:'1',payTypeItem:'现金支付'},{value:'2',payTypeItem:'银行支付'}
                 ],//结算方式列表
                 bankCode:'',//银行账户
                 bankAccountList:[],//银行账户列表
-                debitDate:'',//日期
-                isBoss:false,
-                isTrue:true,
+                debitDate:'',//确认日期
+                isCashier:false,//是否是出纳
+                isTrue:false,
 
                 options4:[],//报销部门列表
                 isShare:false,//是否分摊
@@ -452,6 +453,7 @@
                 },
                 isAuditPerson:false,//审批流程 true为已审批 false为无人审批
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -473,6 +475,7 @@
                 this.discription2 = this.opinion
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -481,17 +484,44 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
-                }else if(n == 1){
-                    if(this.debitDate == ''){
-                        this.$message.error('请正确输入日期');
-                        return
+                }else {
+                    let msg = ''
+                    if(n == 1){
+                        msg = '确定是否驳回'
+                    }else{
+                        msg = '确定是否确认'
+                        if(this.debitDate == ''){
+                            this.$message.error('请选择确认日期')
+                            this.loading = false
+                            return
+                        }
+                        if(this.payType == '2' && this.bankCode == ''){
+                            this.$message.error('请选择银行账户')
+                            this.loading = false
+                            return
+                        }
                     }
-                    this.$confirm('确定是否提交？', '提示', {
+                    this.isLoading = true;
+                    this.$confirm(msg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit(n)
                     }).catch(() => {
@@ -499,19 +529,8 @@
                             type: 'info',
                             message: '已取消'
                         });
-                    });
-                }else if(n == 2){
-                    this.$confirm('确定是否驳回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        this.submit(n)
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '已取消'
-                        });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -531,17 +550,20 @@
             submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
+                var url = '';
+                if(n == 2){
+                    url = addUrl.addUrl('approvalPurchaseConfirmAgree')
+                    this.discription2 = this.discription2 == '驳回' ? '同意':this.discription2
+                }else if(n == 1){
+                    url = addUrl.addUrl('approvalPurchasePayRefuse')
+                    this.discription2 = this.discription2 == '同意' ? '驳回':this.discription2
+                }
                 params.append('purchaseSendId',this.debitId);
                 params.append('discription',this.discription2);
                 params.append('payType',this.payType);
                 params.append('bankCode',this.bankCode);
                 params.append('sendDate',this.debitDate);
-                var url = '';
-                if(n == 1){
-                    url = addUrl.addUrl('approvalPurchaseConfirmAgree')
-                }else if(n == 2){
-                    url = addUrl.addUrl('approvalPurchasePayRefuse')
-                }
+
 //                console.log(url);
                 axios({
                     method:'post',
@@ -553,6 +575,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -567,6 +590,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -605,6 +629,7 @@
                 this.unTotalMoney = this.unTotalMoney2
             },
         },
+        computed:mapState(['isCashierFlg']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -624,13 +649,13 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('seePurchasePayment')
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('seePurchasePayment')
 //            console.log(this.debitId);
             params.append('purchase_send_id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value
                     var purchase = data.purchase
 
@@ -638,7 +663,9 @@
                     this.unPayMoney = number.number(purchase.unsendMoney)
                     this.money = number.number(data.send.send_money)
                     this.attachUrlJson = data.send.attach_urls
-                    this.userDebitAuditRecordList = data.send.record_list
+                    let userDebitAuditRecordList = data.send.record_list
+
+                    this.userDebitAuditRecordList = userDebitAuditRecordList
                     this.bankAccountList = data.bank_account_list
 //                    console.log(this.bankAccountList);
                     for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
@@ -724,10 +751,24 @@
                         this.input4 = data.purchase.projectDivRate4 || 0
                         this.input5 = data.purchase.projectDivRate5 || 0
                     }
-                    var cashFlg = 1;//假设临时变量
-                    //判断用户是否为出纳 1为出纳
-                    if(cashFlg == 1){
-                        this.isBoss = false
+                    if(this.isCashierFlg){
+                        this.isCashier = true
+                        this.isTrue = false
+                    }else{
+                        this.isCashier = false
+                        this.isTrue = true
+                    }
+                    let date = new Date()
+                    if(date.getMonth()+1 < 10){
+                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.debitDate += '-0' + date.getDate()
+                    }else{
+                        this.debitDate += '-' + date.getDate()
                     }
 
                     this.loading = false
@@ -761,12 +802,12 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

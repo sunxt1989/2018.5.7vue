@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>查看银行账户</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-if="bookStatus != 2">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-if="!isEnable">启用</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-if="bookStatus != 2" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-if="!isEnable" :loading="isLoading">启用</el-button>
             </div>
         </div>
         <div class="w">
@@ -28,7 +28,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">账户余额</span>
-                        <input class="ipt" type="text" v-model="initialAmount" @change="changMoney" :readonly="isEnable">
+                        <input class="ipt" type="text" v-model="endAmount" @change="changMoney" :readonly="isEnable">
                     </li>
                     <li class="sm">
                         <span class="tit">缴税账户</span>
@@ -64,7 +64,7 @@
                 bankName:'',//银行名称
                 bankChildName:'',//开户行
                 bankCode:'',//银行卡号
-                initialAmount:'',//账户余额
+                endAmount:'',//账户余额
 
                 taxFlg:false,//缴税标记
                 insuranceFlg:false,//社保标记
@@ -82,6 +82,7 @@
 
                 debitId:this.$route.params.debitId,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -96,27 +97,32 @@
                 }
             },
             changMoney(){
-                let initialAmount = this.initialAmount;
+                let endAmount = this.endAmount;
                 let str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
-                if(!str.test(initialAmount)){
+                if(!str.test(endAmount)){
                     this.$message.error('请正确输入账户余额');
-                    this.initialAmount = '0.00';
+                    this.endAmount = '0.00';
                     return
                 }
-                this.initialAmount = number.number(initialAmount)
+                this.endAmount = number.number(endAmount)
             },
             model(n){
                 this.loading = true;
                 if(n == 0){
-                    this.$confirm('填写的信息还未保存，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
+                    if(this.isEnable){
                         this.$router.go(-1)
-                    }).catch(() => {
+                    }else{
+                        this.$confirm('填写的信息还未保存，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.go(-1)
+                        }).catch(() => {
+                            this.loading = false;
+                        });
+                    }
 
-                    });
                 }else{
                     if (this.bankName == '') {
                         this.$message.error('请正确输入银行名称');
@@ -132,16 +138,36 @@
                         this.loading = false;
                         return
                     }
-                    if(this.initialAmount == ''){
+                    if(this.endAmount == ''){
                         this.$message.error('请正确输入账户余额');
                         this.loading = false;
                         return
                     }
-
-                    this.$confirm('确定是否保存？', '提示', {
+                    this.isLoading = true;
+                    let message = ''
+                    if(n == 1){
+                        message = '确定是否保存？'
+                    }else if(n == 2){
+                        message = '确定是否启用？'
+                    }
+                    this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n);
                     }).catch(() => {
@@ -150,6 +176,7 @@
                             message: '已取消'
                         });
                         this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
@@ -170,10 +197,8 @@
                 params.append('bankName',this.bankName);
                 params.append('bankChildName',this.bankChildName);
                 params.append('bankCode',this.bankCode);
-                params.append('initialAmount',unNumber.unNumber(this.initialAmount));
-
+                params.append('initialAmount',unNumber.unNumber(this.endAmount));
                 params.append('bookStatus',bookStatus);
-
                 params.append('taxFlg',String(this.taxFlg));
                 params.append('insuranceFlg',String(this.insuranceFlg));
                 params.append('housingFlg',String(this.housingFlg));
@@ -182,6 +207,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -196,6 +222,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -226,12 +253,12 @@
             params.append('bankId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let bankAccount = response.data.value.bankAccount
                     this.bankName = bankAccount.bankName
                     this.bankChildName = bankAccount.bankChildName
                     this.bankCode = bankAccount.bankCode
-                    this.initialAmount = number.number(bankAccount.initialAmount)
+                    this.endAmount = number.number(bankAccount.endAmount)
                     this.bankAccountType = bankAccount.bankAccountType
 
                     //判断状态，如果是已启用，
@@ -282,9 +309,6 @@
                     }else{
                         this.wagesFlg = false
                     }
-
-
-
                     this.loading = false;
                 })
                 .catch(error=> {
@@ -375,12 +399,12 @@
         margin-right: 20px;
         vertical-align: middle;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

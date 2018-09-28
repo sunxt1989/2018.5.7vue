@@ -19,7 +19,7 @@
                     <el-table-column prop="bankName" label="银行名称" sortable align="center"></el-table-column>
                     <el-table-column prop="bankChildName" label="开户行" sortable align="center"></el-table-column>
                     <el-table-column prop="bankCode" label="银行账号" sortable align="center"></el-table-column>
-                    <el-table-column prop="initialAmount" label="余额" sortable align="center">
+                    <el-table-column prop="endAmount" label="余额" sortable align="center">
                         <template slot-scope="scope">
                             <span>{{scope.row.showMoney}}</span>
                         </template>
@@ -96,7 +96,7 @@
 //                        console.log(response);
                         let tableData = response.data.value.list
                         for(let i in tableData){
-                            tableData[i].showMoney = number.number(tableData[i].initialAmount)
+                            tableData[i].showMoney = number.number(tableData[i].endAmount)
                         }
                         this.tableData = tableData;//银行账户列表数据
                         this.loading = false;
@@ -111,7 +111,21 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -175,10 +189,10 @@
             var url = addUrl.addUrl('bankList')
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let tableData = response.data.value.list
                     for(let i in tableData){
-                        tableData[i].showMoney = number.number(tableData[i].initialAmount)
+                        tableData[i].showMoney = number.number(tableData[i].endAmount)
                     }
                     this.tableData = tableData;//银行账户列表数据
                     this.loading = false;
@@ -209,7 +223,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -221,7 +235,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

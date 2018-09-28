@@ -69,6 +69,11 @@
                         this.count = data.count;//总条目数
                         this.tableData = data.debitList;
                     })
+                    .catch(error=> {
+//                        console.log(error);
+                        this.loading = false;
+                        alert('网络错误，不能访问');
+                    })
             },
             mounted(){
                 // 动态设置背景图的高度为浏览器可视区域高度
@@ -91,12 +96,12 @@
         },
         created(){
             var params = new URLSearchParams();
-            var url = addUrl.addUrl('repaymentConfirmationRefuse')
+            var url = addUrl.addUrl('repaymentConfirmationList');
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
                     this.count = data.count;//总条目数
                     let tableDataarr =[];
@@ -109,6 +114,11 @@
                     }else{
                         this.tableData = data.debitList
                     }
+                })
+                .catch(error=> {
+//                        console.log(error);
+                    this.loading = false;
+                    alert('网络错误，不能访问');
                 })
         },
     }
@@ -139,7 +149,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

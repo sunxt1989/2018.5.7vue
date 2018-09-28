@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>新建交易方</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub" >保存</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
@@ -25,7 +25,7 @@
                         <input class="ipt" type="text" v-model="tradeName" >
                     </li>
                     <li class="sm" v-show="tradeType">
-                        <span class="tit"><span class="red">*</span>统一社会信用代码</span>
+                        <span class="tit">统一社会信用代码</span>
                         <input class="ipt" type="text" v-model="tradeIdNumber" maxlength="18">
                     </li>
 
@@ -47,11 +47,11 @@
                         <input class="ipt" type="text" v-model="tradeTelephone"  maxlength="15">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系人</span>
+                        <span class="tit">联系人</span>
                         <input class="ipt" type="text" v-model="tradePerson1">
                     </li>
                     <li class="sm">
-                        <span class="tit"><span class="red">*</span>联系电话</span>
+                        <span class="tit">联系电话</span>
                         <input class="ipt" type="text" v-model="tradePersonPhone1" maxlength="15">
                     </li>
                     <li class="sm">
@@ -87,6 +87,7 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import addUrl from '../../../../static/js/addUrl'
     export default{
         data(){
             return{
@@ -113,17 +114,14 @@
                     },
                 },
                 loading:false,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods: {
-
             model(n){
-                var str1=/[A-Z0-9]{18}/;
-                var tradeIdNumber = this.tradeIdNumber;
-                var str2 = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+                this.loading = true
                 var str3 = /^\d+$/;//判断是否为纯数字
-                var IDnumber = this.IDnumber;
                 var bankCode = this.bankCode;
 //                console.log(this.bankCode);
 //                console.log(typeof this.bankCode);
@@ -135,59 +133,57 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else{
                     if(this.tradeType){
                         if(this.tradeName == ''){
                             this.$message.error('请正确输入公司名称');
-                            this.loading = false;
-                            return
-                        }else if(!(str1.test(tradeIdNumber))){
-                            this.$message.error('请正确输入统一社会信用代码');
-                            this.loading = false;
+                            this.loading = false
                             return
                         }
                     }else{
                         if(this.userName == ''){
                             this.$message.error('请正确输入姓名');
-                            this.loading = false;
+                            this.loading = false
                             return
-                        }else if(IDnumber != '') {
-                            if (!(str2.test(IDnumber))) {
-                                this.$message.error('请正确输入身份证号');
-                                this.loading = false;
-                                return
-                            }
                         }
                     }
-                    if(this.tradePerson1 == ''){
-                        this.$message.error('请正确输入联系人');
-                        this.loading = false;
-                        return
-                    }else if(!(str3.test(this.tradePersonPhone1)) || this.tradePersonPhone1.length != 11){
-                        this.$message.error('请正确输入联系电话');
-                        this.loading = false;
-                        return
-                    }else if(bankCode != ''){
+                    if(bankCode != ''){
                         if(bankCode.length != 18 || !(str3.test(bankCode)) ){
                             this.$message.error('请正确输入银行卡号');
-                            this.loading = false;
+                            this.loading = false
                             return
                         }
                     }
-
+                    this.isLoading = true;
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios();
                     }).catch(() => {
                         this.$message({
-                            type: 'info',
-                            message: '已取消'
+                            type:'info',
+                            message:'已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -197,9 +193,7 @@
                 var tradeType = ''
                 var supplierFlg = 0 //供应商
                 var customFlg = 0 //客户
-
                 var identity = this.identity
-
                 if(this.tradeType){
                     tradeName = this.tradeName
                     tradeIdNumber = this.tradeIdNumber
@@ -217,9 +211,8 @@
                         supplierFlg = 1
                     }
                 }
-//
-
                 var params = new URLSearchParams();
+                let url = addUrl.addUrl('saveSupplier')
                 params.append('supplierId','');
                 params.append('tradeName',tradeName);
                 params.append('tradeIdNumber',tradeIdNumber);
@@ -234,10 +227,11 @@
                 params.append('customFlg',customFlg);
                 params.append('tradeType',tradeType);
 
-                axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/save.html',params)
+                axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        this.isLoading = false;
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -251,6 +245,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -344,7 +339,7 @@
         margin-right: 20px;
         vertical-align: middle;
     }
-    .sub{
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;

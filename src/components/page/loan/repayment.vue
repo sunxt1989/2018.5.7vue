@@ -47,27 +47,33 @@
                     <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
                     <el-table-column prop="payType" label="还款方式" sortable width="180">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.payType == 0"></span>
-                            <span v-if="scope.row.payType == 1">现金支付</span>
-                            <span v-if="scope.row.payType == 2">银行支付</span>
-                            <span v-if="scope.row.payType == 3">暂不支付</span>
-                            <span v-if="scope.row.payType == 4">冲抵个人借款</span>
-                            <span v-if="scope.row.payType == 99">其他货币资金</span>
+                            <span v-if="scope.row.paymentMethod == 1">
+                                <span v-if="scope.row.payType == 1">现金支付</span>
+                                <span v-else-if="scope.row.payType == 2">银行支付</span>
+                            </span>
+                            <span v-if="scope.row.paymentMethod == 2">
+                                <span>报销冲抵</span>
+                            </span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable>
-
-                    </el-table-column>
+                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
                     <el-table-column prop="auditFlg" label="还款状态" sortable>
                         <template slot-scope="scope">
                             <span v-if="scope.row.auditFlg == 0">未提交</span>
                             <span v-if="scope.row.auditFlg == 1">驳回</span>
                             <span v-if="scope.row.auditFlg == 2">待审核</span>
                             <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
-                            <span v-if="scope.row.auditFlg == 4">待还款</span>
+                            <span v-if="scope.row.auditFlg == 4">通过</span>
                             <span v-if="scope.row.auditFlg == 5">待审核</span>
                             <span v-if="scope.row.auditFlg == 6">待审核</span>
                             <span v-if="scope.row.auditFlg == 7">已红冲</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="" label="查看详情" >
+                        <template slot-scope="scope">
+                            <router-link :to="{name:'seeRepayment',params:{debitId:scope.row.idString}}" class="see">
+                                <i class="icon iconfont icon-kanguo blue"></i>
+                            </router-link>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -80,6 +86,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex';
     export default{
         data(){
             return{
@@ -87,8 +94,9 @@
                 isRedFlush:this.$route.params.isRedFlush,//是否为红冲
                 unCreditMoney:'',//待还款
                 money:'',//本次还款
-                debitDate:'',//上传日期
+                debitDate:'',//还款时间
                 tableData: [],//还款明细
+                debitDateYMD: [],//审核时间
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
@@ -103,32 +111,64 @@
                 this.money = number.number(this.money)
             },
             model(n){
+                this.loading = true;
                 if (n == 0) {
-                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
+                    if(this.isRedFlush){
                         this.$router.go(-1)
-                    }).catch(() => {
+                    }else {
+                        this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.push('/')
+                        }).catch(() => {
 
-                    });
+                        });
+                    }
                 } else {
-                    if(this.money <= 0){
+                    if(unNumber.unNumber(this.money) <= 0){
                         this.$message.error('请正确输入金额');
+                        this.loading = false;
+                        return
+                    }else if(unNumber.unNumber(this.money) > unNumber.unNumber(this.unCreditMoney)){
+                        this.$message.error('请还款金额不得大于待还款金额');
+                        this.loading = false;
                         return
                     }else if(this.debitDate == ''){
                         this.$message.error('请正确输入还款日期');
+                        this.loading = false;
+                        return
+                    }
+                    //判断还款时间不能早于审核时间
+                    if(Number(this.debitDateYMD.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
+                        this.$message.error('确认日期不得早于当前还款日期')
+                        this.loading = false;
                         return
                     }
 
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios();
                     }).catch(() => {
+                        this.loading = false;
                         this.$message({
                             type: 'info',
                             message: '已取消'
@@ -137,7 +177,6 @@
                 }
             },
             axios(){
-                this.loading = true;
                 var params = new URLSearchParams();
                 var money = unNumber.unNumber(this.money);
                 var url = addUrl.addUrl('repaymentSubmit')
@@ -148,7 +187,6 @@
                 axios.post(url,params)
                     .then(response=> {
 //                        console.log(response);
-                        this.loading = false;
                         this.$router.go(-1);
                         this.$message({
                             type: 'success',
@@ -162,6 +200,7 @@
                     })
             },
         },
+        computed:mapState(['current_book_ym']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -181,16 +220,29 @@
             };
         },
         created(){
-            console.log(this.isRedFlush);
             var params = new URLSearchParams();
             var url = addUrl.addUrl('repayment')
             params.append('debitId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value
                     this.tableData = data.userDebitItemList;
                     this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
+                    this.debitDateYMD = data.userDebitItem.debitDateYMD
+                    let date = new Date()
+
+                    if(date.getMonth()+1 < 10){
+                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.debitDate += '-0' + date.getDate()
+                    }else{
+                        this.debitDate += '-' + date.getDate()
+                    }
 
                     this.loading = false;
                 })
@@ -263,11 +315,14 @@
         border-radius: 3px;
         padding: 3px 10px;
     }
-    .data{
+    .right .data{
         width:500px;
     }
     .el-table{
         margin-top: 30px;
         display: inline-block;
+    }
+    .see{
+        text-decoration: none;
     }
 </style>

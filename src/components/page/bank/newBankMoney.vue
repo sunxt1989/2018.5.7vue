@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>{{name}}</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">提交</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">提交</el-button>
             </div>
         </div>
         <div class="w">
@@ -27,7 +27,7 @@
                     </li>
                     <li class="pt">
                         <span class="tit">银行余额</span>
-                        <input class="ipt" type="text" v-model="initialAmount" readonly>
+                        <input class="ipt" type="text" v-model="endAmount" readonly>
                     </li>
 
                     <li class="pt" v-if="isTurn">
@@ -51,7 +51,7 @@
                     </li>
                     <li class="pt" v-if="isTurn">
                         <span class="tit">转入银行余额</span>
-                        <input class="ipt" type="text" v-model="initialAmount2" readonly>
+                        <input class="ipt" type="text" v-model="endAmount2" readonly>
                     </li>
 
                     <li class="pt">
@@ -85,13 +85,14 @@
     import addUrl from '../../../../static/js/addUrl'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
+    import { mapState } from 'vuex';
     export default{
         data(){
             return{
                 bankName:'',//银行名称
                 bankChildName:'',//开户行
                 bankCode:'',//银行账户
-                initialAmount:'',//银行余额
+                endAmount:'',//银行余额
 
                 money:'',//操作金额
                 transferDate:'',//操作日期
@@ -105,7 +106,7 @@
                 options:'',//副银行账户卡号
                 bankChildName2:'',//转入开户行
                 bankCode2:'',//转入银行账户
-                initialAmount2:'',//转入银行余额
+                endAmount2:'',//转入银行余额
 
 
                 pickerOptions1:{
@@ -116,9 +117,11 @@
                 debitId:this.$route.params.debitId,
                 name:this.$route.params.name,
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym']),
         methods: {
             //转入银行名称change事件
             changeBankName(){
@@ -128,7 +131,7 @@
                     if(remarkBankCode == options[i].bankCode){
                         this.bankChildName2 = options[i].bankChildName
                         this.bankCode2 = options[i].bankCode
-                        this.initialAmount2 = number.number(options[i].initialAmount)
+                        this.endAmount2 = number.number(options[i].endAmount)
                     }
                 }
             },
@@ -144,6 +147,7 @@
                 this.money = number.number(this.money)
             },
             model(n){
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -152,7 +156,7 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false;
                     });
                 }else{
                     if(this.money == ''){
@@ -165,10 +169,30 @@
                         this.loading = false;
                         return
                     }
+                    if(Number(this.transferDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error(this.dateName + '不得早于当前账期');
+                        this.loading = false;
+                        return
+                    }
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit()
                     }).catch(() => {
@@ -176,11 +200,12 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
             submit(){
-                this.loading = true;
                 var url = addUrl.addUrl('newBankMoneySave');
                 var params = new URLSearchParams();
                 var money = unNumber.unNumber(this.money)
@@ -201,7 +226,6 @@
                     }
                 },params)
                     .then(response=> {
-
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -214,9 +238,11 @@
                             this.$message.error(msg);
                         }
                         this.loading = false;
+                        this.isLoading = false;
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -254,7 +280,7 @@
                     this.bankName = data.bankAccount.bankName
                     this.bankChildName = data.bankAccount.bankChildName
                     this.bankCode = data.bankAccount.bankCode
-                    this.initialAmount = number.number(data.bankAccount.initialAmount)
+                    this.endAmount = number.number(data.bankAccount.endAmount)
                     this.options = data.list
 
                     if(name == '提取现金'){
@@ -288,6 +314,18 @@
                         this.moneyName = '投资金额'
                         this.dateName = '收取日期'
                     }
+                    let date = new Date()
+                    if(date.getMonth()+1 < 10){
+                        this.transferDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.transferDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.transferDate += '-0' + date.getDate()
+                    }else{
+                        this.transferDate += '-' + date.getDate()
+                    }
                     this.loading = false
                 })
                 .catch(error=> {
@@ -319,7 +357,7 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;

@@ -39,7 +39,74 @@
                     <el-button @click="query" class="query" size="small" type="primary">查询</el-button>
 
                     <el-dialog title="科目区间" :visible.sync="dialogTableVisible" showConfirmButton="true" top="20px">
-                        <el-tabs v-model="classSubject" type="card" @tab-click="clickSubject">
+                        <el-tabs v-if="current_account_standard == 1" v-model="classSubject" type="card" @tab-click="clickSubject">
+                            <el-tab-pane label="资产" name="1">
+                                <div class="Tree" :style="{height:treeHeight}">
+                                    <el-tree :data="tree1" :props="defaultProps"
+                                             ref="Tree1"
+                                             default-expand-all
+                                             check-on-click-node
+                                             show-checkbox
+                                             check-strictly
+                                             node-key="name"
+                                             @check="clickCheck1">
+                                    </el-tree>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="负债" name="2">
+                                <div class="Tree" :style="{height:treeHeight}">
+                                    <el-tree :data="tree2" :props="defaultProps"
+                                             ref="Tree2"
+                                             default-expand-all
+                                             check-on-click-node
+                                             show-checkbox
+                                             check-strictly
+                                             node-key="name"
+                                             @check="clickCheck2">
+                                    </el-tree>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="权益" name="3">
+                                <div class="Tree" :style="{height:treeHeight}">
+                                    <el-tree :data="tree3" :props="defaultProps"
+                                             ref="Tree3"
+                                             default-expand-all
+                                             check-on-click-node
+                                             show-checkbox
+                                             check-strictly
+                                             node-key="name"
+                                             @check="clickCheck3">
+                                    </el-tree>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="成本" name="4">
+                                <div class="Tree" :style="{height:treeHeight}">
+                                    <el-tree :data="tree4" :props="defaultProps"
+                                             ref="Tree4"
+                                             default-expand-all
+                                             check-on-click-node
+                                             show-checkbox
+                                             check-strictly
+                                             node-key="name"
+                                             @check="clickCheck4">
+                                    </el-tree>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="损益" name="5">
+                                <div class="Tree" :style="{height:treeHeight}">
+                                    <el-tree :data="tree5" :props="defaultProps"
+                                             ref="Tree5"
+                                             default-expand-all
+                                             check-on-click-node
+                                             show-checkbox
+                                             check-strictly
+                                             node-key="name"
+                                             @check="clickCheck5">
+                                    </el-tree>
+                                </div>
+                            </el-tab-pane>
+                        </el-tabs>
+                        <el-tabs v-if="current_account_standard == 2" v-model="classSubject" type="card" @tab-click="clickSubject">
                             <el-tab-pane label="资产" name="1">
                                 <div class="Tree" :style="{height:treeHeight}">
                                     <el-tree :data="tree1" :props="defaultProps"
@@ -164,6 +231,7 @@
                 tree4: [],//权益
                 tree5: [],//成本
                 tree6: [],//损益
+                currentAccountStandard: 1,
                 year: '',//表头展示年份
                 defaultProps: {
                     children: 'children',
@@ -205,13 +273,13 @@
                 if(n == 0){
                     if(!str.test(this.startSubject)){
                         this.$message.error('科目区间只允许输入正整数');
-                        this.startSubject = 0;
+                        this.startSubject = '';
                         return
                     }
                 }else if(n == 1){
                     if(!str.test(this.endSubject)){
                         this.$message.error('科目区间只允许输入正整数');
-                        this.endSubject = 0;
+                        this.endSubject = '';
                         return
                     }
                 }
@@ -238,17 +306,17 @@
             treeSave(){
                 let subject = ''
                 if(this.classSubject == '1'){
-                    subject = parseInt(this.$refs.Tree1.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree1.getCheckedKeys()[0] == undefined)? '':parseInt(this.$refs.Tree1.getCheckedKeys()[0])
                 }else if(this.classSubject == '2'){
-                    subject = parseInt(this.$refs.Tree2.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree2.getCheckedKeys()[0] == undefined)?'': parseInt(this.$refs.Tree2.getCheckedKeys()[0])
                 }else if(this.classSubject == '3'){
-                    subject = parseInt(this.$refs.Tree3.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree3.getCheckedKeys()[0] == undefined)?'': parseInt(this.$refs.Tree3.getCheckedKeys()[0])
                 }else if(this.classSubject == '4'){
-                    subject = parseInt(this.$refs.Tree4.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree4.getCheckedKeys()[0] == undefined)?'': parseInt(this.$refs.Tree4.getCheckedKeys()[0])
                 }else if(this.classSubject == '5'){
-                    subject = parseInt(this.$refs.Tree5.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree5.getCheckedKeys()[0] == undefined)?'': parseInt(this.$refs.Tree5.getCheckedKeys()[0])
                 }else if(this.classSubject == '6'){
-                    subject = parseInt(this.$refs.Tree6.getCheckedKeys()[0])
+                    subject = (this.$refs.Tree6.getCheckedKeys()[0] == undefined)?'': parseInt(this.$refs.Tree6.getCheckedKeys()[0])
                 }
                 if(subject != ''){
                     if(this.n == 0){
@@ -258,9 +326,9 @@
                     }
                 }else{
                     if(this.n == 0){
-                        this.startSubject = 0
+                        this.startSubject = ''
                     }else if(this.n == 1){
-                        this.endSubject = 0
+                        this.endSubject = ''
                     }
                 }
                 this.dialogTableVisible = false;
@@ -317,7 +385,6 @@
                 params.append('type',n);
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
 //                        console.log(response);
                         let data = response.data.value;//列表数据
 //                        console.log(data);
@@ -334,6 +401,7 @@
                         }else if(n == 6){
                             this.tree6 = data.zNodes
                         }
+                        this.loading = false;
                     })
                     .catch(error=> {
 //                        console.log(error);
@@ -345,6 +413,7 @@
             addClick(n){
                 this.n = n
                 this.dialogTableVisible = true;
+                this.loading = true
                 this.treeAxios(1)
             },
             objectSpanMethod({ row, column, rowIndex, columnIndex }) {
@@ -374,15 +443,13 @@
                 params.append('endSub',this.endSubject);
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
                             let data = response.data.value;//列表数据
                             let arr = [];
                             let dataList = data.dataList
-
                             for(let i in dataList){
                                 for(let j in dataList[i]){
                                     dataList[i][0].rowspan = dataList[i].length
@@ -403,7 +470,7 @@
                     })
             },
         },
-        computed:mapState(['current_book_ym','start_ym']),
+        computed:mapState(['current_book_ym','start_ym','current_account_standard']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -452,7 +519,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -467,7 +534,7 @@
     .sub1{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;

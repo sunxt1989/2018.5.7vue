@@ -118,9 +118,10 @@
             axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
+                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
                     var tableDataarr =[];
-//                    console.log(data);
+                    console.log(data);
                     if(data.debitList){
                         for(var i =0; i < data.debitList.length; i++){
                             data.debitList[i].showMoney = number.number(data.debitList[i].money);
@@ -162,7 +163,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

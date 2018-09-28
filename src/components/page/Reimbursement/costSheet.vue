@@ -28,7 +28,7 @@
                     <el-table-column property="" label="" align="center" width="40px">
                         <template slot-scope="scope">
                                 <span class="checkbox">
-                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox" >
+                                <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox listInput" @click="inputcheckboxClick">
                                 <i class="iconfont icon-31xuanze"></i>
                             </span>
                         </template>
@@ -62,7 +62,7 @@
                 </el-table>
                 <div class="checkboxListLast">
                     <span class="checkbox">
-                        <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox" >
+                        <input name=checkAll @change="checkAllChange($event)" type="checkbox" class="inputcheckbox allInput">
                         <i class="iconfont icon-31xuanze"></i>
                     </span>
                     <span class="all">全选</span>
@@ -148,6 +148,15 @@
                     })
                 }
             },
+            //取消全选按钮事件
+            inputcheckboxClick(){
+                let input = $('.listInput')
+                input.each(function(i){
+                    if(!$(this).prop('checked')){
+                        $(".allInput").prop('checked',false)
+                    }
+                })
+            },
             //全选按钮change事件
             checkAllChange(e){
                 var input = $("input[name=checked]")
@@ -159,10 +168,25 @@
             },
             //删除提示模态框
             deleteModel(id){
+                this.loading = true
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     this.deleteList(id)
                 }).catch(() => {
@@ -170,11 +194,11 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                    this.loading = false
                 });
             },
             //删除列表信息
             deleteList(isId){
-                this.loading = true;
                 var debitId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('costSheetDelete')
@@ -210,11 +234,12 @@
                     this.endDate = '';
                 }
             },
-            //执行ajax重新获取借款单列表数据
+            //执行ajax重新获取费用单列表数据
             axios(){
                 this.loading = true;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('costSheet')
+
                 params.append('periodType',this.periodType);
                 params.append('auditFlg',this.auditFlg);
                 params.append('startDate',this.startDate);
@@ -224,25 +249,24 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
+                        console.log(response);
                         var data = response.data.value;//费用列表
                         for(var i = 0; i < data.length; i++){
-                            var originalReceiptList = data[i].originalReceiptList;
-                            data[i].checkbox = 'checkbox'+ data[i].type;
-                            data[i].checkAll = 'checkAll'+ data[i].type;
-                            data[i].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '.png'
+                            data[i].showMoney = number.number(data[i].money);
                             if(data[i].type <= 3){
-                                for(var ii = 0; ii < originalReceiptList.length; ii++){
-                                    originalReceiptList[ii].url = '../../../../static/images/expense/originalReceipt'+ data[i].type + '-'+ originalReceiptList[ii].childType1 +'.png'
-                                    originalReceiptList[ii].money = number.number(originalReceiptList[ii].money)
-                                }
+                                data[i].url = 'static/images/expense/originalReceipt'+ data[i].type + '-'+ data[i].childType1 +'.png'
                             }else{
-                                for(var ii = 0; ii < originalReceiptList.length; ii++){
-                                    originalReceiptList[ii].money = number.number(originalReceiptList[ii].money)
-                                }
+                                data[i].url = 'static/images/expense/originalReceipt'+ data[i].type + '.png';
                             }
                         }
-                        this.list = data;
+//                    console.log(data);
+                        this.tableList = data;
                     })
+                    .catch(error=> {
+                        this.loading = false
+//                    console.log(error);
+                        alert('网络错误，不能访问');
+                    });
             },
 
         },
@@ -275,7 +299,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     this.loading = false
                     var data = response.data.value;//费用列表
 //                    console.log(data);
@@ -290,6 +314,11 @@
 //                    console.log(data);
                     this.tableList = data;
                 })
+                .catch(error=> {
+                    this.loading = false
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -317,7 +346,7 @@
     .addLink{
         display: inline-block;
         width: 56px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -329,7 +358,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

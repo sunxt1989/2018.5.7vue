@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>还款单确认</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-if="!isBoss"  size="small" type="danger" class="sub1">驳回</el-button>
-                <el-button @click="model(2)" v-if="!isBoss"  size="small" type="primary" class="sub2">确认</el-button>
+                <el-button @click="model(1)" v-if="isCashier"  size="small" type="danger" class="sub1" :loading="isLoading">驳回</el-button>
+                <el-button @click="model(2)" v-if="isCashier"  size="small" type="primary" class="sub2" :loading="isLoading">确认</el-button>
             </div>
         </div>
         <div class="w cf">
@@ -41,38 +41,23 @@
                     </ul>
                 </div>
                 <div class="line">
-                    <span>还款明细</span>
+                    <span>审批记录</span>
                 </div>
-                <el-table class="hkTable grayList" :data="userCreditItemList" style="width:100%">
-                    <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
-                    <el-table-column prop="payType" label="还款方式" sortable width="180">
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.payType == 0"></span>
-                            <span v-if="scope.row.payType == 1">现金支付</span>
-                            <span v-if="scope.row.payType == 2">银行支付</span>
-                            <span v-if="scope.row.payType == 3">暂不支付</span>
-                            <span v-if="scope.row.payType == 4">冲抵个人借款</span>
-                            <span v-if="scope.row.payType == 99">其他货币资金</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable>
-                        <template slot-scope="scope">
-                            <span>{{ scope.row.showMoney }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="auditFlg" label="还款状态" sortable>
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.auditFlg == 0">未提交</span>
-                            <span v-if="scope.row.auditFlg == 1">驳回</span>
-                            <span v-if="scope.row.auditFlg == 2">待审核</span>
-                            <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
-                            <span v-if="scope.row.auditFlg == 4">待还款</span>
-                            <span v-if="scope.row.auditFlg == 5">待审核</span>
-                            <span v-if="scope.row.auditFlg == 6">待审核</span>
-                            <span v-if="scope.row.auditFlg == 7">已红冲</span>
-                        </template>
-                    </el-table-column>
-                </el-table>
+                <ul class="approval">
+                    <li class="cf" v-for="item in userDebitAuditRecordList">
+                        <img v-if="!item.audit_user_uri" src="../../../../static/images/tit.png" alt="">
+                        <img v-else :src="item.audit_user_uri" alt="">
+                        <div class="listHeader">
+                            <span class="listName">{{item.audit_user_name}}</span>
+                            <span class="listDepartment" v-if="item.audit_department_name != ''">——{{item.audit_department_name}}</span>
+                            <span class="listData">{{item.time}}</span>
+                        </div>
+                        <div class="listFooter">
+                            <span class="listState">意见：</span>
+                            <span class="listContent">{{item.discription}}</span>
+                        </div>
+                    </li>
+                </ul>
                 <div class="line">
                     <span>审批意见</span>
                 </div>
@@ -85,7 +70,7 @@
                                 :key="item.value"
                                 :label="item.payTypeItem"
                                 :value="item.value"
-                                :disabled="isBoss">
+                                :disabled="!isCashier">
                             </el-option>
                         </el-select>
                     </li>
@@ -95,8 +80,8 @@
                             <el-option
                                 v-for="item in bankAccountList"
                                 :key="item.value"
-                                :label="item.bankNameShow"
-                                :value="item.bankCode">
+                                :label="item.bank_name"
+                                :value="item.bank_code">
                             </el-option>
                         </el-select>
                     </li>
@@ -109,7 +94,7 @@
                             :picker-options="pickerOptions1"
                             placeholder="选择日期"
                             value-format="yyyy-MM-dd"
-                            :disabled="isBoss">
+                            :disabled="!isCashier">
                         </el-date-picker>
                     </li>
                     <li>
@@ -120,13 +105,13 @@
                                 :key="item.value"
                                 :label="item.opinionItem"
                                 :value="item.value"
-                                :disabled="isBoss">
+                                :disabled="!isCashier">
                             </el-option>
                         </el-select>
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="isBoss">
+                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="!isCashier">
                             </textarea>
                     </li>
                 </ul>
@@ -141,39 +126,42 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex';
     export default {
         data () {
             return {
                 money:'',//本次还款金额
                 unCreditMoney:'',//待还款金额
                 nowdata:'',//还款日期
-                debitDate:'',//上传日期（格式修改后的）
+                debitDate:'',//上传日期
                 discription2:'同意',//审批意见
                 opinion:'同意',//select框
                 debitId:this.$route.params.debitId,
-                userCreditItemList:[],//还款明细
+                userDebitAuditRecordList:[],//审批记录
                 bankAccountList:[],//银行账户信息
                 bankCode:'',//银行账户
-                payType:'1',//付款类型
+                payType:'2',//付款类型
                 payTypeList:[
                     {value:'1',payTypeItem:'现金收款'},{value:'2',payTypeItem:'银行收款'}
                 ],//付款类型
                 opinionList:[
                     {value:'同意',opinionItem:'同意'},{value:'驳回',opinionItem:'驳回'}
                 ],//可选审批意见
-                isTrue:true,
-                isBoss:true,
+                isTrue:false,
+                isCashier:true,//是否是出纳
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
                     },
                 },
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
         methods:{
             model(n){
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -181,12 +169,52 @@
                         type: 'warning'
                     }).then(() => {
                         this.$router.go(-1)
-                    }).catch(() => {});
+                    }).catch(() => {
+                        this.loading = false;
+                    });
                 }else{
-                    this.$confirm('确定是否提交？', '提示', {
+                    let msg = ''
+                    if(n == 1){
+                        msg = '确定是否驳回'
+                    }else{
+                        msg = '确定是否确认'
+                        if(this.payType == '2' && this.bankCode == ''){
+                            this.$message.error('请选择银行账户')
+                            this.loading = false;
+                            return
+                        }
+                        if(this.debitDate == ''){
+                            this.$message.error('请选择确认日期')
+                            this.loading = false;
+                            return
+                        }
+                        //判断选择日期不能早于当前还款日期
+                        if(Number(this.nowdata.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
+                            this.$message.error('确认日期不得早于当前还款日期')
+                            this.loading = false;
+                            return
+                        }
+
+                    }
+                    this.isLoading = true;
+                    this.$confirm(msg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.axios(n)
                     }).catch(() => {
@@ -194,6 +222,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false;
+                        this.isLoading = false;
                     });
                 }
             },
@@ -202,25 +232,28 @@
                 this.discription2 = this.opinion
             },
             axios(n){
-                this.loading = true;
-                var params = new URLSearchParams();
-                var url = '';
-                var agreeUrl = addUrl.addUrl('repaymentConfirmationAgree')
-                var refuseUrl = addUrl.addUrl('repaymentConfirmationRefuse')
+                let params = new URLSearchParams();
+                let url = '';
+                let agreeUrl = addUrl.addUrl('repaymentConfirmationAgree')
+                let refuseUrl = addUrl.addUrl('repaymentConfirmationRefuse')
+                //判断n=1时为驳回，n=2时为同意
+                if (n == 1) {
+                    url = refuseUrl
+                    this.discription2 = this.discription2 == '同意' ? '驳回':this.discription2
+                } else if (n == 2) {
+                    url = agreeUrl
+                    this.discription2 = this.discription2 == '驳回' ? '同意':this.discription2
+                }
                 params.append('creditId', this.debitId);
                 params.append('payType', this.payType);
                 params.append('discription', this.discription2);
                 params.append('bankCode', this.bankCode);
                 params.append('confirmDate', this.debitDate);
-                //判断n=1时为驳回，n=2时为同意
-                if (n == 1) {
-                    url = refuseUrl
-                } else if (n == 2) {
-                    url = agreeUrl
-                }
+
                 axios.post(url, params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if (response.data.status == 200) {
                             this.$router.go(-1);
@@ -233,6 +266,12 @@
                             this.$message.error(msg);
                         }
                     })
+                    .catch(error=> {
+//                        console.log(error);
+                        this.loading = false;
+                        this.isLoading = false;
+                        alert('网络错误，不能访问');
+                    })
             },
             //判断支付方式，如果选择银行支付，银行账户才能使用
             payTypeChange(){
@@ -243,6 +282,7 @@
                 }
             },
         },
+        computed:mapState(['isCashierFlg']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -263,38 +303,47 @@
         },
         created(){
             var params = new URLSearchParams();
-            var url = addUrl.addUrl('repaymentConfirmation')
+            var url = addUrl.addUrl('seeRepayment')
             params.append('creditId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
-                    this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
-                    this.money = number.number(data.userCreditItem.money);
-                    this.nowdata = data.userCreditItem.debitDateYMD;
-                    this.bankAccountList = data.bankAccountList;
+                    let debit = data.debit
+                    let credit = data.credit
+                    this.unCreditMoney = number.number(debit.un_credit_money);
+                    this.money = number.number(credit.money);
+                    this.nowdata = credit.credit_date;
+                    this.bankAccountList = data.bank_list;
+                    this.userDebitAuditRecordList = credit.record_list
 
-                    var tableDataarr =[];
-                    if(data.userCreditItemList){
-                        for(var i =0; i < data.userCreditItemList.length; i++){
-//                            console.log(data.userCreditItemList[i]);
-                            data.userCreditItemList[i].showMoney = number.number(data.userCreditItemList[i].money);
-                            tableDataarr.push(data.userCreditItemList[i])
-                        }
-                        this.userCreditItemList = tableDataarr;
+                    if(this.isCashierFlg){
+                        this.isCashier = true;
+                        this.isTrue = false
                     }else{
-                        this.userCreditItemList = data.userCreditItemList
+                        this.isCashier = false
+                        this.isTrue = true
                     }
-
-                    var cashFlg = data.cashFlg;
-                    if(cashFlg == 1){
-                        this.isBoss = false;
+                    let date = new Date()
+                    if(date.getMonth()+1 < 10){
+                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
                     }else{
-                        this.isBoss = true
+                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.debitDate += '-0' + date.getDate()
+                    }else{
+                        this.debitDate += '-' + date.getDate()
                     }
                 })
+                .catch(error=> {
+                    this.loading = false;
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
         },
     }
 </script>
@@ -317,12 +366,12 @@
         right:30px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;
@@ -364,10 +413,10 @@
         border-radius: 3px;
         padding: 3px 10px;
     }
-    .data{
+    .right .data{
         width:500px;
     }
-    .el-table{
+    .right .el-table{
         margin-top: 30px;
         display: inline-block;
     }
@@ -412,6 +461,7 @@
     }
     .hkTable{
         width:100%;
+        margin-top: 20px;
     }
     .el-table thead th{
         color: #fff;
@@ -420,5 +470,57 @@
         font-family: '思源黑体';
         padding: 0;
         font-weight:500;
+    }
+    .approval{
+        width:100%;
+        margin-top: 20px;
+        font-size:14px;
+    }
+    .approval li{
+        margin-top: 20px;
+        text-align: left;
+    }
+    .approval li img{
+        display: inline-block;
+        width:50px;
+        height:50px;
+        border-radius: 50%;
+        overflow: hidden;
+        float: left;
+        margin-left: 130px;
+        margin-right: 20px;
+    }
+    .approval li .listHeader{
+        display: inline-block;
+        float: left;
+        width:80%;
+    }
+    .approval li .listHeader .listName{
+
+        margin-right: 10px;
+    }
+    .approval li .listHeader .listDepartment{
+        margin-left: 10px;
+    }
+    .approval li .listHeader .listData{
+        float: right;
+    }
+    .approval li .listFooter{
+        display: inline-block;
+        float: left;
+        width:80%;
+        margin-top: 10px;
+    }
+    .approval li .listFooter .listState{
+        display: inline-block;
+        float: left;
+        margin-right: 10px;
+    }
+    .approval li .listFooter .listContent{
+        width:90%;
+        display: inline-block;
+        float: left;
+        height:50px;
+        overflow: hidden;
     }
 </style>

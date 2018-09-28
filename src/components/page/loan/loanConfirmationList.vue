@@ -49,6 +49,8 @@
 <script type="text/ecmascript-6">
     import axios from 'axios'
     import addUrl from '../../../../static/js/addUrl'
+    import number from '../../../../static/js/number'
+    import unNumber from '../../../../static/js/unNumber'
     export default {
         data() {
             return {
@@ -91,6 +93,11 @@
                         }
                         this.count = data.count;//总条目数
                     })
+                    .catch(error=> {
+//                        console.log(error);
+                        this.loading = false;
+                        alert('网络错误，不能访问');
+                    })
             }
         },
         mounted(){
@@ -117,7 +124,7 @@
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;//借款单审批列表数据
                     let tableDataarr =[];
@@ -134,6 +141,11 @@
                         this.tableData = data
                     }
                     this.count = data.count;//总条目数
+                })
+                .catch(error=> {
+//                        console.log(error);
+                    this.loading = false;
+                    alert('网络错误，不能访问');
                 })
         },
     }
@@ -163,7 +175,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

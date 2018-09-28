@@ -116,16 +116,6 @@
                                         <span>{{scope.row.showTotalMoney}}</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column align="center" prop="taxRate" label="税率">
-                                    <template slot-scope="scope">
-                                        <span>{{scope.row.taxRate}}%</span>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column align="center" prop="taxMoney" label="税额" width="80px">
-                                    <template slot-scope="scope">
-                                        <span>{{scope.row.showTaxMoney}}</span>
-                                    </template>
-                                </el-table-column>
                                 <el-table-column align="center" prop="sendMoney" label="已付款">
                                     <template slot-scope="scope">
                                         <span>{{scope.row.showSendMoney}}</span>
@@ -191,15 +181,13 @@
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
                                 <el-table-column align="center" prop="type" label="类别">
                                     <template slot-scope="scope">
-                                        <span v-if="scope.row.type == 1">设备</span>
-                                        <span v-else-if="scope.row.type == 2">软件</span>
-                                        <span v-else-if="scope.row.type == 3">劳务服务</span>
-                                        <span v-else-if="scope.row.type == 4">技术服务</span>
-                                        <span v-else-if="scope.row.type == 5">待销商品</span>
-                                        <span v-else-if="scope.row.type == 11">专利技术</span>
-                                        <span v-else-if="scope.row.type == 12">非专利技术</span>
-                                        <span v-else-if="scope.row.type == 13">商标</span>
-                                        <span v-else-if="scope.row.type == 14">著作权</span>
+                                        <span v-if="scope.row.type == 1">待销商品</span>
+                                        <span v-else-if="scope.row.type == 2">技术服务</span>
+                                        <span v-else-if="scope.row.type == 3">技术开发</span>
+                                        <span v-else-if="scope.row.type == 4">技术咨询</span>
+                                        <span v-else-if="scope.row.type == 5">劳务</span>
+                                        <span v-else-if="scope.row.type == 6">软件</span>
+                                        <span v-else-if="scope.row.type == 7">设计服务</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column align="center" prop="discription" label="明细"></el-table-column>
@@ -335,6 +323,7 @@
         methods: {
             //点击红冲按钮
             submit(){
+                this.loading = true
                 let url = ''
                 let params = new URLSearchParams();
                 if(this.activeName == 1){
@@ -356,7 +345,7 @@
                 params.append('discription',this.discription);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -376,7 +365,6 @@
             },
             //打开红冲模态框
             openModel(id){
-                console.log(id);
                 this.isId = id
                 this.discription = ''
                 //判断是哪个红冲业务 1：还款 2：借款 3：报销 4：采购 5：采购付款 6：销售 7：销售收款
@@ -472,7 +460,7 @@
 
                 axios.post(url)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -561,7 +549,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:31px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

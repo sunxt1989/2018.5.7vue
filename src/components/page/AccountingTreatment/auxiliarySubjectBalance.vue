@@ -33,6 +33,7 @@
                 <el-table :data="tableData" class="single" :span-method="objectSpanMethod" :height="tableDataHeight">
                     <el-table-column prop="subjectCode" label="科目编号" align="center" width="100px"></el-table-column>
                     <el-table-column prop="subjectName" label="科目名称" align="center"></el-table-column>
+                    <el-table-column prop="wldw" label="辅助核算" align="center" width="180px"></el-table-column>
                     <el-table-column label="年初余额">
                         <el-table-column prop="debitQC" header-align="center" align="right" label="借方"></el-table-column>
                         <el-table-column prop="creditQC" header-align="center" align="right" label="贷方"></el-table-column>
@@ -131,7 +132,6 @@
                 params.append('endSub',this.endSubject);
                 axios.post(url,params)
                     .then(response=> {
-                        this.loading = false;
                         console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
@@ -151,15 +151,12 @@
                                     arr.shift()
                                 }
                             }
-                            console.log(arr);
-                            console.log(dataList);
                             this.tableData = dataList
                             this.loading = false;
                         }else if(status == 400){
                             this.$message.error(msg);
                             this.loading = false;
                         }
-
                     })
                     .catch(error=> {
 //                    console.log(error);
@@ -201,6 +198,7 @@
 
 <style scoped>
     .w{
+        width:1300px;
         height:100%;
     }
 
@@ -216,7 +214,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
@@ -231,7 +229,7 @@
     .sub1{
         display: inline-block;
         width: 80px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -245,13 +243,14 @@
         margin-left: 30px;
     }
     .left {
-        width: 1120px;
+        width: 1280px;
         background-color: #fff;
-        padding: 20px 40px;
+        padding: 20px 10px;
         text-align: left;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }
+
     .record {
         font-size: 18px;
         color: #333;

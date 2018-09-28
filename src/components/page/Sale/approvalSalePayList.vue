@@ -26,12 +26,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                <!--<el-pagination-->
-                    <!--@current-change="changePage"-->
-                    <!--background-->
-                    <!--layout="prev, pager, next"-->
-                    <!--:total='count'>-->
-                <!--</el-pagination>-->
             </div>
         </div>
     </div>
@@ -52,36 +46,6 @@
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
-        },
-        methods:{
-            //分页器
-//            changePage(val){
-//                this.currentPage = val;
-//                this.axios()
-//            },
-            axios(){
-                var params = new URLSearchParams();
-                params.append('pageNo',this.currentPage);
-                axios.post('http://192.168.2.190:8080/web/vue/tradeCompany/list.html',params)
-                    .then(response=> {
-                        this.loading = false;
-//                        console.log(response);
-                        var data = response.data.value.list;//借款单列表数据
-
-                        this.count = response.data.value.count;//总条目数
-                        var tableDataarr =[];
-                        for(var i =0; i < data.length; i++){
-                            tableDataarr.push(data[i])
-                        }
-//                        console.log(tableDataarr);
-                        this.tableData = tableDataarr;
-
-                    })
-                    .catch(error=> {
-//                        console.log(error);
-                        alert('网络错误，不能访问');
-                    })
-            },
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -120,6 +84,7 @@
                     }
                 })
                 .catch(error=> {
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 })
@@ -144,7 +109,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

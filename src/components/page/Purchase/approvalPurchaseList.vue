@@ -9,7 +9,12 @@
         <div class="w">
             <div class="left" :style="{height:screenHeight}">
                 <el-table :data="tableData" class="blueList">
-                    <el-table-column prop="departmentName" label="部门" sortable align="center"></el-table-column>
+                    <el-table-column prop="departmentName" label="部门" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.departmentName }}</span>
+                            <span v-if="scope.row.divideFlg == 1">（分摊）</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="supplierName" label="供应商" sortable align="center"></el-table-column>
                     <el-table-column prop="type" label="类别" sortable align="center">
                         <template slot-scope="scope">
@@ -107,7 +112,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value.list;//采购单审批列表数据
 
                     var tableDataarr =[];
@@ -147,7 +152,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;

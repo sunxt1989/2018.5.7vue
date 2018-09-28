@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>采购付款单审批</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1">同意</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2">驳回</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">同意</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" :loading="isLoading">驳回</el-button>
             </div>
         </div>
         <div class="w">
@@ -53,11 +53,12 @@
                     </div>
                     <ul class="approval">
                         <li class="cf" v-for="item in userDebitAuditRecordList">
-                            <img :src="item.audit_user_uri" alt="">
+                            <img v-if="!item.audit_user_uri" src="../../../../static/images/tit.png" alt="">
+                            <img v-else :src="item.audit_user_uri" alt="">
                             <div class="listHeader">
                                 <span class="listName">{{item.audit_user_name}}</span>
-                                ——
-                                <span class="listDepartment">{{item.audit_user_type}}</span>
+
+                                <span class="listDepartment" v-if="item.audit_user_type">——{{item.audit_user_type}}</span>
                                 <span class="listData">{{item.time}}</span>
                             </div>
                             <div class="listFooter">
@@ -409,6 +410,7 @@
                 },
                 isAuditPerson:false,//审批流程 true为已审批 false为无人审批
                 loading:true,
+                isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -422,6 +424,7 @@
                 this.discription2 = this.opinion
             },
             model(n){
+                this.loading = true
                 if(n == 0){
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -430,13 +433,28 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-
+                        this.loading = false
                     });
                 }else if(n == 1){
+                    this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit(n)
                     }).catch(() => {
@@ -444,12 +462,29 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }else if(n == 2){
+                    this.isLoading = true;
                     this.$confirm('确定是否驳回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submit(n)
                     }).catch(() => {
@@ -457,6 +492,8 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
+                        this.isLoading = false;
                     });
                 }
             },
@@ -476,14 +513,17 @@
             submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
-                params.append('purchaseSendId',this.debitId);
-                params.append('discription',this.discription2);
                 var url = '';
                 if(n == 1){
                     url = addUrl.addUrl('approvalPurchasePayAgree')
+                    this.discription2 = this.discription2 == '驳回' ? '同意':this.discription2
                 }else if(n == 2){
                     url = addUrl.addUrl('approvalPurchasePayRefuse')
+                    this.discription2 = this.discription2 == '同意' ? '驳回':this.discription2
                 }
+                params.append('purchaseSendId',this.debitId);
+                params.append('discription',this.discription2);
+
 //                console.log(url);
                 axios({
                     method:'post',
@@ -495,6 +535,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
@@ -509,6 +550,7 @@
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
 //                        console.log(error);
                         this.$message.error('提交失败，请重试！');
                     })
@@ -580,7 +622,8 @@
                     this.unPayMoney = number.number(purchase.unsendMoney)
                     this.money = number.number(data.send.send_money)
                     this.attachUrlJson = data.send.attach_urls
-                    this.userDebitAuditRecordList = data.send.record_list
+                    let userDebitAuditRecordList = data.send.record_list
+                    this.userDebitAuditRecordList = userDebitAuditRecordList
                     for(var i = 0; i < this.userDebitAuditRecordList.length; i++){
                         this.userDebitAuditRecordList[i].time = this.userDebitAuditRecordList[i].time.substring(0,10)
                     }
@@ -695,12 +738,12 @@
         right:20px;
         font-size:12px;
     }
-    .sub1{
+    .top .sub1{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:190px;
         font-size:12px;

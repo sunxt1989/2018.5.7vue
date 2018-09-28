@@ -10,15 +10,15 @@
             <div class="content" :style="{height:screenHeight}">
                 <ul class="list cf">
                     <li class="pt">
-                        <span class="tit">企业名称：</span>
+                        <span class="tit"><span class="red">*</span>企业名称：</span>
                         <input class="ipt" type="text" v-model="companyName" maxlength="50">
                     </li>
                     <li class="pt">
-                        <span class="tit">统一社会信用代码</span>
+                        <span class="tit"><span class="red">*</span>统一社会信用代码</span>
                         <input class="ipt" type="text" v-model="idNumber" maxlength="18">
                     </li>
                     <li class="pt">
-                        <span class="tit">企业所在地区</span>
+                        <span class="tit"><span class="red">*</span>企业所在地区</span>
                         <el-select class="adr" v-model="provinceCode" placeholder="省" @change="changeProvince">
                             <el-option
                                 v-for="item in options1"
@@ -45,7 +45,7 @@
                         </el-select>
                     </li>
                     <li class="pt">
-                        <span class="tit">企业所属行业</span>
+                        <span class="tit"><span class="red">*</span>企业所属行业</span>
                         <el-select class="sel" v-model="companyType" placeholder="请选择">
                             <el-option
                                 v-for="item in options4"
@@ -56,7 +56,7 @@
                         </el-select>
                     </li>
                     <li class="pt">
-                        <span class="tit">纳税人性质</span>
+                        <span class="tit"><span class="red">*</span>纳税人性质</span>
                         <el-select class="sel" v-model="companyScale" placeholder="请选择">
                             <el-option
                                 v-for="item in options5"
@@ -67,7 +67,7 @@
                         </el-select>
                     </li>
                     <li class="pt">
-                        <span class="tit">启动日期</span>
+                        <span class="tit"><span class="red">*</span>启动日期</span>
                         <el-date-picker
                             class="data"
                             v-model="startDate"
@@ -78,11 +78,11 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">注册资本</span>
+                        <span class="tit"><span class="red">*</span>注册资金</span>
                         <input class="ipt" type="text" v-model="registeredCapital" maxlength="50" @change="changeMoney">
                     </li>
                     <li class="ptx">
-                        <span class="tit">营业执照</span>
+                        <span class="tit"><span class="red">*</span>营业执照</span>
                         <span class="tit2">上传附件所有信息需清晰可见，内容真实有效，不得做任何修改。照片支持jpg.jpeg.png格式，大小不超过4M</span>
                         <el-upload
                             class="upload"
@@ -106,7 +106,7 @@
                         </el-dialog>
                     </li>
                     <li class="btn">
-                        <p>请认真填写帐套信息，经后台审核（24小时内完成审核）通过后即可正常使用</p>
+                        <p>请认真填写账套信息，经后台审核（24小时内完成审核）通过后即可正常使用</p>
                         <el-button @click="model" type="primary" class="sub1" >保存</el-button>
                     </li>
                 </ul>
@@ -130,26 +130,9 @@
                 registeredCapital:'0.00',//注册资金
                 companyType:'',//公司类型
                 options4:[
-                    {value:1,label:'农、林、木、渔业'},
-                    {value:2,label:'采矿业'},
-                    {value:3,label:'制造业'},
-                    {value:4,label:'电力、热力、燃气及水生产和供应业'},
-                    {value:5,label:'建筑业'},
                     {value:6,label:'批发和零售业'},
-                    {value:7,label:'交通运输、仓储和邮政业'},
-                    {value:8,label:'住宿和餐饮业'},
                     {value:9,label:'信息传输、软件和信息技术服务业'},
-                    {value:10,label:'金融业'},
-                    {value:11,label:'房地产业'},
                     {value:12,label:'租赁和商务服务业'},
-                    {value:13,label:'科学研究和技术服务业'},
-                    {value:14,label:'水利、环境和公共设施管理业'},
-                    {value:15,label:'居民服务、修理和其他服务业'},
-                    {value:16,label:'教育'},
-                    {value:17,label:'卫生和社会工作'},
-                    {value:18,label:'文化、体育和娱乐业'},
-                    {value:19,label:'公共管理、社会保障和社会组织'},
-                    {value:20,label:'国际组织'}
                 ],
                 companyScale:'',//纳税人性质
                 options5:[
@@ -197,9 +180,11 @@
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
                 this.loading = true;
-                const isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
+                const isJPEG = file.type === 'image/jpeg';
+                const isPNG = file.type === 'image/png';
+                const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
-                if (!isJPG) {
+                if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
@@ -207,7 +192,7 @@
                     this.loading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
-                return isJPG && isLt4M;//如果不符合要求的话是不走myUpload函数的
+                return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传1张图片!');
@@ -239,7 +224,7 @@
                 var _this = this;
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.idNumberUrlData = dataurl;
-                    _this.idNumberFileName = name;
+                    _this.idNumberFileName = file.name;
                     _this.submit()
                 });
             },
@@ -273,19 +258,15 @@
                     });
                 }else{
                     if(this.companyName == ''){
-                        this.$message.error('请正确输入公司名称');
+                        this.$message.error('请正确输入企业名称');
                         this.loading = false;
                         return
                     }else if(!(str1.test(this.idNumber))){
                         this.$message.error('请正确输入统一社会信用代码');
                         this.loading = false;
                         return
-                    }else if(this.startDate == ''){
-                        this.$message.error('请正确输入启动日期');
-                        this.loading = false;
-                        return
-                    }else if(registeredCapital == 0){
-                        this.$message.error('请正确输入注册资金');
+                    }else if(this.provinceCode == ''|| this.cityCode == '' || this.areaCode == ''){
+                        this.$message.error('请正确输入企业所在地');
                         this.loading = false;
                         return
                     }else if(this.companyType == ''){
@@ -296,8 +277,12 @@
                         this.$message.error('请正确输入纳税人性质');
                         this.loading = false;
                         return
-                    }else if(this.provinceCode == ''|| this.cityCode == '' || this.areaCode == ''){
-                        this.$message.error('请正确输入企业所在地');
+                    }else if(this.startDate == ''){
+                        this.$message.error('请正确输入启动日期');
+                        this.loading = false;
+                        return
+                    }else if(registeredCapital == 0){
+                        this.$message.error('请正确输入注册资金');
                         this.loading = false;
                         return
                     }else if(this.punch == 0){
@@ -309,7 +294,21 @@
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
                         this.submitUpload();
                     }).catch(() => {
@@ -348,11 +347,11 @@
                     .then(response=> {
                         console.log(response);
                         if(response.data.status == 200){
-                            this.$router.go(-1);
                             this.$message({
                                 type: 'success',
                                 message: '提交成功'
                             });
+                            window.location.reload()
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
                             this.$message.error(msg);
@@ -416,6 +415,18 @@
                     console.log(response);
                     let data = response.data.value
                     this.options1 = data
+                    let date = new Date();
+                    if(date.getMonth()+1 < 10){
+                        this.startDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                    }else{
+                        this.startDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                    };
+
+                    if(date.getDate() < 10){
+                        this.startDate += '-0' + date.getDate()
+                    }else{
+                        this.startDate += '-' + date.getDate()
+                    }
                     this.loading = false
                 })
                 .catch(error=> {
@@ -444,7 +455,7 @@
     .back{
         display: inline-block;
         width:56px;
-        height:32px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
