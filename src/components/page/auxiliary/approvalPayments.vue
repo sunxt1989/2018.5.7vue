@@ -155,7 +155,10 @@
 
                 options2:[//收款方式列表
                     {value:'1',label:'现金'},
-                    {value:'2',label:'银行'}
+                    {value:'2',label:'银行'},
+                    {value:'5',label:'企业微信'},
+                    {value:'6',label:'企业支付宝'},
+                    {value:'7',label:'企业借贷宝'},
                 ],
 
                 recordList:'',//审批记录
@@ -216,15 +219,20 @@
                     this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

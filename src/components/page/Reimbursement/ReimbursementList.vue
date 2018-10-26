@@ -61,18 +61,19 @@
                     </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
-                                <span class="operation">
-                                    <router-link :to="{name:'seeReimbursement',params:{debitId:scope.row.idString}}" class="see">
-                                        <i class="icon iconfont icon-kanguo blue"></i></router-link>
-                                </span>
+                            <span class="operation">
+                                <router-link :to="{name:'seeReimbursement',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
+                                    <i class="icon iconfont icon-kanguo blue"></i>
+                                </router-link>
+                            </span>
 
-                                <span class="operation">
-                                    <i v-if='scope.row.auditFlg == 0' @click='deleteModel(scope.row.idString)'
-                                       class="icon iconfont icon-shanchu red"></i>
-                                    <i v-else-if='scope.row.auditFlg == 1' @click='deleteModel(scope.row.idString)'
-                                       class="icon iconfont icon-shanchu red"></i>
-                                    <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
-                                </span>
+                            <span class="operation">
+                                <i v-if='scope.row.auditFlg == 0' @click='deleteModel(scope.row.idString)'
+                                   class="icon iconfont icon-shanchu red"></i>
+                                <i v-else-if='scope.row.auditFlg == 1' @click='deleteModel(scope.row.idString)'
+                                   class="icon iconfont icon-shanchu red"></i>
+                                <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
+                            </span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -137,10 +138,10 @@
                     choice: '0,1,2,3,5,6',
                     label: '未完成列表'
                 }],
-                choice:'0,1,2,3,5,6',
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,//当前页数
                 tableData: [],//借款单列表数据
                 count:0,//总条目数
-                currentPage:1,//当前页数
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
@@ -202,15 +203,20 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -286,8 +292,10 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('ReimbursementList')
+            if(!this.choice)this.choice='0,1,2,3,5,6';
+            if(!this.currentPage)this.currentPage = 1;
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('ReimbursementList')
             params.append('periodType','');
             params.append('status',this.choice);
             params.append('startDate',this.startDate);

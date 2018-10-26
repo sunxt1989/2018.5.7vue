@@ -339,15 +339,20 @@
                         this.$confirm('确定是否保存？', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
+                            showClose: false,
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
                             type: 'warning',
                             beforeClose: (action, instance, done) => {
                                 if (action === 'confirm') {
                                     instance.confirmButtonLoading = true;
+                                    instance.cancelButtonLoading = true;
                                     instance.confirmButtonText = '执行中...';
                                     setTimeout(() => {
                                         done();
                                         setTimeout(() => {
                                             instance.confirmButtonLoading = false;
+                                            instance.cancelButtonLoading = false;
                                         }, 300);
                                     }, 300);
                                 } else {
@@ -365,15 +370,20 @@
                         this.$confirm('确定是否提交？', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
+                            showClose: false,
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
                             type: 'warning',
                             beforeClose: (action, instance, done) => {
                                 if (action === 'confirm') {
                                     instance.confirmButtonLoading = true;
+                                    instance.cancelButtonLoading = true;
                                     instance.confirmButtonText = '执行中...';
                                     setTimeout(() => {
                                         done();
                                         setTimeout(() => {
                                             instance.confirmButtonLoading = false;
+                                            instance.cancelButtonLoading = false;
                                         }, 300);
                                     }, 300);
                                 } else {
@@ -572,15 +582,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {

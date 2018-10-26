@@ -80,7 +80,35 @@
                         <input class="ipt" type="text" v-model="housingProvidentFundCompany" maxlength="15" @change="changeMoney(13)">
                     </li>
                 </ul>
+
             </div>
+            <el-dialog title="选择付款方式" :visible.sync="dialogGrant" :before-close="handleClose" width="500px"
+                       :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+                <ul class="wagesUl">
+                    <li>
+                        <span class="wagesName">工资</span>
+                        <el-radio v-model="wages" label="1">现金</el-radio>
+                        <el-radio v-model="wages" label="2">银行</el-radio>
+                    </li>
+                    <li>
+                        <span class="wagesName">社保</span>
+                        <el-radio v-model="socialSecurity" label="1">现金</el-radio>
+                        <el-radio v-model="socialSecurity" label="2">银行</el-radio>
+                    </li>
+                    <li>
+                        <span class="wagesName">公积金</span>
+                        <el-radio v-model="AccumulationFund" label="1">现金</el-radio>
+                        <el-radio v-model="AccumulationFund" label="2">银行</el-radio>
+                    </li>
+                    <li>
+                        <span class="wagesName">个人所得税</span>
+                        <el-radio v-model="IndividualIncomeTax" label="1">现金</el-radio>
+                        <el-radio v-model="IndividualIncomeTax" label="2">银行</el-radio>
+                    </li>
+                </ul>
+                <el-button @click="closeGrant" size="small">取 消</el-button>
+                <el-button type="primary" @click="grant" size="small" :disabled="isComplete">确 定</el-button>
+            </el-dialog>
         </div>
     </div>
 
@@ -126,11 +154,19 @@
                 maternityInsuranceCompany:'0.00',//生育保险（公司）
                 housingProvidentFundCompany:'0.00',//住房公积金（公司）
 
+                wages:'2',//工资发放分类
+                socialSecurity:'2',//社保发放分类
+                AccumulationFund:'2',//公积金发放分类
+                IndividualIncomeTax:'2',//个人所得税发放分类
+
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
                     },
                 },
+                dialogGrant:false,//工资发放模态框
+                grantLoading:false,//工资发放按钮loading
+                isComplete:false,//工资发放模态框确认按钮loading状态
                 loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
@@ -139,6 +175,18 @@
         watch:{
         },
         methods: {
+            //关闭工资发放模态框取消按钮
+            closeGrant(){
+                this.dialogGrant = false;
+                this.grantLoading = false;
+                this.isLoading = false;
+                this.loading = false
+            },
+            //工资发放模态框关闭调用方法
+            handleClose(done){
+                this.grantLoading = false;
+                done();
+            },
             //金额change事件
             changeMoney(n){
                 let str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
@@ -290,15 +338,20 @@
                     this.$confirm('确定是否计提？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -308,6 +361,7 @@
                     }).then(() => {
                         this.calculation()
                     }).catch(() => {
+
                         this.$message({
                             type: 'info',
                             message: '已取消'
@@ -321,15 +375,20 @@
                         this.$confirm('确认上月工资已经计提，本月只需要发放工资？如上月未计提，请先计提工资', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
+                            showClose: false,
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
                             type: 'warning',
                             beforeClose: (action, instance, done) => {
                                 if (action === 'confirm') {
                                     instance.confirmButtonLoading = true;
+                                    instance.cancelButtonLoading = true;
                                     instance.confirmButtonText = '执行中...';
                                     setTimeout(() => {
                                         done();
                                         setTimeout(() => {
                                             instance.confirmButtonLoading = false;
+                                            instance.cancelButtonLoading = false;
                                         }, 300);
                                     }, 300);
                                 } else {
@@ -337,7 +396,12 @@
                                 }
                             }
                         }).then(() => {
-                            this.grant()
+                            this.dialogGrant = true;
+                            this.wages = '2'
+                            this.socialSecurity = '2'
+                            this.AccumulationFund = '2'
+                            this.IndividualIncomeTax = '2'
+                            this.loading = false;
                         }).catch(() => {
                             this.$message({
                                 type: 'info',
@@ -347,40 +411,18 @@
                             this.isLoading = false;
                         });
                     }else{
-                        this.isLoading = true;
-                        this.$confirm('确定是否发放工资？', '提示', {
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            type: 'warning',
-                            beforeClose: (action, instance, done) => {
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '执行中...';
-                                    setTimeout(() => {
-                                        done();
-                                        setTimeout(() => {
-                                            instance.confirmButtonLoading = false;
-                                        }, 300);
-                                    }, 300);
-                                } else {
-                                    done();
-                                }
-                            }
-                        }).then(() => {
-                            this.grant()
-                        }).catch(() => {
-                            this.$message({
-                                type: 'info',
-                                message: '已取消'
-                            });
-                            this.loading = false;
-                            this.isLoading = false;
-                        });
+                        this.dialogGrant = true;
+                        this.wages = '2'
+                        this.socialSecurity = '2'
+                        this.AccumulationFund = '2'
+                        this.IndividualIncomeTax = '2'
+                        this.loading = false;
+                        this.isLoading = false;
                     }
-
                 }
             },
             calculation(){
+                console.log('calculation');
                 let url = addUrl.addUrl('calculation');
                 axios.post(url)
                     .then(response=> {
@@ -418,43 +460,65 @@
                     });
             },
             grant(){
-                let params = new URLSearchParams();
-                let url = addUrl.addUrl('provide');
-                params.append('yingfagongzi',this.shouldWages)
-                params.append('jiaonageshui',this.wage_base)
-                params.append('yanglaobaoxian_p',this.endowmentInsurancePerson)
-                params.append('yiliaobaoxian_p',this.medicalInsurancePerson)
-                params.append('shiyebaoxian_p',this.unemploymentInsurancePerson)
-                params.append('gongshangbaoxian_p',this.employmentInjuryInsurancePerson)
-                params.append('shengyubaoxian_p',this.maternityInsurancePerson)
-                params.append('gongjijin_p',this.housingProvidentFundPerson)
-                params.append('yanglaobaoxian_c',this.endowmentInsuranceCompany)
-                params.append('yiliaobaoxian_c',this.medicalInsuranceCompany)
-                params.append('shiyebaoxian_c',this.unemploymentInsuranceCompany)
-                params.append('gongshangbaoxian_c',this.employmentInjuryInsuranceCompany)
-                params.append('shengyubaoxian_c',this.maternityInsuranceCompany)
-                params.append('gongjijin_c',this.housingProvidentFundCompany)
+                this.isComplete = true;
+                this.$confirm('确定是否工资发放？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    console.log(this.wages);
+                    let params = new URLSearchParams();
+                    let url = addUrl.addUrl('provide');
+                    params.append('gzPayWay', this.wages)
+                    params.append('sbPayWay', this.socialSecurity)
+                    params.append('gjjPayWay', this.AccumulationFund)
+                    params.append('gsPayWay', this.IndividualIncomeTax)
 
-                axios.post(url,params)
-                    .then(response=> {
-                        console.log(response);
-                        let data = response.data.value;
-                        let msg = data.msg;
-                        let result = data.result
-                        if(result == 1){
-                            this.$message.success(msg);
-                        }else{
-                            this.$message.error(msg);
-                        }
-                        this.loading = false
-                        this.isLoading = false;
-                    })
-                    .catch(error=> {
-                        this.loading = false
-                        this.isLoading = false;
-//                    console.log(error);
-                        alert('网络错误，不能访问');
-                    });
+                    params.append('yingfagongzi', this.shouldWages)
+                    params.append('jiaonageshui', this.wage_base)
+                    params.append('yanglaobaoxian_p', this.endowmentInsurancePerson)
+                    params.append('yiliaobaoxian_p', this.medicalInsurancePerson)
+                    params.append('shiyebaoxian_p', this.unemploymentInsurancePerson)
+                    params.append('gongshangbaoxian_p', this.employmentInjuryInsurancePerson)
+                    params.append('shengyubaoxian_p', this.maternityInsurancePerson)
+                    params.append('gongjijin_p', this.housingProvidentFundPerson)
+                    params.append('yanglaobaoxian_c', this.endowmentInsuranceCompany)
+                    params.append('yiliaobaoxian_c', this.medicalInsuranceCompany)
+                    params.append('shiyebaoxian_c', this.unemploymentInsuranceCompany)
+                    params.append('gongshangbaoxian_c', this.employmentInjuryInsuranceCompany)
+                    params.append('shengyubaoxian_c', this.maternityInsuranceCompany)
+                    params.append('gongjijin_c', this.housingProvidentFundCompany)
+
+                    axios.post(url, params)
+                        .then(response=> {
+                            console.log(response);
+                            let data = response.data.value;
+                            let msg = data.msg;
+                            let result = data.result
+                            if (result == 1) {
+                                this.$message.success(msg);
+                            } else {
+                                this.$message.error(msg);
+                            }
+                            this.loading = false;
+                            this.isLoading = false;
+                            this.isComplete = false;
+                            this.grantLoading = false;
+                            this.dialogGrant = false;
+                        })
+                        .catch(error=> {
+                            this.loading = false
+                            this.isLoading = false;
+                            this.grantLoading = false;
+                            this.isComplete = false;
+                            this.dialogGrant = false;
+                        });
+                }).catch(()=> {
+                    this.loading = false
+                    this.isLoading = false;
+                    this.isComplete = false;
+                    this.grantLoading = false;
+                })
             }
         },
         mounted(){
@@ -650,5 +714,12 @@
     }
     .blue{
         color: #1a96d4;
+    }
+    .wagesUl{
+        margin-bottom: 30px;
+    }
+    .wagesUl .wagesName{
+        display: inline-block;
+        width:200px;
     }
 </style>

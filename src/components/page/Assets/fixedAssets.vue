@@ -174,6 +174,28 @@
                             placeholder="选择日期" :readonly="isFinish">
                         </el-date-picker>
                     </li>
+                    <!--<li class="sm" v-show="isHandle || isFinish">-->
+                        <!--<span class="tit2">收款方式</span>-->
+                        <!--<el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange">-->
+                            <!--<el-option-->
+                                <!--v-for="item in options3"-->
+                                <!--:key="item.value"-->
+                                <!--:label="item.label"-->
+                                <!--:value="item.value">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
+                    <!--</li>-->
+                    <!--<li class="sm" v-show="isHandle || isFinish">-->
+                        <!--<span class="tit2">银行账户</span>-->
+                        <!--<el-select class="sel" v-model="bankCode" placeholder="请选择" :disabled="isTrue">-->
+                            <!--<el-option-->
+                                <!--v-for="item in bankList"-->
+                                <!--:key="item.value"-->
+                                <!--:label="item.bankNameShow"-->
+                                <!--:value="item.bankCode">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
+                    <!--</li>-->
                 </ul>
             </div>
         </div>
@@ -233,6 +255,17 @@
                     {value:16,label:'16%'},
                     {value:17,label:'17%'}
                 ],
+                payType:'1',//收款方式
+                options3:[//收款方式列表
+                    {value:'1',label:'现金'},
+                    {value:'2',label:'银行'},
+                    {value:'5',label:'企业微信'},
+                    {value:'6',label:'企业支付宝'},
+                    {value:'7',label:'企业借贷宝'},
+                ],
+                bankCode:'',//银行账户
+                bankList:[],//银行列表
+                isTrue:true,//是否禁用银行列表
 
                 debitId:this.$route.params.debitId,
                 pickerOptions1:{
@@ -246,6 +279,14 @@
             }
         },
         methods: {
+            //判断支付方式，如果选择银行支付，银行账户才能使用
+            payTypeChange(){
+                if(this.payType == 2){
+                    this.isTrue = false
+                }else {
+                    this.isTrue = true
+                }
+            },
             numberMoney(n){
                 let str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 let dealTotalMoney = this.dealTotalMoney
@@ -291,15 +332,20 @@
                     this.$confirm('是否处置？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -349,15 +395,20 @@
                     this.$confirm('是否处置完成？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

@@ -75,11 +75,13 @@
                     let isLt4M = file.size / 1024 / 1024 < 4;
                     if (!isJPG) {
                         this.loading = false;
+                        this.isLoading = false;
                         this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                         return
                     }
                     if (!isLt4M) {
                         this.loading = false;
+                        this.isLoading = false;
                         this.$message.error('上传图片大小不能超过 4MB!');
                         return
                     }
@@ -125,15 +127,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -179,6 +186,9 @@
                                 type: 'success',
                                 message: '提交成功'
                             });
+                            let obj = {};
+                            obj.name = this.userName
+                            this.$store.commit('add',obj)
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
                             this.$message.error(msg);

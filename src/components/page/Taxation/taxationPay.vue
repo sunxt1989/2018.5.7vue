@@ -18,7 +18,6 @@
                         <span class="tit">缴纳金额</span>
                         <input class="ipt" type="text" v-model="amount" maxlength="18" disabled>
                     </li>
-
                     <li class="pt">
                         <span class="tit">付款方式</span>
                         <el-select class="sel" v-model="fkType" placeholder="请选择">
@@ -51,7 +50,10 @@
                 fkType:'2',//付款方式
                 options:[
                     {value:'1',label:'现金'},
-                    {value:'2',label:'银行'}
+                    {value:'2',label:'银行'},
+                    {value:'5',label:'企业微信'},
+                    {value:'6',label:'企业支付宝'},
+                    {value:'7',label:'企业借贷宝'},
                 ],
                 loading:false,
                 isLoading:false,

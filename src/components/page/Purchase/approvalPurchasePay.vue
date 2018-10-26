@@ -365,6 +365,7 @@
                     {value:'12',label:'非专利技术'},
                     {value:'13',label:'商标'},
                     {value:'14',label:'著作权'},
+                    {value:'20',label:'委托研发'},
                 ],
                 taxFlg:'1',//发票类别
                 options2:[//发票类别列表
@@ -440,15 +441,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -470,15 +476,20 @@
                     this.$confirm('确定是否驳回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

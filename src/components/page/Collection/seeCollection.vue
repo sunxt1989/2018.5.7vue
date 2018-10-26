@@ -54,7 +54,7 @@
                     </li>
                     <li class="sm" v-show="tradeFlg == 1">
                         <span class="tit"><span class="red">*</span>{{tradeName}}</span>
-                        <el-select class="sel" v-model="supplier" placeholder="请选择" :disabled="!isChange">
+                        <el-select class="sel" v-model="supplier" placeholder="请选择" :disabled="!isChange" filterable allow-create default-first-option>
                             <el-option
                                 v-for="item in supplierList"
                                 :key="item.value"
@@ -151,7 +151,11 @@
                 payTypeName:'',//收付款方式名称
                 modeList:[
                     {value:'1',name:'现金'},
-                    {value:'2',name:'银行'}
+                    {value:'2',name:'银行'},
+                    {value:'3',name:'未收付'},
+                    {value:'5',name:'企业微信'},
+                    {value:'6',name:'企业支付宝'},
+                    {value:'7',name:'企业借贷宝'}
                 ],//收付款方式列表
 
                 bankCode:'',//银行账户
@@ -261,10 +265,10 @@
         methods: {
             //判断支付方式，如果选择银行支付，银行账户才能使用
             payTypeChange(){
-                if(this.mode == 1){
-                    this.ChangeBankCode = true
-                }else if(this.mode == 2){
+                if(this.mode == 2){
                     this.ChangeBankCode = false
+                }else {
+                    this.ChangeBankCode = true
                 }
             },
             //输入税额的change事件，
@@ -397,15 +401,20 @@
                     this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -432,9 +441,10 @@
                 }else if(n == 2){
                     url = addUrl.addUrl('collectionSubmit')
                 }
+
                 let departmentJson = ''
                 for(let i in this.departmentAndProjectList){
-                    if(this.departmentAndProjectList[i].id = this.department){
+                    if(this.departmentAndProjectList[i].id == this.department){
                         departmentJson = JSON.stringify(this.departmentAndProjectList[i])
                     }
                 }

@@ -186,15 +186,20 @@
                     this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -214,15 +219,17 @@
                 }
         },
             submit(n){
-                var params = new URLSearchParams();
-                params.append('bankTransferId', this.debitId);
-                params.append('remark', this.discription2);
-                var url = '';
+                let params = new URLSearchParams();
+                let url = '';
                 if (n == 1) {
                     url = addUrl.addUrl('approvalBankAgree')
+                    this.discription2 = (this.discription2 == '驳回') ? '同意':this.discription2
                 } else if (n == 2) {
                     url = addUrl.addUrl('approvalBankRefuse')
+                    this.discription2 = (this.discription2 == '同意') ? '驳回':this.discription2
                 }
+                params.append('bankTransferId', this.debitId);
+                params.append('remark', this.discription2);
                 axios({
                     method: 'post',
                     url: url,

@@ -234,7 +234,6 @@
                 addedTaxPeroidType:'',//增值税及附加税的申报方式（1：按月度；2：按季度）控制税种（月）中的申报方式
                 incomeTaxPeroidType:'',//企业所得税的申报方式（1：按月度；3：按季度）
 
-
                 loading:false
             }
         },
@@ -334,14 +333,19 @@
                     showCancelButton: true,
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -400,14 +404,19 @@
                     showCancelButton: true,
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {

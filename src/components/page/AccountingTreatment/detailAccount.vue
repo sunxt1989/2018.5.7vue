@@ -152,7 +152,7 @@
                 params.append('type','0');
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let data = response.data.value;//列表数据
 //                        console.log(data);
                         this.tree = data.zNodes

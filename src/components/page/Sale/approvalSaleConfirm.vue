@@ -293,7 +293,11 @@
                 money:'',//本次收款
                 payType:'2',//结算方式
                 payTypeList:[
-                    {value:'1',payTypeItem:'现金收款'},{value:'2',payTypeItem:'银行收款'}
+                    {value:'1',payTypeItem:'现金收款'},
+                    {value:'2',payTypeItem:'银行收款'},
+                    {value:'5',payTypeItem:'企业微信'},
+                    {value:'6',payTypeItem:'企业支付宝'},
+                    {value:'7',payTypeItem:'企业借贷宝'},
                 ],//结算方式列表
                 bankCode:'',//银行账户
                 bankAccountList:[],//银行账户列表
@@ -374,10 +378,10 @@
         methods: {
             //判断支付方式，如果选择银行收款，银行账户才能使用
             payTypeChange(){
-                if(this.payType == 1){
-                    this.isTrue = true
-                }else if(this.payType == 2){
+                if(this.payType == 2){
                     this.isTrue = false
+                }else {
+                    this.isTrue = true
                 }
             },
             //radio change事件，切换显示内容
@@ -421,10 +425,14 @@
                     this.$confirm(msg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();

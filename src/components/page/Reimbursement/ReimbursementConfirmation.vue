@@ -288,7 +288,12 @@
                 originalReceiptIds:'',//费用单id字符串（用逗号拼接）
                 payType:'2',//付款类型
                 payTypeList:[
-                    {value:'1',payTypeItem:'现金支付'},{value:'2',payTypeItem:'银行支付'}
+                    {value:'1',payTypeItem:'现金支付'},
+                    {value:'2',payTypeItem:'银行支付'},
+                    {value:'3',payTypeItem:'未收付'},
+                    {value:'5',payTypeItem:'企业微信'},
+                    {value:'6',payTypeItem:'企业支付宝'},
+                    {value:'7',payTypeItem:'企业借贷宝'},
                 ],//付款类型
                 opinion:'同意',//select框
                 opinionList:[
@@ -351,15 +356,20 @@
                     this.$confirm(msg, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -380,10 +390,10 @@
             },
             //判断支付方式，如果选择银行支付，银行账户才能使用
             payTypeChange(){
-                if(this.payType == 1){
-                    this.isTrue = true
-                }else if(this.payType == 2){
+                if(this.payType == 2){
                     this.isTrue = false
+                }else {
+                    this.isTrue = true
                 }
             },
             //selsect框change事件

@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>查看费用单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="danger" class="sub" :loading="isLoading">保存</el-button>
+                <el-button @click="model(1)" v-if="!isSee" size="small" type="danger" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
@@ -16,7 +16,7 @@
                     <ul class="list cf">
                         <li class="sm">
                             <span class="tit"><span class="red">*</span>费用类别</span>
-                            <el-select class="sel" v-model="type" placeholder="请选择" @change="typeChange">
+                            <el-select class="sel" v-model="type" placeholder="请选择" @change="typeChange" :disabled="isSee">
                                 <el-option
                                     v-for="item in options"
                                     :key="item[1]"
@@ -28,7 +28,7 @@
 
                         <li class="sm" v-show="typeShow">
                             <span class="tit"><span class="red">*</span>费用类别</span>
-                            <el-select class="sel" v-model="childType1" placeholder="请选择" >
+                            <el-select class="sel" v-model="childType1" placeholder="请选择" :disabled="isSee">
                                 <el-option
                                     v-for="item in optionsSmall"
                                     :key="item.value"
@@ -39,11 +39,11 @@
                         </li>
                         <li class="sm">
                             <span class="tit"><span class="red">*</span>费用金额</span>
-                            <input class="ipt" type="text" v-model="money" @blur="blurMoney">
+                            <input class="ipt" type="text" v-model="money" @blur="blurMoney" :readonly="isSee">
                         </li>
                         <li class="sm" v-if="current_company_scale == 2">
                             <span class="tit">增值税专用发票税额</span>
-                            <input class="ipt" type="text" v-model="taxMoney" @blur="blurTaxMoney">
+                            <input class="ipt" type="text" v-model="taxMoney" @blur="blurTaxMoney" :readonly="isSee">
                         </li>
                         <li class="sm">
                             <span class="tit"><span class="red">*</span>费用发生日期</span>
@@ -53,12 +53,13 @@
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 :picker-options="pickerOptions1"
-                                placeholder="选择日期">
+                                placeholder="选择日期"
+                                :disabled="isSee">
                             </el-date-picker>
                         </li>
                         <li class="sm" v-show="destination">
                             <span class="tit"><span class="red">*</span>出差目的</span>
-                            <el-select class="sel" v-model="aimType" placeholder="请选择" >
+                            <el-select class="sel" v-model="aimType" placeholder="请选择" :disabled="isSee">
                                 <el-option
                                     v-for="item in objective"
                                     :key="item.value"
@@ -69,11 +70,11 @@
                         </li>
                         <li class="sm">
                             <span class="tit">发票张数</span>
-                            <input class="ipt" type="text" v-model="receiptCount" @change="receiptCountChange">
+                            <input class="ipt" type="text" v-model="receiptCount" @change="receiptCountChange" :readonly="isSee">
                         </li>
                         <li class="pt cf">
                             <span class="tit2">费用描述</span>
-                            <textarea class="tex" v-model="discription" maxlength="50">
+                            <textarea class="tex" v-model="discription" maxlength="50" :readonly="isSee">
                             </textarea>
                         </li>
                         <li class="ptx cf">
@@ -93,7 +94,8 @@
                                     :on-change='onChange'
                                     :on-remove='onRemove'
                                     :file-list="attachUrlJson"
-                                    :auto-upload="false">
+                                    :auto-upload="false"
+                                    :disabled="isSee">
                                     <i class="el-icon-plus"></i>
                                 </el-upload>
                                 <el-dialog :visible.sync="dialogVisible">
@@ -122,6 +124,7 @@
                 options:[],//费用大类列表
                 optionsSmall:[],//费用小类列表
                 id:this.$route.params.id,
+                isSee:this.$route.params.isSee,
                 type:'',//费用大类
                 childType1:'',//费用小类
                 typeShow:false,//是否显示费用小类
@@ -144,6 +147,7 @@
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
                 punch2:0,//打点器
+                punch3:0,//打点器 临时变量保存punch ，当上传图片时有不符合规定的图片出现时会发生继续上传的bug
                 fileList:[],//上传成功展示图片参数
 
                 allBase:[],//所有base64格式的地址
@@ -209,15 +213,20 @@
             model(n){
                 this.loading = true
                 if(n == 0){
-                    this.$confirm('修改的信息还未提交，是否返回？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
+                    if(this.isSee){
                         this.$router.go(-1)
-                    }).catch(() => {
-                        this.loading = false;
-                    });
+                    }else{
+                        this.$confirm('修改的信息还未提交，是否返回？', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            this.$router.go(-1)
+                        }).catch(() => {
+                            this.loading = false;
+                        });
+                    }
+
                 }else{
                     if(this.money <= 0){
                         this.$message.error('请正确输入金额');
@@ -244,15 +253,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -263,6 +277,7 @@
                         var index = this.punch + this.punch2
 //                        console.log(index);
                         if(index !=0 ){
+                            this.punch3 = this.punch
                             this.submitUpload();
                         }else{
                             this.submit()
@@ -284,27 +299,30 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-                this.loading = true;
                 const isJPEG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
                 if (!isLt4M) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
                 return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
             },
             onExceed(){
                 this.loading = false;
+                this.isLoading = false;
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
             },
             onError(){
                 this.loading = false
+                this.isLoading = false;
                 this.$message.error('图片上传失败，请重试！');
             },
             onChange(){
@@ -343,7 +361,7 @@
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
-                    if(_this.allBase.length == (_this.punch + _this.punch2)){
+                    if(_this.allBase.length == (_this.punch3 + _this.punch2)){
                         _this.submit()
                     }
                 });

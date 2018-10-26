@@ -19,7 +19,7 @@
                     <div>
                         <img class="headPortrait img-circle" :src=faceUri alt="" >
                         <i class="icon iconfont icon-fanhui4"></i>
-                        <span class="dropdown-toggle" v-if="name">{{name}}</span>
+                        <span class="dropdown-toggle" v-if="userName">{{userName}}</span>
                         <span class="dropdown-toggle" v-else>用户名称</span>
                     </div>
                     <el-dropdown-menu slot="dropdown">
@@ -39,13 +39,12 @@
     import addUrl from '../../../static/js/addUrl'
     import { mapState,mapMutations } from 'vuex';
     export default {
-        name:'top-h',
         data(){
             return{
                 bookId:'',//当前账套
                 accounts:[],//账套列表
                 account:'2018年9月',//当前账期
-                name:'',//用户名称
+                userName:'',//用户名称
                 faceUri:'',//用户头像
                 password:'',//修改密码路径
                 loading:false
@@ -54,6 +53,9 @@
         watch:{
             current_book_ym:function(val){
                 this.account = String(val).substring(0,4) + '年'+ String(val).substring(4,6) + '月';//当前账期
+            },
+            name:function(val){
+                this.userName = val
             }
         },
         methods: {
@@ -116,7 +118,6 @@
                         }else{
                             this.accounts = data.accounts
                             this.bookId = data.current_book_id;
-                            this.name = data.name;
                             this.faceUri = data.faceUri ? data.faceUri : 'static/images/gongjuxiang.png';
                             let obj = {}
                             let start_ym = data.current_start_date.substring(0,7)//账套开账时间
@@ -131,6 +132,8 @@
                             let current_book_level = data.current_book_level//用户类型 0 普通用户 1：代记账会计 2：代记账管理人员
                             let user_type = data.user_type//账套等级 0 演示帐套 1 一般帐套 3 代记账帐套
                             let isAccountBookkeeping = (user_type > 0 && current_book_level == 3)? true : false//是否为代记账，true 为是代记账账套 false 为普通账套
+                            let account_type = data.account_type//代记账会计身份，1为普通会计 >1会计
+                            let name = data.name;
 
                             obj.start_ym = start_ym.split('-').join('');
                             obj.current_book_ym = current_book_ym;
@@ -144,9 +147,12 @@
                             obj.user_type = user_type;
                             obj.current_book_level = current_book_level;
                             obj.isAccountBookkeeping = isAccountBookkeeping
+                            obj.account_type = account_type
+                            obj.name = name
                             console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
+                            this.userName = name
                             if(n == 1){
                                 window.location.reload()
                             }else{
@@ -156,16 +162,16 @@
                         }
                     })
                     .catch(error=> {
-                        console.log('@');
-//                        alert('请您重新登录')
-//                        let url = addUrl.addUrl('logout')
-//                        window.location.href = url
+                        console.log('没有登录信息');
+                        alert('请您重新登录')
+                        let url = addUrl.addUrl('logout')
+                        window.location.href = url
                     });
             },
 
         },
         computed:{
-            ...mapState(["current_book_ym"]),
+            ...mapState(["current_book_ym","name"]),
         },
         created(){
             this.password = addUrl.addUrl('password')

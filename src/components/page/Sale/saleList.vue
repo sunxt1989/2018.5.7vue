@@ -84,7 +84,7 @@
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seeSale',params:{debitId:scope.row.idString}}" class="see">
+                                    <router-link :to="{name:'seeSale',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
                                         <i class="icon iconfont icon-bianji blue"></i></router-link>
                                 </span>
                                 <span class="operation">
@@ -159,10 +159,10 @@
                     choice: '0,1,2,3,4,5,6',
                     label: '未完成列表'
                 }],
-                choice:'0,1,2,3,4,5,6',
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,//当前页数
                 tableData: [],//销售单列表数据
                 count:0,//总条目数
-                currentPage:1,//当前页数
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
@@ -224,15 +224,20 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -316,8 +321,10 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('Sale');
+            if(!this.choice)this.choice='0,1,2,3,4,5,6';
+            if(!this.currentPage)this.currentPage = 1;
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('Sale');
             params.append('periodType','');
             params.append('auditFlg',this.choice);
             params.append('startDate',this.startDate);

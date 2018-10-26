@@ -17,6 +17,8 @@ const state ={
     user_type:'',//用户类型 0 普通用户 1：代记账会计 2：代记账管理人员
     current_book_level:'',//账套等级 0 演示帐套 1 一般帐套 3 代记账帐套
     isAccountBookkeeping:'',//是否为代记账，true 为是代记账账套 false 为普通账套
+    account_type:'',//代记账会计身份，1为普通会计 >1会计
+    name:'',//用户名称
 }
 const mutations={
     add(state,obj){
@@ -32,6 +34,8 @@ const mutations={
         state.user_type = obj.user_type ? obj.user_type : state.user_type;
         state.current_book_level = obj.current_book_level ? obj.current_book_level : state.current_book_level;
         state.isAccountBookkeeping = obj.isAccountBookkeeping ? obj.isAccountBookkeeping : state.isAccountBookkeeping;
+        state.account_type = obj.account_type ? obj.account_type : state.account_type;
+        state.name = obj.name ? obj.name : state.name;
     },
 }
 

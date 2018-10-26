@@ -62,6 +62,7 @@
                             <span v-if="scope.row.type == 17">申请著作权</span>
                             <span v-if="scope.row.type == 18">初次购买增值税税控系统专用设备</span>
                             <span v-if="scope.row.type == 19">增值税税控系统专用设备技术维护费</span>
+                            <span v-if="scope.row.type == 20">委托研发</span>
                             <span v-if="scope.row.type == 99">其他</span>
                         </template>
                     </el-table-column>
@@ -246,15 +247,20 @@
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {

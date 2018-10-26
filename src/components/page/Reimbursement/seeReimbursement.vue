@@ -153,7 +153,7 @@
                     </li>
                     <li class="sm" v-show="isShow">
                         <span class="tit" v-show="isShow">银行账号</span>
-                        <input class="ipt" type="text" v-model="bankName" readonly>
+                        <input class="ipt" type="text" v-model="bankCode" readonly>
                     </li>
                     <li class="sm" v-show="isShow">
                         <span class="tit" v-show="isShow">付款日期</span>
@@ -320,6 +320,8 @@
                         return time.getTime() > Date.now();
                     },
                 },
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,
                 loading: true,
                 isLoading: false,
                 screenHeight: '' //页面初始化高度
@@ -369,14 +371,13 @@
                             cancelButtonText: '取消',
                             type: 'warning'
                         }).then(() => {
-                            this.$router.go(-1)
+                            this.$router.push({name:'ReimbursementList',params:{choice:this.choice,currentPage:this.currentPage}})
                         }).catch(() => {
                             this.loading = false
                         });
                     } else {
-                        this.$router.go(-1)
+                        this.$router.push({name:'ReimbursementList',params:{choice:this.choice,currentPage:this.currentPage}})
                     }
-
                 } else if (n == 1) {
                     if (this.isShare) {
                         let input1 = Number(this.input1)
@@ -423,15 +424,20 @@
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -493,15 +499,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -523,15 +534,20 @@
                     this.$confirm('确定是否撤回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -735,15 +751,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {

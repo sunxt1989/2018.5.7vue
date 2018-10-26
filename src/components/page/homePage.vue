@@ -180,7 +180,6 @@
                                         <img src="static/images/homePage/LRBeport.png" alt="">
                                     </div>
                                     <span class="itemName">利润表</span>
-
                                 </div>
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('LRBeport')"></i>
@@ -367,7 +366,7 @@
                                     <div class="itemLink">
                                         <img src="static/images/homePage/develop.png" alt="">
                                     </div>
-                                    <span class="itemName">研发支出辅助账</span>
+                                    <span class="itemName">自主研发辅助账</span>
                                 </div>
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('develop')"></i>
@@ -394,7 +393,18 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('costCollection')"></i>
                         </div>
-                        <div class="item" data-id="34" id="collectionList">
+                        <div class="item" data-id="34" id="Entrust">
+                            <div @mousedown="mousedown" @mouseup="mouseup('Entrust',$event)">
+                                <div class="item-content">
+                                    <div class="itemLink">
+                                        <img src="static/images/homePage/Entrust.png" alt="">
+                                    </div>
+                                    <span class="itemName">委托研发辅助账</span>
+                                </div>
+                            </div>
+                            <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('Entrust')"></i>
+                        </div>
+                        <div class="item" data-id="35" id="collectionList">
                             <div @mousedown="mousedown" @mouseup="mouseup('collectionList',$event)">
                                 <div class="item-content">
                                     <div class="itemLink">
@@ -405,7 +415,7 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('collectionList')"></i>
                         </div>
-                        <div class="item" data-id="35" id="addBoss">
+                        <div class="item" data-id="36" id="addBoss">
                             <div @mousedown="mousedown" @mouseup="mouseup('addBoss',$event)">
                                 <div class="item-content">
                                     <div class="itemLink">
@@ -416,7 +426,7 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('addBoss')"></i>
                         </div>
-                        <div class="item" data-id="36" id="invoiceDeduction">
+                        <div class="item" data-id="37" id="invoiceDeduction">
                             <div @mousedown="mousedown" @mouseup="mouseup('invoiceDeduction',$event)">
                                 <div class="item-content">
                                     <div class="itemLink">
@@ -427,7 +437,7 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('invoiceDeduction')"></i>
                         </div>
-                        <div class="item" data-id="37" id="recordSheet">
+                        <div class="item" data-id="38" id="recordSheet">
                             <div @mousedown="mousedown" @mouseup="mouseup('recordSheet',$event)">
                                 <div class="item-content">
                                     <div class="itemLink">
@@ -438,7 +448,7 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('recordSheet')"></i>
                         </div>
-                        <div class="item" data-id="38" id="bookkeeping">
+                        <div class="item" data-id="39" id="bookkeeping">
                             <div @mousedown="mousedown" @mouseup="mouseup('bookkeeping',$event)">
                                 <div class="item-content">
                                     <div class="itemLink">
@@ -450,6 +460,7 @@
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('bookkeeping')"></i>
                         </div>
                     </div>
+
                     <el-dialog class="dialog cf" title="常用功能选择" :visible.sync="dialogSseTableVisible" showConfirmButton="true"
                                width="1300px" top="50px" center>
                         <!--<span class="remind">菜单项目最多可选择 <b>17</b>项，您已选择：<b>{{Num}}</b></span>-->
@@ -588,9 +599,9 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="items2.isShowDevelop || items2.isShowSummary || items2.isShowCostCollection">
+                        <div class="items cf" v-if="items2.isShowDevelop || items2.isShowSummary || items2.isShowCostCollection || items2.isShowEntrust">
                             <span class="items-tit">研发辅助账</span>
-                            <!--研发支出辅助账-->
+                            <!--自主研发辅助账-->
                             <div class="checkbox" v-if="items2.isShowDevelop">
                                 <el-checkbox v-model="items1.develop" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[14].src alt="" class="itemImg">
@@ -609,6 +620,13 @@
                                 <el-checkbox v-model="items1.costCollection" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[16].src alt="" class="itemImg">
                                     <span class="name">{{items[16].name}}</span>
+                                </el-checkbox>
+                            </div>
+                            <!--委托研发辅助账-->
+                            <div class="checkbox" v-if="items2.isShowEntrust">
+                                <el-checkbox v-model="items1.Entrust" class="homePage-checkbox" @change="checkboxChange">
+                                    <img :src=items[38].src alt="" class="itemImg">
+                                    <span class="name">{{items[38].name}}</span>
                                 </el-checkbox>
                             </div>
                         </div>
@@ -729,7 +747,7 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="items2.isShowStaffList || items2.isShowDepartmentList">
+                        <div class="items cf" v-if="items2.isShowStaffList || items2.isShowDepartmentList || items2.isShowAddBoss">
                             <span class="items-tit">账套管理</span>
                             <!--员工列表-->
                             <div class="checkbox" v-if="items2.isShowStaffList">
@@ -926,7 +944,7 @@
                         src:'static/images/homePage/projectList.png',
                     },
                     {
-                        name:'研发支出辅助账',
+                        name:'自主研发辅助账',
                         id:'#develop',
                         src:'static/images/homePage/develop.png',
                     },
@@ -1045,6 +1063,11 @@
                         id:'#bookkeeping',
                         src:'static/images/homePage/bookkeeping.png',
                     },
+                    {
+                        name:'委托研发辅助账',//38
+                        id:'#Entrust',
+                        src:'static/images/homePage/Entrust.png',
+                    },
                 ],//菜单列表数据
                 items1:{
                     costSheet:false,
@@ -1085,6 +1108,7 @@
                     invoiceDeduction:false,
                     recordSheet:false,
                     bookkeeping:false,
+                    Entrust:false,
                 },//判断这个模块是否在桌面显示
                 items2:{
                     isShowLoan:false,
@@ -1125,6 +1149,7 @@
                     isShowInvoiceDeduction:false,
                     isShowRecordSheet:false,
                     isShowBookkeeping:false,
+                    isShowEntrust:false,
                 },//判断这个模块是否在菜单中显示（身份不同显示的模块不同）
                 isFirst:true,//计数器，判断menuArr这个公共参数是否有值
                 newsList:[],//消息列表
@@ -1155,7 +1180,7 @@
                 }
             }
         },
-        computed:mapState(['menuArr','auth_json','user_type','current_book_level']),
+        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type']),
         methods:{
             //选择菜单配置的时候的change事件
             checkboxChange(e){
@@ -1246,6 +1271,9 @@
                     }else if(id == 'costCollection'){
                         let costCollection = addUrl.addUrl('costCollection');
                         window.open(costCollection);
+                    }else if(id == 'Entrust'){
+                        let Entrust = addUrl.addUrl('Entrust');
+                        window.open(Entrust);
                     }else if(id == 'collectionList'){
                         this.$router.push('/Collection/collectionList')
                     }else if(id == 'addBoss'){
@@ -1401,11 +1429,11 @@
                 let obj = {}//vuex公共参数
                 let arrId =[];//已显示id 数组类型
                 let strId = '';//已显示id 字符串类型
-                console.log(activeItems);
+//                console.log(activeItems);
                 for(let i in activeItems){
                     arrId.push('#'+ $(activeItems[i]._element).attr('id'))
                 }
-                console.log(arrId);
+//                console.log(arrId);
                 this.activeItems = arrId
 
                 obj.menuArr = arrId;
@@ -1511,13 +1539,16 @@
                     if (menuArr[i] == '#projectList' && auth_json.manage_chakan == 1) {//项目
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#develop' && auth_json.accounting_chakan == 1) {//研发支出辅助账
+                    if (menuArr[i] == '#develop' && auth_json.accounting_chakan == 1) {//自主研发辅助账
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#summary' && auth_json.accounting_chakan == 1) {//辅助账汇总表
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#costCollection' && auth_json.accounting_chakan == 1) {//费用情况归集表
+                        newMenuArr.push(menuArr[i])
+                    }
+                    if (menuArr[i] == '#Entrust' && auth_json.accounting_chakan == 1) {//委托研发辅助账
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#Initialization' && auth_json.accounting_chakan == 1) {//账务处理
@@ -1580,10 +1611,9 @@
                     if (menuArr[i] == '#recordSheet' && this.user_type > 0 && this.current_book_level == 3) {//录单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#bookkeeping' && this.user_type > 0 && this.current_book_level == 3) {//记账
+                    if (menuArr[i] == '#bookkeeping' && this.user_type > 0 && this.current_book_level == 3 && this.account_type > 1) {//记账
                         newMenuArr.push(menuArr[i])
                     }
-
                 }
                 //判断功能权限,将无权限的项目隐藏不显示
                 if (auth_json.application_chakan == 1 && this.current_book_level != 3) {//费用单
@@ -1684,6 +1714,7 @@
                     this.items2.isShowDevelop = true;
                     this.items2.isShowCostCollection = true;
                     this.items2.isShowSummary = true;
+                    this.items2.isShowEntrust = true;
                 } else {
                     this.items2.isShowInitialization = false;
                     this.items2.isShowVoucherList = false;
@@ -1697,6 +1728,7 @@
                     this.items2.isShowDevelop = false;
                     this.items2.isShowCostCollection = false;
                     this.items2.isShowSummary = false;
+                    this.items2.isShowEntrust = false;
                 }
                 if (auth_json.manage_chakan == 1 && this.current_book_level != 3) {
                     this.items2.isShowStaffList = true;
@@ -1710,14 +1742,21 @@
                     this.items2.isShowAddBoss = true;
                     this.items2.isShowInvoiceDeduction = true;
                     this.items2.isShowRecordSheet = true;
-                    this.items2.isShowBookkeeping = true;
+
+                    if(this.account_type > 1){//是否显示记账功能
+                        this.items2.isShowBookkeeping = true;
+                    }else{
+                        this.items2.isShowBookkeeping = false;
+                    }
+
                 } else {
                     this.items2.isShowAddBoss = false;
                     this.items2.isShowInvoiceDeduction = false;
                     this.items2.isShowRecordSheet = false;
                     this.items2.isShowBookkeeping = false;
                 }
-                console.log(newMenuArr,'newMenuArr');
+
+//                console.log(newMenuArr,'newMenuArr');
                 let newArr = this.changeElement(newMenuArr);
                 this.grid = new Muuri(element,{
                     dragEnabled: true,//模块是否可以拖动

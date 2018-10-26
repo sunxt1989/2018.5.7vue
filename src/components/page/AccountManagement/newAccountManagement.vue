@@ -186,10 +186,12 @@
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
                 if (!isLt4M) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
                 return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
@@ -294,15 +296,20 @@
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

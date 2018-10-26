@@ -106,7 +106,10 @@
                     <el-table-column prop="payType" label="收付款方式" sortable width="180">
                         <template slot-scope="scope">
                             <span v-if="scope.row.payType == 1">现金支付</span>
-                            <span v-else>银行支付</span>
+                            <span v-else-if="scope.row.payType == 2">银行支付</span>
+                            <span v-else-if="scope.row.payType == 5">企业微信</span>
+                            <span v-else-if="scope.row.payType == 6">企业支付宝</span>
+                            <span v-else-if="scope.row.payType == 7">企业借贷宝</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="money" label="金额" sortable>
@@ -165,9 +168,11 @@
                 tradeList:[],//交易方列表
 
                 options2:[//收款方式列表
-                    {value:'0',label:'银行'},
                     {value:'1',label:'现金'},
-                    {value:'2',label:'银行'}
+                    {value:'2',label:'银行'},
+                    {value:'5',label:'企业微信'},
+                    {value:'6',label:'企业支付宝'},
+                    {value:'7',label:'企业借贷宝'},
                 ],
                 discription:'',//备注
                 recordList:'',//审批记录
@@ -220,10 +225,10 @@
             },
             //判断支付方式，如果选择银行支付，银行账户才能使用
             payTypeChange(){
-                if(this.payType == 1){
-                    this.isTrue = true
-                }else if(this.payType == 2){
+                if(this.payType == 2){
                     this.isTrue = false
+                }else {
+                    this.isTrue = true
                 }
             },
             model(n){
@@ -282,15 +287,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

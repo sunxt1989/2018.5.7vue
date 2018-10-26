@@ -352,7 +352,7 @@
             //出纳change事件（控制报销、借款、银行业务、收付款）
             cashierFlg:function(val){
                 //银行业务、收付款状态判断
-                if(val || this.bossFlg || this.financeFlg){
+                if(val && (this.bossFlg || this.financeFlg)){
                     this.chakanBank = true;
                     this.caozuoBank = true;
                     this.chakanPayment = true;
@@ -367,7 +367,7 @@
             //综合负责人change事件（控制报销、借款、工资、资产）
             hrFlg:function(val){
                 //工资、资产状态判断
-                if(val || this.bossFlg || this.financeFlg){
+                if(val && (this.bossFlg || this.financeFlg)){
                     this.chakanSalary = true;
                     this.caozuoSalary = true;
                     this.chakanAssets = true;
@@ -381,8 +381,9 @@
             },
             //采购专员change事件（控制报销、借款、采购）
             purchaseFlg:function(val){
+                console.log(val);
                 //采购状态判断
-                if(val || this.financeFlg || this.bossFlg){
+                if(val && (this.financeFlg || this.bossFlg)){
                     this.chakanPurchase = true;
                     this.caozuoPurchase = true;
                 }else{
@@ -393,7 +394,7 @@
             //销售专员change事件（控制报销、借款、销售）
             saleFlg:function(val){
                 //销售状态判断
-                if(val || this.financeFlg || this.bossFlg){
+                if(val && (this.financeFlg || this.bossFlg)){
                     this.chakanSale = true;
                     this.caozuoSale = true;
                 }else{
@@ -420,15 +421,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

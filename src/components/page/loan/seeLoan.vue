@@ -156,6 +156,7 @@
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
                 punch2:0,//打点器
+                punch3:0,//打点器 临时变量保存punch ，当上传图片时有不符合规定的图片出现时会发生继续上传的bug
 
                 allBase:[],//所有base64格式的地址
                 allName:[],//所有namen名称
@@ -191,7 +192,6 @@
                                 type:'success',
                                 message:'撤回成功'
                             })
-
                         }else if(response.data.status == 400){
                             this.$message.error(response.data.msg);
                         }
@@ -229,15 +229,20 @@
                     this.$confirm('确定是否撤回？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -276,15 +281,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -295,6 +305,7 @@
                         var index = this.punch + this.punch2;
 //                        console.log(index);
                         if(index !=0 ){
+                            this.punch3 = this.punch
                             this.submitUpload();
                         }else{
                             this.submit()
@@ -316,17 +327,18 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-                this.loading = true;
                 const isJPEG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
                 if (!isLt4M) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
                 return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
@@ -334,9 +346,11 @@
             onExceed(){
                 this.$message.error('超过上传图片最大张数，您一次只能上传4张图片!');
                 this.loading = false;
+                this.isLoading = false;
             },
             onError(){
-                this.loading = false
+                this.loading = false;
+                this.isLoading = false;
                 this.$message.error('图片上传失败，请重试！');
             },
             onChange(file,fileList){
@@ -371,7 +385,7 @@
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
-                    if(_this.allBase.length == (_this.punch + _this.punch2)){
+                    if(_this.allBase.length == (_this.punch3 + _this.punch2)){
                         _this.submit()
                     }
                 });
@@ -385,6 +399,7 @@
                 var finalUrl = [];
                 var finalName = [];
                 var money = unNumber.unNumber(this.money);
+                console.log(money);
                 var url = addUrl.addUrl('seeLoanSubmit')
 
                 var urlList = this.attachUrlJson
@@ -434,7 +449,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-//                        console.log(response);
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -450,7 +465,7 @@
                         this.loading = false;
                         this.isLoading = false;
 //                        console.log(error);
-                        alert('网络错误，不能访问');
+                        alert('网络错误，不能访问111');
                     })
             },
             //上传图片缩略图信息赋值

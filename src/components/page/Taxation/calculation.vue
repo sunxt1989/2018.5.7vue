@@ -79,6 +79,7 @@
     export default{
         data(){
             return{
+                aa:0,
                 B1:0,//
                 B2:0,//
                 B3:0,//
@@ -88,7 +89,6 @@
                 B9:0,//
                 B10:0,//
                 B11:0,//
-
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
@@ -105,29 +105,36 @@
 
         computed:{
             B7:function(){
-                let b1 = unNumber.unNumber(this.B1) * 100
-                let b2 = unNumber.unNumber(this.B2) * 100
-                let b3 = unNumber.unNumber(this.B3) * 100
-                let b4 = unNumber.unNumber(this.B4) * 100
-                let b5 = unNumber.unNumber(this.B5) * 100
-                let b6 = unNumber.unNumber(this.B6) * 100
-                return number.number((b1 + b2 - b3 - b4 - b5 - b6) / 100)
+                let b1 = unNumber.unNumber(this.B1) * 1000
+                let b2 = unNumber.unNumber(this.B2) * 1000
+                let b3 = unNumber.unNumber(this.B3) * 1000
+                let b4 = unNumber.unNumber(this.B4) * 1000
+                let b5 = unNumber.unNumber(this.B5) * 1000
+                let b6 = unNumber.unNumber(this.B6) * 1000
+                return number.number((b1 + b2 - b3 - b4 - b5 - b6) / 1000)
             },
             B8:function(){
-                let b7 = unNumber.unNumber(this.B7) * 100
-                return number.number( b7 * 0.25 / 100)
+                let b7 = unNumber.unNumber(this.B7) * 100;
+//                console.log(Math.round((b7 * 0.25)));
+                return number.number( Math.round((b7 * 0.25)) / 100)//四舍五入保留两位小数
             },
             B12:function(){
                 let b8 = unNumber.unNumber(this.B8) * 100
                 let b9 = unNumber.unNumber(this.B9) * 100
                 let b10 = unNumber.unNumber(this.B10) * 100
                 let b11 = unNumber.unNumber(this.B11) * 100
+
                 return number.number( (b8 - b9 - b10 - b11) / 100)
             }
         },
         methods: {
+            changeNum(){
+                let aa = number.number(this.aa)
+                console.log(aa);
+            },
             changeInput(val,id){
                 let value = unNumber.unNumber(val)
+                console.log(value);
                 if(value == 0){
                     this.$message.error('请正确输入金额');
                 }
@@ -182,15 +189,20 @@
                     this.$confirm('确定是否计提？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

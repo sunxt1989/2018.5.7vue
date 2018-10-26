@@ -239,15 +239,20 @@
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -276,11 +281,11 @@
                 var identity = this.identity
                 if(this.tradeType){
                     tradeName = this.tradeName
-                    tradeIdNumber = this.tradeIdNumber
+                    tradeIdNumber = this.tradeIdNumber || '';
                     tradeType = 1;
                 }else{
                     tradeName = this.userName
-                    tradeIdNumber = this.IDnumber
+                    tradeIdNumber = this.IDnumber || '';
                     tradeType = 2;
                 }
 
@@ -361,7 +366,7 @@
                     console.log(response);
                     this.loading = false;
                     var data = response.data.value
-                    var bankInfo = data.tradeCompany.bankInfo;//银行账户信息
+                    var bankInfo = data.tradeCompany.bankInfoJson;//银行账户信息
                     var tradeName = data.tradeCompany.tradeName;//交易方名称
                     var tradeType = data.tradeCompany.tradeType;//往来单位类别，1：公司，2：个人
                     var tradeIdNumber = data.tradeCompany.tradeIdNumber;//社会信用代码
@@ -399,7 +404,6 @@
                         this.option2 = data.saleList
                     }
 
-
                     //tradeType 为2时是个人
                     if(tradeType != 2){
                         this.tradeType = true
@@ -410,13 +414,8 @@
                         this.userName = tradeName
                         this.IDnumber = tradeIdNumber
                     }
-                    //银行账户信息json格式；如果有多个的话，取第一条数据：[{"bankCode":"1511156156122222222"}]
-//                    console.log(bankInfo);
-                    if(bankInfo){
-                        var ob=JSON.parse(bankInfo);
-                        this.bankCode = ob[0].bankCode
-//                        console.log(this.bankCode);
-                    }
+                    //银行账户信息arr格式；如果有多个的话，取第一条数据：[{"bankCode":"1511156156122222222"}]
+                    this.bankCode = bankInfo[0].bankCode ? bankInfo[0].bankCode : '';
                     //判断身份选择
                     if(customFlg == 1){
                         this.identity.push('0')

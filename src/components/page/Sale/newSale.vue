@@ -402,6 +402,7 @@
                 dialogVisible: false,//dialog是否打开状态
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
+                punch2:0,//打点器 临时变量保存punch ，当上传图片时有不符合规定的图片出现时会发生继续上传的bug
                 fileList:[],//上传成功展示图片参数
 
                 allBase:[],//所有base64格式的地址
@@ -887,15 +888,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -924,15 +930,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -1069,15 +1080,20 @@
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {
@@ -1086,6 +1102,7 @@
                         }
                     }).then(() => {
                         if(this.punch != 0){
+                            this.punch2 = this.punch
                             this.submitUpload(n);
                         }else{
                             this.submit(n)
@@ -1107,17 +1124,18 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-                this.loading = true;
                 const isJPEG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
                 if (!isLt4M) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
                 return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
@@ -1127,6 +1145,7 @@
             },
             onError(){
                 this.loading = false
+                this.isLoading = false;
                 this.$message.error('图片上传失败，请重试！');
             },
             onChange(){
@@ -1151,7 +1170,7 @@
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
-                    if(_this.allBase.length == _this.punch){
+                    if(_this.allBase.length == _this.punch2){
                         _this.submit(_this.n)
                     }
                 });

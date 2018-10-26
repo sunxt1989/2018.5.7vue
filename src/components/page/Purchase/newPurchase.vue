@@ -424,6 +424,7 @@
                     {value:'12',label:'非专利技术'},
                     {value:'13',label:'商标'},
                     {value:'14',label:'著作权'},
+                    {value:'20',label:'委托研发'},
                 ],
                 taxFlg:'1',//发票类别
                 options2:[//发票类别列表
@@ -483,6 +484,7 @@
                 dialogVisible: false,//dialog是否打开状态
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
+                punch2:0,//打点器 临时变量保存punch ，当上传图片时有不符合规定的图片出现时会发生继续上传的bug
                 fileList:[],//上传成功展示图片参数
 
                 allBase:[],//所有base64格式的地址
@@ -535,8 +537,21 @@
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
             },
-            type:function(val){
-                if(val == '1'){
+            type:function(newVal,oldVal){
+                console.log(newVal,'newVal');
+                console.log(oldVal,'oldVal');
+                if(oldVal != '1' && newVal != '1' && this.newList2.length != 0){
+                    this.$confirm('修改采购类别后，采购明细中项目所有采购类别将一同变化，是否清空采购明细列表?(设备明细列表不清空)', '提示', {
+                        confirmButtonText: '是',
+                        cancelButtonText: '否',
+                        type: 'warning'
+                    }).then(() => {
+                        this.newList2 = [];
+                    }).catch(() => {
+                    });
+                }
+
+                if(newVal == '1'){
                     this.totalMoney = this.totalMoney1
                     this.unTotalMoney = this.unTotalMoney1
                 }else{
@@ -587,19 +602,7 @@
             typeChange(){
                 var type = this.type;
                 //type=1时 选择了设备，isShowLow = true；
-                console.log(type);
-                if(this.newList1.length != 0 || this.newList2.length != 0){
-                    this.$confirm('修改采购类别后，采购明细中项目所有采购类别将一同变化，是否清空采购明细列表?','提示',{
-                        confirmButtonText: '是',
-                        cancelButtonText: '否',
-                        type: 'warning'
-                    }).then(() => {
-                        this.newList1 = [];
-                        this.newList2 = [];
-                    }).catch(() => {
 
-                    });
-                }
                 if(type == '1'){
                     this.isShowLow = true
                     this.isShowCount = false
@@ -965,15 +968,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -1001,15 +1009,20 @@
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
                             instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
                             instance.confirmButtonText = '执行中...';
                             setTimeout(() => {
                                 done();
                                 setTimeout(() => {
                                     instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
                                 }, 300);
                             }, 300);
                         } else {
@@ -1164,15 +1177,20 @@
                         this.$confirm('确定是否提交？', '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
+                            showClose: false,
+                            closeOnClickModal: false,
+                            closeOnPressEscape: false,
                             type: 'warning',
                             beforeClose: (action, instance, done) => {
                                 if (action === 'confirm') {
                                     instance.confirmButtonLoading = true;
+                                    instance.cancelButtonLoading = true;
                                     instance.confirmButtonText = '执行中...';
                                     setTimeout(() => {
                                         done();
                                         setTimeout(() => {
                                             instance.confirmButtonLoading = false;
+                                            instance.cancelButtonLoading = false;
                                         }, 300);
                                     }, 300);
                                 } else {
@@ -1182,6 +1200,7 @@
                         }).then(() => {
 //                            console.log(this.punch);
                             if(this.punch != 0){
+                                this.punch2 = this.punch
                                 this.submitUpload(n);
                             }else{
                                 this.submit(n)
@@ -1208,15 +1227,20 @@
                                 this.$confirm('固定资产单价超过2000元，如需进行分配，请在固定资产管理模块下进行,确定是否提交？', '提示', {
                                     confirmButtonText: '确定',
                                     cancelButtonText: '取消',
+                                    showClose: false,
+                                    closeOnClickModal: false,
+                                    closeOnPressEscape: false,
                                     type: 'warning',
                                     beforeClose: (action, instance, done) => {
                                         if (action === 'confirm') {
                                             instance.confirmButtonLoading = true;
+                                            instance.cancelButtonLoading = true;
                                             instance.confirmButtonText = '执行中...';
                                             setTimeout(() => {
                                                 done();
                                                 setTimeout(() => {
                                                     instance.confirmButtonLoading = false;
+                                                    instance.cancelButtonLoading = false;
                                                 }, 300);
                                             }, 300);
                                         } else {
@@ -1242,15 +1266,20 @@
                                 this.$confirm('确定是否提交？', '提示', {
                                     confirmButtonText: '确定',
                                     cancelButtonText: '取消',
+                                    showClose: false,
+                                    closeOnClickModal: false,
+                                    closeOnPressEscape: false,
                                     type: 'warning',
                                     beforeClose: (action, instance, done) => {
                                         if (action === 'confirm') {
                                             instance.confirmButtonLoading = true;
+                                            instance.cancelButtonLoading = true;
                                             instance.confirmButtonText = '执行中...';
                                             setTimeout(() => {
                                                 done();
                                                 setTimeout(() => {
                                                     instance.confirmButtonLoading = false;
+                                                    instance.cancelButtonLoading = false;
                                                 }, 300);
                                             }, 300);
                                         } else {
@@ -1277,15 +1306,20 @@
                             this.$confirm('确定是否提交？', '提示', {
                                 confirmButtonText: '确定',
                                 cancelButtonText: '取消',
+                                showClose: false,
+                                closeOnClickModal: false,
+                                closeOnPressEscape: false,
                                 type: 'warning',
                                 beforeClose: (action, instance, done) => {
                                     if (action === 'confirm') {
                                         instance.confirmButtonLoading = true;
+                                        instance.cancelButtonLoading = true;
                                         instance.confirmButtonText = '执行中...';
                                         setTimeout(() => {
                                             done();
                                             setTimeout(() => {
                                                 instance.confirmButtonLoading = false;
+                                                instance.cancelButtonLoading = false;
                                             }, 300);
                                         }, 300);
                                     } else {
@@ -1318,17 +1352,18 @@
             },
             //限制用户上传图片格式和大小
             beforeAvatarUpload(file){
-                this.loading = true;
                 const isJPEG = file.type === 'image/jpeg';
                 const isPNG = file.type === 'image/png';
                 const isJPG = file.type === 'image/jpg';
                 const isLt4M = file.size / 1024 / 1024 < 4;
                 if (!isJPG && !isPNG && !isJPEG) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片只能是 JPG/PNG/JPEG 格式!');
                 }
                 if (!isLt4M) {
                     this.loading = false;
+                    this.isLoading = false;
                     this.$message.error('上传图片大小不能超过 4MB!');
                 }
                 return (isJPG || isPNG || isJPEG) && isLt4M;//如果不符合要求的话是不走myUpload函数的
@@ -1338,6 +1373,7 @@
             },
             onError(){
                 this.loading = false
+                this.isLoading = false;
                 this.$message.error('图片上传失败，请重试！');
             },
             onChange(){
@@ -1362,7 +1398,7 @@
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
-                    if(_this.allBase.length == _this.punch){
+                    if(_this.allBase.length == _this.punch2){
                         _this.submit(_this.n)
                     }
                 });

@@ -16,6 +16,7 @@ import repaymentConfirmationList from '@/components/page/loan/repaymentConfirmat
 import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'//还款单确认
 //报销
 import costSheet from '@/components/page/Reimbursement/costSheet'//费用单列表
+import costSheetHistory from '@/components/page/Reimbursement/costSheetHistory'//费用单列表
 import newCost from '@/components/page/Reimbursement/newCost'//新建费用单
 import seeCost from '@/components/page/Reimbursement/seeCost'//查看费用单
 import ReimbursementList from '@/components/page/Reimbursement/ReimbursementList'//报销单列表
@@ -135,6 +136,9 @@ import approvalPayments from '@/components/page/auxiliary/approvalPayments' // �
 import collectionList from '@/components/page/Collection/collectionList' //收容项列表
 import newCollection from '@/components/page/Collection/newCollection' //新建收容项
 import seeCollection from '@/components/page/Collection/seeCollection' //查看收容项
+
+//记账凭证
+import Bookkeeping from '@/components/page/Bookkeeping/Bookkeeping' //记账凭证
 Vue.use(Router)
 
 
@@ -205,6 +209,12 @@ export default new Router({
             name:'costSheet',
             component:costSheet
         },
+        {
+            path:'/Reimbursement/costSheetHistory',
+            name:'costSheetHistory',
+            component:costSheetHistory
+        },
+
         {
             path:'/Reimbursement/newCost',
             name:'newCost',
@@ -697,5 +707,11 @@ export default new Router({
             name:'seeCollection',
             component:seeCollection
         },
+        {
+            path:'/Bookkeeping/Bookkeeping',
+            name:'Bookkeeping',
+            component:Bookkeeping
+        },
+
     ]
 })

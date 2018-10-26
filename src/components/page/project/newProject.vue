@@ -89,7 +89,8 @@
                 endDate:'',//结束日期
                 projectType:'',//类型
                 options:[
-                    {value:'1',label:'自主研发'}
+                    {value:'1',label:'自主研发'},
+                    {value:'3',label:'委托研发'}
                 ],
                 projectStatus:'',//状态
                 options2:[
@@ -165,15 +166,20 @@
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
                         type: 'warning',
                         beforeClose: (action, instance, done) => {
                             if (action === 'confirm') {
                                 instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
                                 instance.confirmButtonText = '执行中...';
                                 setTimeout(() => {
                                     done();
                                     setTimeout(() => {
                                         instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
                                     }, 300);
                                 }, 300);
                             } else {

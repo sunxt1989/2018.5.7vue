@@ -2,9 +2,9 @@
  * Created by who on 2018/7/4.
  */
 function addUrl(name){
-    var url = 'http://192.168.2.105:8881/web';
+    //var url = 'http://192.168.2.105:8881/web';
     //var url = 'http://192.168.2.190:8080/web';
-    //var url = 'http://192.168.2.191:8080/web';
+    var url = 'http://192.168.2.191:8080/web';
     //var url = 'http://www.cloudaccounting.cn'
 
     //借款单列表
@@ -916,7 +916,7 @@ function addUrl(name){
     if(name == 'toolList'){
         return url + '/vue/news/list.html'
     }
-    //研发支出辅助账
+    //自主研发辅助账
     if(name == 'develop'){
         return url + '/support/account/show/one.html'
     }
@@ -927,6 +927,10 @@ function addUrl(name){
     //费用情况归集表
     if(name == 'costCollection'){
         return url + '/support/account/show/three.html'
+    }
+    //委托研发辅助账
+    if(name == 'Entrust'){
+        return url + '/support/account/show/four.html'
     }
     //收容业务列表
     if(name == 'collectionList'){
