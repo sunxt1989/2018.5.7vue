@@ -78,7 +78,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//列表数据
 //                    console.log(data);
                     var tableDataarr =[];

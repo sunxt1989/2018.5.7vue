@@ -308,12 +308,12 @@
                 var tol = this.tableData;
                 if(tol){
                     for(var i = 0; i < tol.length; i++){
-                        totalMoney += unNumber.unNumber(tol[i].totalMoney) * 100;//含税总价
-                        sendMoney += unNumber.unNumber(tol[i].sendMoney) * 100;//已付款
+                        totalMoney += parseFloat(unNumber.unNumber(tol[i].totalMoney));//含税总价
+                        sendMoney += parseFloat(unNumber.unNumber(tol[i].sendMoney));//已付款
                     }
                 }
-                totalMoney = number.number(totalMoney / 100)
-                sendMoney = number.number(sendMoney / 100)
+                totalMoney = number.number(totalMoney.toFixed(2));
+                sendMoney = number.number(sendMoney.toFixed(2));
                 const sums = ['合计','','含税总价：',(totalMoney + '元'),'','已付款：',(sendMoney + '元'),]
                 return sums
             },

@@ -68,7 +68,7 @@
         methods: {
             changeUrl(e){
                 let file = e.srcElement.files[0];
-                console.log(file);
+//                console.log(file);
                 let imageUrl = ''
                 if(file){
                     let isJPG = file.type === 'image/jpeg'||'image/png'||'image/jpg';
@@ -179,7 +179,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.push('/');
                             this.$message({
@@ -227,7 +227,7 @@
             var url = addUrl.addUrl('personal')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value.item
                     this.userName = data.userName
                     this.gender = String(data.gender)

@@ -79,7 +79,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         let list = data.list
                         for(let i in list){

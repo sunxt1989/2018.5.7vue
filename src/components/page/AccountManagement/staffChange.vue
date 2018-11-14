@@ -381,7 +381,7 @@
             },
             //采购专员change事件（控制报销、借款、采购）
             purchaseFlg:function(val){
-                console.log(val);
+//                console.log(val);
                 //采购状态判断
                 if(val && (this.financeFlg || this.bossFlg)){
                     this.chakanPurchase = true;
@@ -552,7 +552,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -594,10 +594,10 @@
             var params = new URLSearchParams();
             params.append('userId',this.debitId);
             var url = addUrl.addUrl('seeStaff');
-            console.log(this.debitId);
+//            console.log(this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false
                     let data = response.data.value;
                     //bookUser 部分

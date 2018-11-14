@@ -159,7 +159,7 @@
             params.append('tradeId',this.relationIdString);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false
                     let data = response.data.value;
                     for(let i in data.list){

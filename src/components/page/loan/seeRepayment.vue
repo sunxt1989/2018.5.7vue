@@ -113,7 +113,7 @@
                 .then(response=> {
                     this.loading = false
                     if(response.data.status == 200){
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;
                         let debit = data.debit
                         let credit = data.credit;

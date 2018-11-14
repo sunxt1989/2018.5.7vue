@@ -295,11 +295,11 @@
                 var hk = 0;
                 var tol = this.tableData;
                 for(var i = 0; i < tol.length; i++){
-                    jk += (tol[i].money * 100);
-                    hk += (tol[i].creditMoney * 100)
+                    jk += parseFloat(tol[i].money);
+                    hk += parseFloat(tol[i].creditMoney)
                 }
-                jk = number.number(jk/100);
-                hk = number.number(hk/100);
+                jk = number.number(jk.toFixed(2));
+                hk = number.number(hk.toFixed(2));
                 const sums = ['合计','','借款：',(jk + '元'),'','还款：',(hk + '元')];
                 return sums
             },

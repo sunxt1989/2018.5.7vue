@@ -38,7 +38,7 @@
                             </el-select>
                         </li>
                         <li class="sm">
-                            <span class="tit"><span class="red">*</span>费用金额</span>
+                            <span class="tit"><span class="red">*</span>含税总价金额</span>
                             <input class="ipt" type="text" v-model="money" @blur="blurMoney" :readonly="isSee">
                         </li>
                         <li class="sm" v-if="current_company_scale == 2">

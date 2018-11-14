@@ -459,10 +459,10 @@
                     let input3 = Number(this.input3)
                     let input4 = Number(this.input4)
                     let input5 = Number(this.input5)
-                    let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+                    let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
 //                    console.log(allInput);
                     //判断所有填写的百分比是不是等于100
-                    if(allInput/100 != 100 ){
+                    if(allInput != 100 ){
                         this.$message.error('请正确输入分摊比例');
                         this.loading = false;
                         return
@@ -720,7 +720,7 @@
             var url = addUrl.addUrl('fixedAssets')
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     let fixedAssets = data.fixedAssets

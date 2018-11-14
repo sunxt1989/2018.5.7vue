@@ -254,7 +254,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({

@@ -152,7 +152,7 @@
                 params.append('type','0');
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;//列表数据
 //                        console.log(data);
                         this.tree = data.zNodes
@@ -180,7 +180,7 @@
                 params.append('subjectCode',this.startSubject);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status;
                         let msg = response.data.msg;
                         if(status == 200){
@@ -223,7 +223,7 @@
             };
         },
         created(){
-            console.log(this.start_ym);
+//            console.log(this.start_ym);
             this.startTime = this.start_ym.substring(0,4) + '-' +this.start_ym.substring(4,6)
             this.endTime = this.current_book_ym.substring(0,4) + '-' +this.current_book_ym.substring(4,6);
             this.axios()

@@ -124,7 +124,7 @@
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;//借款单审批列表数据
                     let tableDataarr =[];

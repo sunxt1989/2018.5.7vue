@@ -275,13 +275,8 @@
                     }else{
                         this.endowmentInsurancePerson = number.number(endowmentInsurancePerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 2){
                     if(!str.test(medicalInsurancePerson)){
                         this.$message.error('请正确输入医疗保险');
@@ -290,13 +285,8 @@
                     }else{
                         this.medicalInsurancePerson = number.number(medicalInsurancePerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 3){
                     if(!str.test(unemploymentInsurancePerson)){
                         this.$message.error('请正确输入失业保险');
@@ -305,13 +295,8 @@
                     }else{
                         this.unemploymentInsurancePerson = number.number(unemploymentInsurancePerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 4){
                     if(!str.test(employmentInjuryInsurancePerson)){
                         this.$message.error('请正确输入工伤保险');
@@ -320,13 +305,8 @@
                     }else{
                         this.employmentInjuryInsurancePerson = number.number(employmentInjuryInsurancePerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 5){
                     if(!str.test(maternityInsurancePerson)){
                         this.$message.error('请正确输入生育保险');
@@ -335,13 +315,8 @@
                     }else{
                         this.maternityInsurancePerson = number.number(maternityInsurancePerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 6){
                     if(!str.test(housingProvidentFundPerson)){
                         this.$message.error('请正确输入住房公积金');
@@ -350,13 +325,8 @@
                     }else{
                         this.housingProvidentFundPerson = number.number(housingProvidentFundPerson)
                     }
-                    insuranceSumPerson = ((endowmentInsurancePerson *100) +
-                    (medicalInsurancePerson *100)+
-                    (unemploymentInsurancePerson *100)+
-                    (employmentInjuryInsurancePerson *100)+
-                    (maternityInsurancePerson *100)+
-                    (housingProvidentFundPerson*100))
-                    this.insuranceSumPerson = number.number(insuranceSumPerson/100)
+                    insuranceSumPerson = parseFloat(endowmentInsurancePerson + medicalInsurancePerson + unemploymentInsurancePerson + employmentInjuryInsurancePerson + maternityInsurancePerson + housingProvidentFundPerson).toFixed(2)
+                    this.insuranceSumPerson = number.number(insuranceSumPerson)
                 }else if(n == 8){
                     if(!str.test(endowmentInsuranceCompany)){
                         this.$message.error('请正确输入养老保险');
@@ -365,13 +335,8 @@
                     }else{
                         this.endowmentInsuranceCompany = number.number(endowmentInsuranceCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany = parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }else if(n == 9){
                     if(!str.test(medicalInsuranceCompany)){
                         this.$message.error('请正确输入医疗保险');
@@ -380,13 +345,8 @@
                     }else{
                         this.medicalInsuranceCompany = number.number(medicalInsuranceCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany =parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }else if(n == 10){
                     if(!str.test(unemploymentInsuranceCompany)){
                         this.$message.error('请正确输入失业保险');
@@ -395,13 +355,8 @@
                     }else{
                         this.unemploymentInsuranceCompany = number.number(unemploymentInsuranceCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany =parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }else if(n == 11){
                     if(!str.test(employmentInjuryInsuranceCompany)){
                         this.$message.error('请正确输入工伤保险');
@@ -410,13 +365,8 @@
                     }else{
                         this.employmentInjuryInsuranceCompany = number.number(employmentInjuryInsuranceCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany =parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }else if(n == 12){
                     if(!str.test(maternityInsuranceCompany)){
                         this.$message.error('请正确输入生育保险');
@@ -425,13 +375,8 @@
                     }else{
                         this.maternityInsuranceCompany = number.number(maternityInsuranceCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany =parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }else if(n == 13){
                     if(!str.test(housingProvidentFundCompany)){
                         this.$message.error('请正确输入住房公积金');
@@ -440,13 +385,8 @@
                     }else{
                         this.housingProvidentFundCompany = number.number(housingProvidentFundCompany)
                     }
-                    insuranceSumCompany = ((endowmentInsuranceCompany *100) +
-                    (medicalInsuranceCompany *100)+
-                    (unemploymentInsuranceCompany *100)+
-                    (employmentInjuryInsuranceCompany *100)+
-                    (maternityInsuranceCompany *100)+
-                    (housingProvidentFundCompany*100))
-                    this.insuranceSumCompany = number.number(insuranceSumCompany/100)
+                    insuranceSumCompany =parseFloat(endowmentInsuranceCompany + medicalInsuranceCompany + unemploymentInsuranceCompany + employmentInjuryInsuranceCompany + maternityInsuranceCompany + housingProvidentFundCompany).toFixed(2)
+                    this.insuranceSumCompany = number.number(insuranceSumCompany)
                 }
             },
             //社保基数生成事件
@@ -457,7 +397,7 @@
                 params.append('currentYM', this.currentYM);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         this.endowmentInsurancePerson = number.number(data.endowmentInsurancePerson)
                         this.medicalInsurancePerson = number.number(data.medicalInsurancePerson)
@@ -562,10 +502,10 @@
                         let input3 = Number(this.input3)
                         let input4 = Number(this.input4)
                         let input5 = Number(this.input5)
-                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
 //                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
-                        if(allInput/100 != 100 ){
+                        if(allInput != 100 ){
                             this.$message.error('请正确输入分摊比例');
                             this.loading = false;
                             return

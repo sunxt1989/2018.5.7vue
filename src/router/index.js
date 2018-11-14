@@ -139,6 +139,9 @@ import seeCollection from '@/components/page/Collection/seeCollection' //查看�
 
 //记账凭证
 import Bookkeeping from '@/components/page/Bookkeeping/Bookkeeping' //记账凭证
+
+//杜邦分析
+import DuPont from '@/components/page/DuPont/DuPont' //记账凭证
 Vue.use(Router)
 
 
@@ -711,6 +714,11 @@ export default new Router({
             path:'/Bookkeeping/Bookkeeping',
             name:'Bookkeeping',
             component:Bookkeeping
+        },
+        {
+            path:'/DuPont/DuPont',
+            name:'DuPont',
+            component:DuPont
         },
 
     ]

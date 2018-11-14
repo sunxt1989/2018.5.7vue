@@ -68,7 +68,7 @@
                     params.append('inviteCode',this.inviteCode);
                     axios.post(url,params)
                         .then(response=> {
-                            console.log(response);
+//                            console.log(response);
                             let status = response.data.status
                             let msg = response.data.msg
                            if(status == 200){
@@ -108,7 +108,7 @@
             var url = addUrl.addUrl('AccountManagement')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     this.userAuthName = data.userAuthName
                     let authStatus = data.authStatus

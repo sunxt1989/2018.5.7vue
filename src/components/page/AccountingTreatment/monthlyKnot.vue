@@ -192,7 +192,7 @@
                 let url = addUrl.addUrl('monthlyKnot');
                 axios.post(url)
                     .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                         let data = response.data
                         let status = data.status
                         let msg = data.msg

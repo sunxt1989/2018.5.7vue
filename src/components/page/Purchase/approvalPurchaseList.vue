@@ -112,7 +112,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value.list;//采购单审批列表数据
 
                     var tableDataarr =[];

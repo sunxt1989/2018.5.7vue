@@ -353,7 +353,7 @@
             params.append('advanceId',this.advanceId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.unPayMoney = number.number(data.unPayMoney)
                     var list = data.list

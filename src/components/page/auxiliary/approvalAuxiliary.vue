@@ -251,7 +251,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -295,7 +295,7 @@
             params.append('businessId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     let recordList = data.recordList
                     this.recordList = recordList

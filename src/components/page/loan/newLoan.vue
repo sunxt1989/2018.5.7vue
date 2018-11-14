@@ -271,7 +271,7 @@
                 let params = new URLSearchParams();
                 let money = unNumber.unNumber(this.money);
                 let url = addUrl.addUrl('newLoanSubmit');
-                console.log(money);
+//                console.log(money);
                 this.imgUrl1 = this.allBase[0] ? this.allBase[0] : '';
                 this.imgUrl2 = this.allBase[1] ? this.allBase[1] : '';
                 this.imgUrl3 = this.allBase[2] ? this.allBase[2] : '';
@@ -309,7 +309,7 @@
                 },params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -361,7 +361,7 @@
             var url = addUrl.addUrl('newLoan')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false
                     let data = response.data.value;
                     this.options = data;

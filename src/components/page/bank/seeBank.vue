@@ -28,7 +28,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">账户余额</span>
-                        <input class="ipt" type="text" v-model="endAmount" @change="changMoney" :readonly="isEnable">
+                        <input class="ipt" type="text" v-model="endAmount" @change="changMoney" readonly>
                     </li>
                     <li class="sm">
                         <span class="tit">缴税账户</span>
@@ -258,7 +258,7 @@
             params.append('bankId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let bankAccount = response.data.value.bankAccount
                     this.bankName = bankAccount.bankName
                     this.bankChildName = bankAccount.bankChildName

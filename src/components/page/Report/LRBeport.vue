@@ -62,10 +62,9 @@
                     <el-table class="single" :data="tableData3">
                         <el-table-column align="center" prop="xiangmu_1" label="项目"></el-table-column>
                         <el-table-column align="center" prop="hangci_2" label="行次"></el-table-column>
-                        <el-table-column align="center" prop="bennianleijijine_3" label="本期金额"></el-table-column>
-                        <el-table-column align="center" prop="benyuejine_4" label="上期金额"></el-table-column>
+                        <el-table-column align="center" prop="bennianleijijine_3" :label=thisPeriod></el-table-column>
+                        <el-table-column align="center" prop="benyuejine_4" :label=lastPeriod></el-table-column>
                     </el-table>
-
                 </div>
             </div>
         </div>
@@ -88,6 +87,8 @@
                 url2:'',//导出PDF
                 ymName: '',
                 year:'',
+                thisPeriod:'',//本期名称
+                lastPeriod:'',//上期名称
                 tableData3:[],
                 loading:true
             }
@@ -142,8 +143,10 @@
                     })
             }
         },
-        computed:mapState(['start_ym']),
+        computed:mapState(['start_ym','current_account_standard']),
         created(){
+            this.thisPeriod = (this.current_account_standard == 1) ? '本年累计金额' : '本期金额'
+            this.lastPeriod = (this.current_account_standard == 1) ? '本月金额' : '上期金额'
             let url = addUrl.addUrl('LRBeport');
             axios.post(url)
                 .then(response=> {

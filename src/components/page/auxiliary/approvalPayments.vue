@@ -275,7 +275,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -314,13 +314,13 @@
             };
         },
         created(){
-            console.log(this.debitId);
+//            console.log(this.debitId);
             let params = new URLSearchParams();
             let url = addUrl.addUrl('approvalPayments')
             params.append('paymentId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let item = data.item;
                     let recordList = data.recordList

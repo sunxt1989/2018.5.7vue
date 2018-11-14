@@ -147,7 +147,7 @@
                 .then(response=> {
                     this.loading = false
                     if(response.data.status == 200){
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;
                         let send = data.send
                         this.unPayMoney = number.number(data.purchase.unsendMoney)

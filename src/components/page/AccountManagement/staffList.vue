@@ -56,7 +56,7 @@
         },
         methods:{
             deleteModel(id){
-                console.log(id);
+//                console.log(id);
                 this.$confirm('此操作将永久删除该信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -89,7 +89,7 @@
                     axios.post(url,params)
                         .then(response=> {
                             this.loading = false;
-                                console.log(response);
+//                                console.log(response);
                             let status = response.data.status
                             let msg = response.data.msg
                             if(status == 200){
@@ -120,7 +120,7 @@
                 axios.post(url)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;//列表数据
                         this.tableData = data.bookUserList
                     })

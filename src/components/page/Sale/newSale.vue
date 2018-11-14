@@ -430,12 +430,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney / 100);
-                this.unTotalMoney1 = number.number(unTotalMoney / 100);
+                this.totalMoney1 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -445,12 +445,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney / 100);
-                this.unTotalMoney2 = number.number(unTotalMoney / 100);
+                this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
@@ -557,6 +557,10 @@
                 if(this.isShowLow) {
                     if (this.inventoryId == ''){
                         this.$message.error('请正确输入库存商品');
+                        this.loading = false;
+                        return
+                    }else if (this.newNum == 0) {
+                        this.$message.error('请正确输入数量');
                         this.loading = false;
                         return
                     }else if (this.newUnitPrice == '0.00') {
@@ -691,7 +695,7 @@
             //查看明细列表1事件
             seeList1(id){
                 var newList1 = this.newList1
-                console.log(newList1);
+//                console.log(newList1);
                 for(var i =0; i < newList1.length; i++){
                     if(id == newList1[i].id){
                         this.inventoryId = newList1[i].inventoryId
@@ -713,7 +717,7 @@
             //查看明细列表2事件
             seeList2(id){
                 var newList2 = this.newList2;
-                console.log(newList2);
+//                console.log(newList2);
                 for(var i =0; i < newList2.length; i++){
                     if(id == newList2[i].id){
                         this.newDetailed = newList2[i].commodityName;
@@ -983,20 +987,19 @@
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
-                var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
+                var newUnitPrice = unNumber.unNumber(this.newUnitPrice);
                 if(n == 1){
                     if(!this.isShowCount){
                         if(!str.test(newNum)){
                             this.$message.error('请正确输入数量');
                             this.newNum = 1;
-                            return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number((newNum * newUnitPrice).toFixed(2));
                         this.taxMoneyChange()
                     }else{
-                        this.newUnitPrice  = number.number(newUnitPrice /100);
-                        this.newMoney = number.number(newUnitPrice /100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }else if(n == 2){
@@ -1006,8 +1009,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(this.newNum * newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }else{
                         if(!str2.test(this.newUnitPrice)){
@@ -1015,8 +1018,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }
@@ -1025,7 +1028,7 @@
             taxMoneyChange(){
                 var newMoney = unNumber.unNumber(this.newMoney);
                 var newTaxRate = unNumber.unNumber(this.newTaxRate);
-                this.newTaxAmount = number.number(newMoney * newTaxRate / 100)
+                this.newTaxAmount = number.number(Math.round(newMoney * newTaxRate) / 100)
             },
             //after模态框事件
 
@@ -1316,7 +1319,6 @@
             };
         },
         created(){
-            console.log(this.current_company_scale);
             if(this.current_company_scale == 1){
                 this.options3 = [//发票类别列表
                     {value:0,label:'免税'},
@@ -1327,7 +1329,7 @@
             let url = addUrl.addUrl('newSale')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;

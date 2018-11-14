@@ -154,7 +154,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -180,7 +180,7 @@
                 axios.post(url)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;//列表数据
                         let departmentList = data.departmentList
                         let options2 = [];
@@ -222,7 +222,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value.department;//部门数据
                     this.departmentName = data.departmentName
                     this.departmentType = String(data.departmentType)

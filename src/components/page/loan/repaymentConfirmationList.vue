@@ -101,7 +101,7 @@
             axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
                     this.count = data.count;//总条目数
                     let tableDataarr =[];

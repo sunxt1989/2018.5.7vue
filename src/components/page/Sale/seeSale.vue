@@ -464,12 +464,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney / 100);
-                this.unTotalMoney1 = number.number(unTotalMoney / 100);
+                this.totalMoney1 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -479,12 +479,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney / 100);
-                this.unTotalMoney2 = number.number(unTotalMoney / 100);
+                this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
@@ -515,7 +515,7 @@
                 }else{
                     for(var i = 0; i < customList.length; i++){
                         if(tradeName == customList[i].tradeName || tradeName == customList[i].tradeIdNumber){
-                            console.log(customList[i]);
+//                            console.log(customList[i]);
                             this.customIdNumber = customList[i].tradeIdNumber == 'undefined' ? '' : customList[i].tradeIdNumber;
                             this.customTelephone = customList[i].tradeTelephone == 'undefined' ? '' : customList[i].tradeTelephone;
                             this.customPerson1 = customList[i].tradePerson1 == 'undefined' ? '' : customList[i].tradePerson1;
@@ -606,6 +606,10 @@
                 if(this.isShowLow) {
                     if (this.inventoryId == '') {
                         this.$message.error('请正确输入库存商品');
+                        this.loading = false;
+                        return
+                    } else if (this.newNum == 0) {
+                        this.$message.error('请正确输入数量');
                         this.loading = false;
                         return
                     }else if (this.newUnitPrice == '0.00') {
@@ -1037,20 +1041,19 @@
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
-                var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
+                var newUnitPrice = unNumber.unNumber(this.newUnitPrice);
                 if(n == 1){
                     if(!this.isShowCount){
                         if(!str.test(newNum)){
                             this.$message.error('请正确输入数量');
                             this.newNum = 1;
-                            return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number((newNum * newUnitPrice).toFixed(2));
                         this.taxMoneyChange()
                     }else{
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }else if(n == 2){
@@ -1060,8 +1063,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number((newNum * newUnitPrice).toFixed(2));
                         this.taxMoneyChange()
                     }else{
                         if(!str2.test(this.newUnitPrice)){
@@ -1069,8 +1072,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }
@@ -1079,7 +1082,7 @@
             taxMoneyChange(){
                 var newMoney = unNumber.unNumber(this.newMoney);
                 var newTaxRate = unNumber.unNumber(this.newTaxRate);
-                this.newTaxAmount = number.number(newMoney * newTaxRate / 100)
+                this.newTaxAmount = number.number(Math.round(newMoney * newTaxRate) / 100)
             },
             //after模态框事件
 
@@ -1300,7 +1303,7 @@
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);
                     _this.allName.push(file.name);
-                    if(_this.allBase.length == _this.punch2){
+                    if(_this.allBase.length == (_this.punch3 + _this.punch2)){
                         _this.submit(_this.n)
                     }
                 });
@@ -1464,7 +1467,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;

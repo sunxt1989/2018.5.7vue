@@ -150,7 +150,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -195,7 +195,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//列表数据
                     this.options2 = data.departmentList
                 })

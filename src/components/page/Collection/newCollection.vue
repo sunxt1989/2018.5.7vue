@@ -51,9 +51,9 @@
                         <span class="tit"><span class="red">*</span>{{moneyName}}</span>
                         <input class="ipt" type="text" v-model="money" maxlength="20" @change="changeMoney">
                     </li>
-                    <li class="sm" v-show="tradeFlg == 1">
+                    <li class="sm" v-show="tradeFlg == 1" style="position: relative;">
                         <span class="tit"><span class="red">*</span>{{tradeName}}</span>
-                        <el-select class="sel" v-model="supplier" placeholder="请选择" filterable allow-create default-first-option>
+                        <el-select class="sel" v-model="supplier" placeholder="请选择">
                             <el-option
                                 v-for="item in supplierList"
                                 :key="item.value"
@@ -61,6 +61,7 @@
                                 :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input class="opt" type="text" v-model="supplier" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="sm" v-show="payTypeFlg == 1">
                         <span class="tit"><span class="red">*</span>{{payTypeName}}</span>
@@ -85,7 +86,7 @@
                         </el-select>
                     </li>
                     <li class="sm" v-show="tradeBankCodeFlg == 1">
-                        <span class="tit"><span class="red">*</span>{{tradeBankCodeName}}</span>
+                        <span class="tit">{{tradeBankCodeName}}</span>
                         <input class="ipt" type="text" v-model="supplierBankCode" maxlength="20">
                     </li>
                     <li class="sm" v-show="taxRateFlg==1">
@@ -261,7 +262,7 @@
                 params.append('id',this.scene);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -343,11 +344,6 @@
                         this.loading = false;
                         return
                     }
-                    if(this.supplierBankCode == '' && this.tradeBankCodeFlg == 1){
-                        this.$message.error('请输入交易方银行账户');
-                        this.loading = false;
-                        return
-                    }
                     this.isLoading = true;
                     let message = ''
                     if(n == 1){
@@ -404,7 +400,7 @@
                         departmentJson = JSON.stringify(this.departmentAndProjectList[i])
                     }
                 }
-                console.log(departmentJson);
+//                console.log(departmentJson);
                 params.append('id','');
                 params.append('sceneId',this.scene);
                 params.append('businessDate',this.businessDate);
@@ -422,7 +418,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -464,7 +460,7 @@
             var url = addUrl.addUrl('collection')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     this.bankCodeList = data.bankList
                     this.departmentAndProjectList = data.departmentList
@@ -521,6 +517,17 @@
     }
     .list .sm{
         width:50%;
+    }
+    .list .sm .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
     }
     .list .pt{
         width:100%;

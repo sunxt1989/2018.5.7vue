@@ -59,12 +59,8 @@
             }
         },
         methods: {
-            sub(){
-                console.log('@');
-            },
             //安全退出
             handleCommand(command) {
-                console.log(command);
                 if(command == '1'){
                     this.$router.push('/AccountManagement/personal')
                 }else if(command == '2'){
@@ -92,11 +88,10 @@
                 this.loading = true
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('change');
-                console.log(url);
                 params.append('bookId',this.bookId)
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         this.axios(1);
                     })
                     .catch(error=> {
@@ -109,7 +104,7 @@
                 let url = addUrl.addUrl('login')
                 axios.post(url)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
                             let url2 = addUrl.addUrl('initialize')
@@ -149,7 +144,7 @@
                             obj.isAccountBookkeeping = isAccountBookkeeping
                             obj.account_type = account_type
                             obj.name = name
-                            console.log(obj);
+//                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
                             this.userName = name
@@ -162,9 +157,11 @@
                         }
                     })
                     .catch(error=> {
+                        this.loading = false
                         console.log('没有登录信息');
                         alert('请您重新登录')
                         let url = addUrl.addUrl('logout')
+                        alert(url);
                         window.location.href = url
                     });
             },

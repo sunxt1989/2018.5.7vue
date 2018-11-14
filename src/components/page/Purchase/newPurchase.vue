@@ -512,12 +512,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100;
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money));
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney / 100);
-                this.unTotalMoney1 = number.number(unTotalMoney / 100) ;
+                this.totalMoney1 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2)) ;
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -527,19 +527,17 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money) * 100
-                    totalMoney += unNumber.unNumber(val[i].taxMoney) * 100
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney / 100);
-                this.unTotalMoney2 = number.number(unTotalMoney / 100);
+                this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2
             },
             type:function(newVal,oldVal){
-                console.log(newVal,'newVal');
-                console.log(oldVal,'oldVal');
                 if(oldVal != '1' && newVal != '1' && this.newList2.length != 0){
                     this.$confirm('修改采购类别后，采购明细中项目所有采购类别将一同变化，是否清空采购明细列表?(设备明细列表不清空)', '提示', {
                         confirmButtonText: '是',
@@ -619,13 +617,13 @@
                             this.newList2[i].count = 1;
                             this.newList2[i].money = this.newList2[i].perPrice
                             this.newList2[i].taxMoney = unNumber.unNumber(this.newList2[i].money) * this.newList2[i].taxRate / 100;
-                            unTotalMoney += unNumber.unNumber(this.newList2[i].money);
-                            totalMoney += unNumber.unNumber(this.newList2[i].taxMoney)
+                            unTotalMoney += parseFloat(unNumber.unNumber(this.newList2[i].money))
+                            totalMoney += parseFloat(unNumber.unNumber(this.newList2[i].taxMoney))
                         }
 
                         totalMoney += unTotalMoney;
-                        this.totalMoney2 = number.number(totalMoney);
-                        this.unTotalMoney2 = number.number(unTotalMoney);
+                        this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                        this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
 
                         this.totalMoney = this.totalMoney2
                         this.unTotalMoney = this.unTotalMoney2
@@ -680,7 +678,11 @@
                         this.$message.error('请正确输入设备类别');
                         this.loading = false;
                         return
-                    }else if (this.newUnitPrice == '0.00') {
+                    } else if (this.newNum == 0) {
+                        this.$message.error('请正确输入数量');
+                        this.loading = false;
+                        return
+                    } else if (this.newUnitPrice == '0.00') {
                         this.$message.error('请正确输入单价');
                         this.loading = false;
                         return
@@ -707,7 +709,7 @@
                             obj.taxMoney = this.newTaxAmount;//税额
                             obj.unit = this.newUnit;//单位
                             obj.id = id;//该条目id
-                            console.log(obj);
+//                            console.log(obj);
 
                             this.newList1.push(obj);
                             id++;
@@ -753,7 +755,7 @@
                             obj.taxMoney = this.newTaxAmount;//税额
                             obj.unit = this.newUnit;//单位
                             obj.id = id;//该条目id
-                            console.log(obj);
+//                            console.log(obj);
                             this.newList2.push(obj);
                             id++;
                             this.newId = id;
@@ -902,10 +904,10 @@
                             obj.taxMoney = this.newTaxAmount;//税额
                             obj.unit = this.newUnit;//单位
                             obj.id = id;//该条目id
-                            console.log(obj);
+//                            console.log(obj);
 
                             this.newList1.splice(isI,1,obj);
-                            console.log(this.newList1);
+//                            console.log(this.newList1);
                             this.classCode ='';
                             this.className ='';
                             this.newDetailed ='';
@@ -945,7 +947,7 @@
                             obj.taxMoney = this.newTaxAmount;//税额
                             obj.unit = this.newUnit;//单位
                             obj.id = id;//该条目id
-                            console.log(obj);
+//                            console.log(obj);
                             this.newList2.splice(isI,1,obj);
                             this.classCode ='';
                             this.className ='';
@@ -964,7 +966,7 @@
             },
             //删除列表1事件
             newListDelete1(id){
-                console.log(id);
+//                console.log(id);
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -1005,7 +1007,7 @@
             },
             //删除列表2事件
             newListDelete2(id){
-                console.log(id);
+//                console.log(id);
                 this.$confirm('是否删除该信息?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -1059,20 +1061,19 @@
                 var str = /^\d+$/;//判断只允许输入正整数
                 var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
                 var newNum = this.newNum
-                var newUnitPrice = unNumber.unNumber(this.newUnitPrice) * 100;
+                var newUnitPrice = unNumber.unNumber(this.newUnitPrice);
                 if(n == 1){
                     if(!this.isShowCount){
                         if(!str.test(newNum)){
                             this.$message.error('请正确输入数量');
                             this.newNum = 1;
-                            return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(parseFloat(this.newNum * newUnitPrice).toFixed(2));
                         this.taxMoneyChange()
                     }else{
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }else if(n == 2){
@@ -1082,8 +1083,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(this.newNum * newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(parseFloat(this.newNum * newUnitPrice).toFixed(2));
                         this.taxMoneyChange()
                     }else{
                         if(!str2.test(this.newUnitPrice)){
@@ -1091,8 +1092,8 @@
                             this.newUnitPrice = '0.00';
                             return
                         }
-                        this.newUnitPrice  = number.number(newUnitPrice / 100);
-                        this.newMoney = number.number(newUnitPrice / 100);
+                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
+                        this.newMoney = number.number(newUnitPrice.toFixed(2));
                         this.taxMoneyChange()
                     }
                 }
@@ -1101,7 +1102,9 @@
             taxMoneyChange(){
                 var newMoney = unNumber.unNumber(this.newMoney);
                 var newTaxRate = unNumber.unNumber(this.newTaxRate);
-                this.newTaxAmount = number.number(newMoney * newTaxRate / 100)
+                console.log(newMoney);
+                console.log(newTaxRate);
+                this.newTaxAmount = number.number(Math.round(newMoney * newTaxRate) / 100)
             },
             //after模态框事件
 
@@ -1126,9 +1129,9 @@
                         let input3 = Number(this.input3)
                         let input4 = Number(this.input4)
                         let input5 = Number(this.input5)
-                        let allInput = (input1 * 100) + (input2 * 100) + (input3 * 100) + (input4 * 100) + (input5 * 100);
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
                         //判断所有填写的百分比是不是等于100
-                        if(allInput/100 != 100 ){
+                        if(allInput != 100 ){
                             this.$message.error('请正确输入分摊比例');
                             this.loading = false
                             return
@@ -1141,7 +1144,6 @@
                             return
                         }
                     }
-
                     if(this.tradeName == ''){
                         this.$message.error('请正确输入供应商');
                         this.loading = false
@@ -1250,6 +1252,7 @@
                                 }).then(() => {
 //                                    console.log(this.punch);
                                     if(this.punch != 0){
+                                        this.punch2 = this.punch
                                         this.submitUpload(n);
                                     }else{
                                         this.submit(n)
@@ -1289,6 +1292,7 @@
                                 }).then(() => {
 //                                    console.log(this.punch);
                                     if(this.punch != 0){
+                                        this.punch2 = this.punch
                                         this.submitUpload(n);
                                     }else{
                                         this.submit(n)
@@ -1329,6 +1333,7 @@
                             }).then(() => {
 //                                console.log(this.punch);
                                 if(this.punch != 0){
+                                    this.punch2 = this.punch
                                     this.submitUpload(n);
                                 }else{
                                     this.submit(n)
@@ -1412,6 +1417,7 @@
                 this.dialogVisible = true;
             },
             submit(n){
+                console.log(n);
                 this.loading = true;
                 var params = new URLSearchParams();
                 var type = this.type;
@@ -1656,7 +1662,7 @@
             var url = addUrl.addUrl('newPurchase')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;

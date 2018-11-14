@@ -105,36 +105,39 @@
 
         computed:{
             B7:function(){
-                let b1 = unNumber.unNumber(this.B1) * 1000
-                let b2 = unNumber.unNumber(this.B2) * 1000
-                let b3 = unNumber.unNumber(this.B3) * 1000
-                let b4 = unNumber.unNumber(this.B4) * 1000
-                let b5 = unNumber.unNumber(this.B5) * 1000
-                let b6 = unNumber.unNumber(this.B6) * 1000
-                return number.number((b1 + b2 - b3 - b4 - b5 - b6) / 1000)
+                let b1 = unNumber.unNumber(this.B1)
+                let b2 = unNumber.unNumber(this.B2)
+                let b3 = unNumber.unNumber(this.B3)
+                let b4 = unNumber.unNumber(this.B4)
+                let b5 = unNumber.unNumber(this.B5)
+                let b6 = unNumber.unNumber(this.B6)
+                return number.number( parseFloat((b1 + b2 - b3 - b4 - b5 - b6).toFixed(2)) )
             },
             B8:function(){
-                let b7 = unNumber.unNumber(this.B7) * 100;
+                if(unNumber.unNumber(this.B7) > 0){
+                    let b7 = unNumber.unNumber(this.B7);
 //                console.log(Math.round((b7 * 0.25)));
-                return number.number( Math.round((b7 * 0.25)) / 100)//四舍五入保留两位小数
+                    return number.number( parseFloat((b7 * 0.25).toFixed(2)))
+                }else{
+                    return '0.00'
+                }
+
             },
             B12:function(){
-                let b8 = unNumber.unNumber(this.B8) * 100
-                let b9 = unNumber.unNumber(this.B9) * 100
-                let b10 = unNumber.unNumber(this.B10) * 100
-                let b11 = unNumber.unNumber(this.B11) * 100
-
-                return number.number( (b8 - b9 - b10 - b11) / 100)
+                let b8 = unNumber.unNumber(this.B8)
+                let b9 = unNumber.unNumber(this.B9)
+                let b10 = unNumber.unNumber(this.B10)
+                let b11 = unNumber.unNumber(this.B11)
+                return number.number( parseFloat((b8 - b9 - b10 - b11).toFixed(2)) )
             }
         },
         methods: {
             changeNum(){
                 let aa = number.number(this.aa)
-                console.log(aa);
             },
             changeInput(val,id){
                 let value = unNumber.unNumber(val)
-                console.log(value);
+//                console.log(value);
                 if(value == 0){
                     this.$message.error('请正确输入金额');
                 }
@@ -233,7 +236,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.value.result == '1'){
                             this.$router.go(-1);
                             this.$message({

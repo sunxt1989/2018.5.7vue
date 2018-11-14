@@ -194,7 +194,7 @@
             var url = addUrl.addUrl('bankList')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let tableData = response.data.value.list
                     for(let i in tableData){
                         tableData[i].showMoney = number.number(tableData[i].endAmount)

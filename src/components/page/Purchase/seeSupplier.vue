@@ -63,7 +63,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
-                        <input class="ipt" type="text" v-model="bankCode" maxlength="18">
+                        <input class="ipt" type="text" v-model="bankCode" maxlength="21">
                     </li>
                     <li class="sm">
                         <span class="tit">身份选择</span>
@@ -229,7 +229,7 @@
                         }
                     }
                     if(bankCode != ''){
-                        if(bankCode.length != 18 && typeof bankCode != 'number'){
+                        if(bankCode.length < 16 && typeof bankCode != 'number'){
                             this.$message.error('请正确输入银行卡号');
                              this.loading = false
                             return
@@ -363,7 +363,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value
                     var bankInfo = data.tradeCompany.bankInfoJson;//银行账户信息

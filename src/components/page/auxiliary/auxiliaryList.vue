@@ -123,7 +123,7 @@
                 this.axios()
             },
             axios(){
-                console.log(this.currentPage);
+//                console.log(this.currentPage);
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('auxiliaryList');
                 params.append('pageNo',this.currentPage);
@@ -131,7 +131,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         let list = data.list
                         for(let i in list){

@@ -2,9 +2,9 @@
  * Created by who on 2018/7/4.
  */
 function addUrl(name){
-    //var url = 'http://192.168.2.105:8881/web';
+    var url = 'http://192.168.2.105:8881/web';
     //var url = 'http://192.168.2.190:8080/web';
-    var url = 'http://192.168.2.191:8080/web';
+    //var url = 'http://192.168.2.191:8080/web';
     //var url = 'http://www.cloudaccounting.cn'
 
     //借款单列表
@@ -678,6 +678,10 @@ function addUrl(name){
     if(name == 'tree'){
         return url + '/vue/report/getSubType.html'
     }
+    //获取会计科目
+    if(name == 'subjectList'){
+        return url + '/vue/report/get/subject/list.html'
+    }
     //导出总分类账xls
     if(name == 'generalLedgerExcel'){
         return url + '/vue/report/general/ledger/download/list.html'
@@ -971,6 +975,10 @@ function addUrl(name){
     //代记账-工资单
     if(name == 'payrollAccountBookkeeping'){
         return url + '/djz/salary/salary/show/list.html'
+    }
+    //杜邦分析
+    if(name == 'DuPont'){
+        return url + '/vue/financial/analysis/du/pont/analysis.html'
     }
 
 }

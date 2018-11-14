@@ -1205,11 +1205,8 @@
                         this.$router.push('/Reimbursement/costSheet')
                     }else if(id == 'ReimbursementList'){
                         this.$router.push('/Reimbursement/ReimbursementList')
-                    }else if(id == 'payroll'&& this.current_book_level != 3){
+                    }else if(id == 'payroll'){
                         this.$router.push('/Payroll/payroll')
-                    }else if(id == 'payroll' && this.current_book_level == 3){
-                        let payrollAccountBookkeeping = addUrl.addUrl('payrollAccountBookkeeping');
-                        window.open(payrollAccountBookkeeping);
                     }else if(id == 'SupplierList'){
                         this.$router.push('/Purchase/SupplierList')
                     }else if(id == 'PurchaseList'){
@@ -1309,7 +1306,7 @@
                     params.append('noticeId',newsId);
                     axios.post(url,params)
                         .then(response=> {
-                            console.log(response);
+//                            console.log(response);
                         })
                 }
                 if(type == '5'){
@@ -1447,7 +1444,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         if (response.data.status == 200) {
                             this.$message.success('菜单配置保存成功');
                             this.isSave = false;
@@ -1463,7 +1460,7 @@
             },
             //删除桌面模块，参数为模块id
             deleteClick(name){
-                console.log(name);
+//                console.log(name);
                 let items = this.grid.getItems('active');
                 let activeItems = this.activeItems
                 if(activeItems.length == 1){
@@ -1818,7 +1815,7 @@
             let url = addUrl.addUrl('newsList');
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let list = data.list
                     for(let i in list){
@@ -2019,7 +2016,7 @@
             let url2 = addUrl.addUrl('toolList');
             axios.post(url2)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let list = data.list
                     for(let i in list){
@@ -2031,7 +2028,7 @@
                 })
         },
         mounted(){
-            console.log('homePage');
+//            console.log('homePage');
             if(this.menuArr != ''){
                 this.isFirst = false;
                 this.startMuuri()

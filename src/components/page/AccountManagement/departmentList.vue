@@ -92,7 +92,7 @@
                     axios.post(url,params)
                         .then(response=> {
                             this.loading = false;
-                            console.log(response);
+//                            console.log(response);
                             let status = response.data.status
                             let msg = response.data.msg
                             if(status == 200){
@@ -141,7 +141,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//列表数据
                     this.tableData = data.departmentList
                 })

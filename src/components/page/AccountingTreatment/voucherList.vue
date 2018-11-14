@@ -5,10 +5,19 @@
                 <h2>凭证列表</h2>
                 <router-link to="/" class="back">返回</router-link>
                 <a :href=url4 v-show="isDownload" target="_blank" class="sub1">导出Excel</a>
-                <a :href=url3 v-show="isDownload" target="_blank" class="sub2">导出PDF</a>
+                <!--<a :href=url3 v-show="isDownload" target="_blank" class="sub2">导出PDF</a>-->
+                <el-button v-show="isDownload" @click="exportPDF" size="small" type="primary" class="sub2" :loading="grantLoading">导出PDF</el-button>
                 <el-button v-show="!isDownload" @click="stop" size="small" type="primary" class="sub3" >导出PDF</el-button>
                 <el-button v-show="!isDownload" @click="stop" size="small" type="primary" class="sub4" >导出Excel</el-button>
 
+                <el-dialog title="选择PDF模板" :visible.sync="dialogGrant" :before-close="handleClose" width="500px">
+                    <div class="exportPDF">
+                        <el-radio v-model="printType" label="1">A4一联版（横向）</el-radio>
+                        <el-radio v-model="printType" label="2">A4两联版</el-radio>
+                    </div>
+                    <el-button @click="closeGrant" size="small">取 消</el-button>
+                    <el-button type="primary" @click="grantAxios" size="small" >确 定</el-button>
+                </el-dialog>
             </div>
             <div class="w">
                 <div class="content cf" :style="{height:screenHeight}">
@@ -126,6 +135,9 @@
                 url2:'',//导出pdf
                 url3:'',//完整导出pdf地址
                 url4:'',//完整导出Excel地址
+                printType:'2',//选择PDF模板
+                dialogGrant:false,//选择PDF模板模态框
+                grantLoading:false,//导出PDF按钮loading
                 ymName: '',
                 quarterName: '',
                 year:'',
@@ -142,6 +154,37 @@
                     return 'success-row';
                 }
                 return ;
+            },
+            //导出PDF
+            exportPDF(){
+                this.dialogGrant = true;
+                this.grantLoading = true;
+            },
+            //关闭模态框
+            handleClose(done){
+                this.grantLoading = false;
+                done();
+            },
+            //关闭选择PDF模板模态框取消按钮
+            closeGrant(){
+                this.dialogGrant = false;
+                this.grantLoading = false;
+            },
+
+            grantAxios(){
+                if(this.url3.includes('printType')){
+                    let arr = this.url3.split('printType=')
+                    arr[1] = this.printType
+                    this.url3 = arr.join('=')
+                    console.log(this.url3);
+                }else{
+                    this.url3 +='&printType=' + this.printType
+                }
+                console.log(this.url3);
+                window.open(this.url3)
+                this.dialogGrant = false;
+                this.grantLoading = false;
+                this.loading = false
             },
             stop(){
                 this.$message.error('请先选择需要下载的凭证')
@@ -192,7 +235,7 @@
                 params.append('ym',this.indexYM);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         let certificateList = data.certificateList
                         for(let i in certificateList){
@@ -202,11 +245,11 @@
                             let creditAll = 0;
                             for(let j = 0 ;j < certificateItemList.length; j++){
                                 if(certificateItemList[j].debitAmount){
-                                    debitAll += Number(certificateItemList[j].debitAmount) * 100
+                                    debitAll += parseFloat(Number(certificateItemList[j].debitAmount))
                                     certificateItemList[j].debitAmount = number.number(certificateItemList[j].debitAmount)
                                 }
                                 if(certificateItemList[j].creditAmount){
-                                    creditAll += Number(certificateItemList[j].creditAmount) * 100
+                                    creditAll += parseFloat(Number(certificateItemList[j].creditAmount))
                                     certificateItemList[j].creditAmount = number.number(certificateItemList[j].creditAmount)
                                 }
                                 //判断如果不是第一行时摘要全部为空，如果第一行serviceName为空时，就用remark
@@ -219,7 +262,7 @@
                                 }
                             }
                             certificateItemList.push({
-                                serviceName:'合计：',debitAmount:number.number(debitAll / 100),creditAmount: number.number(creditAll / 100)
+                                serviceName:'合计：',debitAmount:number.number(debitAll.toFixed(2)),creditAmount: number.number(creditAll.toFixed(2))
                             })
 
                         }
@@ -321,10 +364,10 @@
         position: absolute;
         right: 20px;
     }
-    .sub1{
+    .top .sub1{
         display: inline-block;
-        width: 80px;
-        height:30px;
+        width: 82px;
+        height:32px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -334,30 +377,26 @@
         right:100px;
         font-size:12px;
     }
-    .sub2{
-        display: inline-block;
-        width: 80px;
-        height:30px;
-        color: #fff;
-        background-color: #409EFF;
-        border-radius: 3px;
-        line-height: 32px;
-        text-decoration: none;
-        position: absolute;
-        right:200px;
-        font-size:12px;
-    }
-    .sub3{
+    .top .sub2{
         width: 80px;
         height:32px;
         position: absolute;
         right:200px;
     }
-    .sub4{
+    .top .sub3{
+        width: 80px;
+        height:32px;
+        position: absolute;
+        right:200px;
+    }
+    .top .sub4{
         width: 80px;
         height:32px;
         position: absolute;
         right:100px;
+    }
+    .top .exportPDF{
+        margin-bottom: 30px;
     }
 
 </style>

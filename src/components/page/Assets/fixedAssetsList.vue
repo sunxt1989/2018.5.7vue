@@ -76,7 +76,7 @@
                 var url = addUrl.addUrl('fixedAssetsListCalculation')
                 axios.post(url)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             let msg = response.data.msg;
                             this.$message.success(msg);
@@ -136,7 +136,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     let tableData = data.list;

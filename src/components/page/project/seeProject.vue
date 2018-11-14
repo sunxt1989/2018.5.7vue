@@ -260,7 +260,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     this.options3 = data.userList;
                     this.endDate = data.project.endDate

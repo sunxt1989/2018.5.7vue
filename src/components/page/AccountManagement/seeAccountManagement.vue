@@ -225,7 +225,7 @@
                 var url = addUrl.addUrl('changeInviteCode')
                 axios.post(url)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         this.inviteCode = data.inviteCode
                         this.loading = false
@@ -265,7 +265,7 @@
             let url = addUrl.addUrl('seeAccountManagement')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value.item
 
                     this.companyName = data.companyName

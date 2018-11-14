@@ -395,12 +395,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney);
-                this.unTotalMoney1 = number.number(unTotalMoney);
+                this.totalMoney1 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney1
                 this.unTotalMoney = this.unTotalMoney1
@@ -410,12 +410,12 @@
                 var totalMoney = 0;
                 var unTotalMoney = 0;
                 for(var i = 0; i < val.length; i++){
-                    unTotalMoney += unNumber.unNumber(val[i].money);
-                    totalMoney += unNumber.unNumber(val[i].taxMoney)
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
                 }
                 totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney);
-                this.unTotalMoney2 = number.number(unTotalMoney);
+                this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
 
                 this.totalMoney = this.totalMoney2
                 this.unTotalMoney = this.unTotalMoney2

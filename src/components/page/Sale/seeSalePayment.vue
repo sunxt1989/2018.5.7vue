@@ -146,7 +146,7 @@
                 .then(response=> {
                     this.loading = false
                     if(response.data.status == 200){
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;
                         let receive = data.receive
                         this.unreceiveMoney = number.number(data.sale.unreceiveMoney)

@@ -90,13 +90,11 @@
             axios(){
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('history')
-                console.log(this.debitDate);
-                console.log(this.taxType);
                 params.append('ym', this.debitDate);
                 params.append('taxType', this.taxType);
                 axios.post(url, params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         this.loading = false;
                         let data = response.data.value;
                         for(let i in data.dataList){
@@ -138,7 +136,7 @@
             params.append('taxType', '');
             axios.post(url, params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     let data = response.data.value;
                     for(let i in data.dataList){

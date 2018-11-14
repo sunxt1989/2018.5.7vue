@@ -52,16 +52,17 @@
                         <span class="tit"><span class="red">*</span>{{moneyName}}</span>
                         <input class="ipt" type="text" v-model="money" maxlength="20" @change="changeMoney" :readonly="!isChange">
                     </li>
-                    <li class="sm" v-show="tradeFlg == 1">
+                    <li class="sm" v-show="tradeFlg == 1" style="position: relative;">
                         <span class="tit"><span class="red">*</span>{{tradeName}}</span>
                         <el-select class="sel" v-model="supplier" placeholder="请选择" :disabled="!isChange" filterable allow-create default-first-option>
                             <el-option
                                 v-for="item in supplierList"
                                 :key="item.value"
                                 :label="item.tradeName"
-                                :value="item.idString">
+                                :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input class="opt" type="text" v-model="supplier" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="sm" v-show="payTypeFlg == 1">
                         <span class="tit"><span class="red">*</span>{{payTypeName}}</span>
@@ -86,7 +87,7 @@
                         </el-select>
                     </li>
                     <li class="sm" v-show="tradeBankCodeFlg == 1">
-                        <span class="tit"><span class="red">*</span>{{tradeBankCodeName}}</span>
+                        <span class="tit">{{tradeBankCodeName}}</span>
                         <input class="ipt" type="text" v-model="supplierBankCode" maxlength="20" :readonly="!isChange">
                     </li>
                     <li class="sm" v-show="taxRateFlg==1">
@@ -231,7 +232,7 @@
                 params.append('id',val);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -299,7 +300,7 @@
                 params.append('id',this.scene);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -385,11 +386,6 @@
                         this.loading = false;
                         return
                     }
-                    if(this.supplierBankCode == '' && this.tradeBankCodeFlg == 1){
-                        this.$message.error('请输入交易方银行账户');
-                        this.loading = false;
-                        return
-                    }
                     this.isLoading = true;
                     let message = ''
                     if(n == 1){
@@ -448,13 +444,13 @@
                         departmentJson = JSON.stringify(this.departmentAndProjectList[i])
                     }
                 }
-                console.log(departmentJson);
+//                console.log(departmentJson);
                 params.append('id',this.debitId);
                 params.append('sceneId',this.scene);
                 params.append('businessDate',this.businessDate);
                 params.append('departmentJson',departmentJson);
                 params.append('money',unNumber.unNumber(this.money));
-                params.append('tradeId',this.supplier);
+                params.append('tradeName',this.supplier);
                 params.append('payType',this.mode);
                 params.append('bankId',this.bankCode);
                 params.append('tradeBankName',this.supplierBankCode);
@@ -466,7 +462,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -510,7 +506,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let item = data.item
                     this.bankCodeList = data.bankList
@@ -521,14 +517,14 @@
                     this.businessDate = item.businessDateYMD
                     this.department = item.projectDepartmentIdString
                     this.money = number.number(item.money)
-                    this.supplier = item.tradeIdString
+                    this.supplier = item.tradeName
                     this.mode = String(item.payType)
-                    if(this.mode == '1'){
-                        this.bankCode = ''
-                        this.ChangeBankCode = true
-                    }else{
+                    if(this.mode == '2'){
                         this.bankCode = item.bankIdString;
                         this.ChangeBankCode = false
+                    }else{
+                        this.bankCode = ''
+                        this.ChangeBankCode = true
                     }
                     this.supplierBankCode = item.tradeBankNameShow
                     this.taxRate = item.taxRate
@@ -594,10 +590,20 @@
     .list .sm{
         width:50%;
     }
+    .list .sm .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
+    }
     .list .pt{
         width:100%;
     }
-
     .list li .ipt{
         display: inline-block;
         width:300px;

@@ -82,28 +82,40 @@
                 </ul>
 
             </div>
-            <el-dialog title="选择付款方式" :visible.sync="dialogGrant" :before-close="handleClose" width="500px"
+            <el-dialog title="选择付款方式" :visible.sync="dialogGrant" :before-close="handleClose" width="700px"
                        :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
                 <ul class="wagesUl">
                     <li>
                         <span class="wagesName">工资</span>
                         <el-radio v-model="wages" label="1">现金</el-radio>
                         <el-radio v-model="wages" label="2">银行</el-radio>
+                        <el-radio v-model="wages" label="5">企业微信</el-radio>
+                        <el-radio v-model="wages" label="6">企业支付宝</el-radio>
+                        <el-radio v-model="wages" label="7">企业借贷宝</el-radio>
                     </li>
                     <li>
                         <span class="wagesName">社保</span>
                         <el-radio v-model="socialSecurity" label="1">现金</el-radio>
                         <el-radio v-model="socialSecurity" label="2">银行</el-radio>
+                        <el-radio v-model="socialSecurity" label="5">企业微信</el-radio>
+                        <el-radio v-model="socialSecurity" label="6">企业支付宝</el-radio>
+                        <el-radio v-model="socialSecurity" label="7">企业借贷宝</el-radio>
                     </li>
                     <li>
                         <span class="wagesName">公积金</span>
                         <el-radio v-model="AccumulationFund" label="1">现金</el-radio>
                         <el-radio v-model="AccumulationFund" label="2">银行</el-radio>
+                        <el-radio v-model="AccumulationFund" label="5">企业微信</el-radio>
+                        <el-radio v-model="AccumulationFund" label="6">企业支付宝</el-radio>
+                        <el-radio v-model="AccumulationFund" label="7">企业借贷宝</el-radio>
                     </li>
                     <li>
                         <span class="wagesName">个人所得税</span>
                         <el-radio v-model="IndividualIncomeTax" label="1">现金</el-radio>
                         <el-radio v-model="IndividualIncomeTax" label="2">银行</el-radio>
+                        <el-radio v-model="IndividualIncomeTax" label="5">企业微信</el-radio>
+                        <el-radio v-model="IndividualIncomeTax" label="6">企业支付宝</el-radio>
+                        <el-radio v-model="IndividualIncomeTax" label="7">企业借贷宝</el-radio>
                     </li>
                 </ul>
                 <el-button @click="closeGrant" size="small">取 消</el-button>
@@ -422,11 +434,10 @@
                 }
             },
             calculation(){
-                console.log('calculation');
                 let url = addUrl.addUrl('calculation');
                 axios.post(url)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;
                         let msg = data.msg;
                         let result = data.result
@@ -466,7 +477,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    console.log(this.wages);
+//                    console.log(this.wages);
                     let params = new URLSearchParams();
                     let url = addUrl.addUrl('provide');
                     params.append('gzPayWay', this.wages)
@@ -491,7 +502,7 @@
 
                     axios.post(url, params)
                         .then(response=> {
-                            console.log(response);
+//                            console.log(response);
                             let data = response.data.value;
                             let msg = data.msg;
                             let result = data.result
@@ -543,7 +554,7 @@
             let url = addUrl.addUrl('record');
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     if(data === null){
                         this.isNull = true
@@ -720,6 +731,6 @@
     }
     .wagesUl .wagesName{
         display: inline-block;
-        width:200px;
+        width:100px;
     }
 </style>

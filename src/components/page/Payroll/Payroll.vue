@@ -4,24 +4,24 @@
             <div class="top">
                 <h2>工资单</h2>
                 <router-link to="/" class="back">返回</router-link>
-                <a :href=url target="_blank" class="sub1">导出</a>
-                <el-button @click="grant" size="small" type="primary" class="sub2" >工资发放</el-button>
-                <el-button @click="Calculation" size="small" type="primary" class="sub3" >工资计提</el-button>
-                <el-button @click="dialogFormVisible = true" size="small" type="primary" class="sub4" >工资发放时间：{{showProvideDay}}</el-button>
+                <a :href=url target="_blank" class="sub1" @keydown.enter.native.prevent>导出</a>
+                <el-button @click="grant" size="small" type="primary" class="sub2" :loading="grantLoading">工资发放</el-button>
+                <el-button @click="Calculation" size="small" type="primary" class="sub3" :loading="calculationLoading">工资计提</el-button>
+                <el-button @click="dialogFormVisible = true" size="small" type="primary" class="sub4">工资发放时间：{{showProvideDay}}</el-button>
                 <router-link v-if="!isCalculation" :to="{name:'addPayroll',params:{ym:currentYM} }" class="sub5">新增临时员工</router-link>
+                <router-link v-if=" start_ym == current_book_ym " :to="{name:'record',params:{ym:currentYM} }" class="sub6">初始化工资补录</router-link>
             </div>
             <div class="w">
-                <div class="content cf">
-                    <el-date-picker
-                        class="yearSelect"
-                        v-model="year"
-                        type="year"
-                        placeholder="选择年"
-                        size="small"
-                        value-format="yyyy"
-                        @change="changeYear">
-                    </el-date-picker>
-
+                <div class="content cf" :style="{height:screenHeight}">
+                        <el-date-picker
+                            class="yearData"
+                            v-model="year"
+                            type="year"
+                            placeholder="选择年"
+                            size="small"
+                            value-format="yyyy"
+                            @change="changeYear">
+                        </el-date-picker>
                     <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane name="01">
                             <span slot="label" class="mon">1月</span>
@@ -61,7 +61,7 @@
                         </el-tab-pane>
                     </el-tabs>
 
-                    <el-table class="single" :data="tableData3" style="width: 100%" height="500">
+                    <el-table class="single" :data="tableData3" style="width: 100%" :height="tableHeight">
                             <el-table-column fixed prop="userName" label="姓名">
                                 <template slot-scope="scope">
                                     <span v-if="scope.row.userId == 0"><span class="red">*</span>{{scope.row.userName}}</span>
@@ -69,20 +69,27 @@
                                     <span v-else>{{scope.row.userName}}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column fixed prop="departmentName" label="部门"></el-table-column>
+                            <el-table-column fixed label="部门">
+                                <template slot-scope="scope">
+                                    <span v-if="scope.row.departmentName">{{scope.row.departmentName}}</span>
+                                    <span v-else-if="scope.row.projectName">{{scope.row.projectName}}</span>
+                                    <span v-if="scope.row.divideFlg == 1">(分摊)</span>
+                                </template>
+                            </el-table-column>
                             <el-table-column fixed prop="" label="操作">
                                 <template slot-scope="scope">
                                     <span class="operation" v-if="scope.row.userName != ''">
                                         <router-link :to="{name:'seePayroll',params:{id:scope.row.id,
                                         userName:scope.row.userName,
                                         userId:scope.row.userId,
-                                        ym:currentYM}}" class="see">
+                                        ym:currentYM,
+                                        isCalculation:isCalculation}}" class="see">
                                             <i class="icon iconfont icon-bianji blue"></i>
                                         </router-link>
                                     </span>
                                     <span class="operation" v-if="scope.row.userName != ''">
                                         <!--当userId为 0 时才能点击删除按钮-->
-                                        <i v-if='scope.row.userId == 0' @click='deleteModel(scope.row.id)'
+                                        <i v-if='scope.row.userId == 0 && !isCalculation' @click='deleteModel(scope.row.id)'
                                             class="icon iconfont icon-shanchu red"></i>
                                         <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
                                     </span>
@@ -128,6 +135,49 @@
                             <el-button type="primary" @click="provideTime" size="small">确 定</el-button>
                         </div>
                     </el-dialog>
+                    <el-dialog title="选择付款方式" :visible.sync="dialogGrant" :before-close="handleClose" width="700px">
+                        <ul class="wagesUl">
+                            <li>
+                                <span class="wagesName">工资</span>
+                                <el-radio v-model="wages" label="1">现金</el-radio>
+                                <el-radio v-model="wages" label="2">银行</el-radio>
+                                <el-radio v-model="wages" label="5">企业微信</el-radio>
+                                <el-radio v-model="wages" label="6">企业支付宝</el-radio>
+                                <el-radio v-model="wages" label="7">企业借贷宝</el-radio>
+                            </li>
+                            <li>
+                                <span class="wagesName">社保</span>
+                                <el-radio v-model="socialSecurity" label="1">现金</el-radio>
+                                <el-radio v-model="socialSecurity" label="2">银行</el-radio>
+                                <el-radio v-model="socialSecurity" label="5">企业微信</el-radio>
+                                <el-radio v-model="socialSecurity" label="6">企业支付宝</el-radio>
+                                <el-radio v-model="socialSecurity" label="7">企业借贷宝</el-radio>
+                            </li>
+                            <li>
+                                <span class="wagesName">公积金</span>
+                                <el-radio v-model="AccumulationFund" label="1">现金</el-radio>
+                                <el-radio v-model="AccumulationFund" label="2">银行</el-radio>
+                                 <el-radio v-model="AccumulationFund" label="5">企业微信</el-radio>
+                                <el-radio v-model="AccumulationFund" label="6">企业支付宝</el-radio>
+                                <el-radio v-model="AccumulationFund" label="7">企业借贷宝</el-radio>
+                            </li>
+                            <li>
+                                <span class="wagesName">个人所得税</span>
+                                <el-radio v-model="IndividualIncomeTax" label="1">现金</el-radio>
+                                <el-radio v-model="IndividualIncomeTax" label="2">银行</el-radio>
+                                 <el-radio v-model="IndividualIncomeTax" label="5">企业微信</el-radio>
+                                <el-radio v-model="IndividualIncomeTax" label="6">企业支付宝</el-radio>
+                                <el-radio v-model="IndividualIncomeTax" label="7">企业借贷宝</el-radio>
+                            </li>
+                            <li>
+                                <span class="wagesName">发放期间</span>
+                                <el-radio v-model="ffqj" label="2">上月</el-radio>
+                                <el-radio v-model="ffqj" label="1">本月</el-radio>
+                            </li>
+                        </ul>
+                        <el-button @click="closeGrant" size="small">取 消</el-button>
+                        <el-button type="primary" @click="grantAxios" size="small" :disabled="isComplete">确 定</el-button>
+                    </el-dialog>
                 </div>
             </div>
         </div>
@@ -139,6 +189,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
 
     export default{
         data(){
@@ -146,10 +197,15 @@
                 currentYM:'',//当前账期
                 indexYM:'',//显示账期
                 accruedYM:'',//末次计提年月
-                provideYM:'',//末次发放年月
                 isCalculation:false,//是否已计提
                 url:'',
                 dialogFormVisible:false,
+                dialogGrant:false,//工资发放模态框
+                wages:'2',//工资发放分类
+                socialSecurity:'2',//社保发放分类
+                AccumulationFund:'2',//公积金发放分类
+                IndividualIncomeTax:'2',//个人所得税发放分类
+                ffqj:'2',//发放期间
                 activeName: '',
                 year:'',
                 tableData3:[],
@@ -184,66 +240,126 @@
                     {value:'-1',label:'月末前一天'},
                     {value:'0',label:'月末'}
                 ],
-                loading:true
+                loading:true,
+                isComplete:false,//工资发放模态框确认按钮loading状态
+                grantLoading:false,//工资发放按钮loading
+                calculationLoading:false,//工资计提按钮loading
+                screenHeight: '' ,//页面初始化高度
+                tableHeight: 460 //表格高度
             }
         },
+        computed:mapState(['start_ym','current_book_ym']),
         methods: {
+            handleClose(done){
+                this.grantLoading = false;
+                done();
+            },
             //工资发放
             grant(){
-                this.loading = true
+                this.grantLoading = true;
+                this.loading = true;
                 if(this.showProvideDay == '未设置'){
                     this.$message.error('您还未设置工资发放时间');
-                    this.loading = false
-                    return
-                }else if(Number(this.currentYM) <= (Number(this.provideYM) + 1)){
-                    this.$message.error('上月工资已发放');
-                    this.loading = false
+                    this.loading = false;
+                    this.grantLoading = false;
                     return
                 }else{
-                    this.$confirm('确定是否工资发放？', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        let params = new URLSearchParams();
-                        let url = addUrl.addUrl('grant');
-                        params.append('ym',this.currentYM);
-                        axios.post(url,params)
-                            .then(response=> {
+                    this.dialogGrant = true;
+                    this.wages = '2'
+                    this.socialSecurity = '2'
+                    this.AccumulationFund = '2'
+                    this.IndividualIncomeTax = '2'
+                    this.ffqj = '1'
+                    this.loading = false;
+                }
+            },
+            //关闭工资发放模态框取消按钮
+            closeGrant(){
+                this.dialogGrant = false;
+                this.grantLoading = false;
+                this.loading = false
+            },
+            grantAxios(){
+                this.isComplete = true;
+                this.$confirm('确定是否工资发放？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+//                    console.log(this.wages);
+                    this.dialogGrant = false;
+                    let params = new URLSearchParams();
+                    let url = addUrl.addUrl('grant');
+                    params.append('ym',this.currentYM);
+                    params.append('gzPayWay',this.wages);
+                    params.append('sbPayWay',this.socialSecurity);
+                    params.append('gjjPayWay',this.AccumulationFund);
+                    params.append('gsPayWay',this.IndividualIncomeTax);
+                    params.append('ffqj',this.ffqj);
+                    axios.post(url,params)
+                        .then(response=> {
 //                                console.log(response);
-                                let provideType = response.data.value.provideType
-                                let provideMsg = response.data.value.provideMsg
-                                if(provideType == 1){
-                                    this.$message.success(provideMsg);
-                                    this.provideYM = String(Number(this.provideYM) + 1);//将末次发放年月+1
-                                }else{
-                                    this.$message.error(provideMsg);
-                                }
-
-                                this.loading = false
-                                this.dialogFormVisible = false
-                            })
+                            let provideType = response.data.value.provideType
+                            let provideMsg = response.data.value.provideMsg
+                            if(provideType == 1){
+                                this.$message.success(provideMsg);
+                            }else{
+                                this.$message.error(provideMsg);
+                            }
+                            this.loading = false;
+                            this.isComplete = false;
+                            this.grantLoading = false;
+                            this.dialogFormVisible = false
+                        })
                         .catch(()=>{
                             this.loading = false
+                            this.grantLoading = false;
+                            this.isComplete = false;
                         })
-                    })
-                }
+                }).catch(()=>{
+                    this.loading = false
+                    this.isComplete = false;
+                    this.grantLoading = false;
+                })
             },
             //工资计提
             Calculation(){
+                this.calculationLoading = true
                 this.loading = true
                 if(!this.isCalculation){
                     this.$confirm('计提工资之后，不可修改当前账期的工资单，同时也不能进行员工的添加，建议等到月结时系统自动计提当前账期下的工资！确定是否进行计提？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        type: 'warning'
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
                     }).then(() => {
+                        let params = new URLSearchParams();
                         let url = addUrl.addUrl('Calculation');
-                        axios.post(url)
+                        params.append('ym',this.currentYM)
+                        axios.post(url,params)
                             .then(response=> {
 //                                console.log(response);
                                 let accruedType = response.data.value.accruedType
                                 let accruedMsg = response.data.value.accruedMsg
+
                                 if (accruedType == 1) {
                                     this.$message.success(accruedMsg);
                                     this.accruedYM = String(Number(this.accruedYM) + 1);//将末次计提年月+1
@@ -253,14 +369,17 @@
                                     this.$message.error(accruedMsg);
                                 }
                                 this.loading = false
+                                this.calculationLoading = false;
                                 this.dialogFormVisible = false
                             })
                     }).catch(()=>{
                         this.loading = false
+                        this.calculationLoading = false
                     })
                 }else{
                     this.$message.error('当前账期工资已计提！');
                     this.loading = false
+                    this.calculationLoading = false
                 }
 
             },
@@ -291,7 +410,26 @@
                 this.$confirm('确定是否删除？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    type: 'warning'
+                    showClose: false,
+                    closeOnClickModal: false,
+                    closeOnPressEscape: false,
+                    type: 'warning',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.cancelButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            setTimeout(() => {
+                                done();
+                                setTimeout(() => {
+                                    instance.confirmButtonLoading = false;
+                                    instance.cancelButtonLoading = false;
+                                }, 300);
+                            }, 300);
+                        } else {
+                            done();
+                        }
+                    }
                 }).then(() => {
                     let params = new URLSearchParams();
                     let url = addUrl.addUrl('payrollDelete');
@@ -318,7 +456,16 @@
                 this.indexYM = String(this.year) + String(this.activeName)
                 if(Number(this.currentYM) < Number(this.indexYM)){
                     this.$message.error('对不起，当前日期没有员工数据')
+                    this.tableData3 = []
+                }else if(Number(this.start_ym) > Number(this.indexYM)){
+                    this.$message.error('对不起，当前日期没有员工数据')
+                    this.tableData3 = []
                 }else{
+                    if(Number(this.indexYM) > Number(this.accruedYM)){
+                        this.isCalculation = false
+                    }else{
+                        this.isCalculation = true
+                    }
                     this.axios()
                 }
             },
@@ -327,7 +474,16 @@
                 this.indexYM = String(this.year) + String(this.activeName)
                 if(Number(this.currentYM) < Number(this.indexYM)){
                     this.$message.error('对不起，当前日期没有员工数据')
+                    this.tableData3 = []
+                }else if(Number(this.start_ym) > Number(this.indexYM)){
+                    this.$message.error('对不起，当前日期没有员工数据')
+                    this.tableData3 = []
                 }else{
+                    if(Number(this.indexYM) > Number(this.accruedYM)){
+                        this.isCalculation = false
+                    }else{
+                        this.isCalculation = true
+                    }
                     this.axios()
                 }
             },
@@ -353,10 +509,30 @@
 
                         this.loading = false
                     })
-                .catch(()=>{
-                    this.loading = false
-                })
+                    .catch(()=> {
+                        this.loading = false
+                    })
             }
+        },
+        mounted(){
+            // 动态设置背景图的高度为浏览器可视区域高度
+            // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
+            var topHeight = $('.top').innerHeight()
+            var headerHeight = $('header').innerHeight()
+//            console.log(topHeight);
+//            console.log(headerHeight);
+            this.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+            this.tableHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 150}px`;
+            // 然后监听window的resize事件．在浏览器窗口变化时再设置下背景图高度．
+            const that = this;
+            window.onresize = function temp() {
+                var topHeight = $('.top').innerHeight()
+                var headerHeight = $('header').innerHeight()
+//                console.log(topHeight);
+//                console.log(headerHeight);
+                that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
+                that.tableHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 150}px`;
+            };
         },
         created(){
             var url = addUrl.addUrl('payroll');
@@ -364,7 +540,7 @@
                 .then(response=> {
 //                    console.log(response);
                     let data = response.data.value
-                    let currentYM = data.currentYM;
+                    let currentYM = this.current_book_ym;
                     var url = addUrl.addUrl('derive');
                     this.year = currentYM.substring(0,4)
                     this.activeName = currentYM.substring(4,6)
@@ -377,19 +553,20 @@
                         this.showProvideDay = '未设置'
                     }else{
                         this.showProvideDay = showProvideDay
+                        this.provideDay = showProvideDay
                     }
 
                     this.accruedYM = data.accruedYM;
                     this.currentYM = currentYM
                     this.indexYM = data.indexYM
-                    this.provideYM = data.provideYM
 
-//                    console.log(this.currentYM,'当前账期');
-//                    console.log(this.provideYM,'末次发放年月');
-//                    console.log(this.accruedYM,'末次计提年月');
-                    if(Number(this.accruedYM) >= Number(this.currentYM)){
+//                    console.log(Number(this.currentYM) > Number(this.accruedYM));
+                    if(Number(this.currentYM) > Number(this.accruedYM)){
                         this.isCalculation = false
+                    }else{
+                        this.isCalculation = true
                     }
+
                     this.url = url + '?ym=' + this.indexYM;
 
                     this.axios();
@@ -419,7 +596,6 @@
         height: 100%;
         background-color: #fff;
         padding: 20px 40px;
-        margin-bottom: 50px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }
@@ -429,33 +605,26 @@
         float: left;
         margin-left: 2%;
     }
-    .yearSelect{
-        display: inline-block;
-        width:12%;
-        float: left;
-        margin-top: 10px;
-    }
-
     .mon{
         font-size:16px;
         font-weight: bold;
     }
-    .back{
+    .top .back{
         display: inline-block;
         width:56px;
-        height:31px;
+        height:30px;
         background-color: #fff;
         border: 1px solid #ccc;
         border-radius: 3px;
         line-height: 32px;
         text-align: center;
-        font-size:14px;
+        font-size:12px;
         text-decoration: none;
         color: #333;
         position: absolute;
         right: -2px;
     }
-    .sub1{
+    .top .sub1{
         display: inline-block;
         width: 56px;
         height:32px;
@@ -468,25 +637,25 @@
         right:60px;
         font-size:12px;
     }
-    .sub2{
+    .top .sub2{
         position: absolute;
         right:120px;
         font-size:12px;
     }
-    .sub3{
+    .top .sub3{
         position: absolute;
         right:205px;
         font-size:12px;
     }
-    .sub4{
+    .top .sub4{
         position: absolute;
         right:290px;
         font-size:12px;
     }
-    .sub5{
+    .top .sub5{
         display: inline-block;
         width: 104px;
-        height:32px;
+        height:30px;
         color: #fff;
         background-color: #fea728;
         border-radius: 3px;
@@ -495,6 +664,21 @@
         position: absolute;
         left:0px;
         font-size:12px;
+    }
+    .top .sub6{
+        display: inline-block;
+        width:120px;
+        height:30px;
+        color: #333;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        line-height: 32px;
+        text-align: center;
+        font-size:12px;
+        text-decoration: none;
+        position: absolute;
+        left:120px;
     }
     .operation {
         cursor: pointer;
@@ -508,6 +692,16 @@
     .littleTable .el-table__header-wrapper table thead tr th{
         background-color: #fff;
         color: #333;
+    }
+    .tabs .el-tabs__item{
+        padding:0 28px
+    }
+    .wagesUl{
+        margin-bottom: 30px;
+    }
+    .wagesUl .wagesName{
+        display: inline-block;
+        width:100px;
     }
 
 </style>

@@ -278,8 +278,6 @@
                 this.imgName2 = this.allName[1] ? this.allName[1] : '';
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
-                console.log(this.imgUrl1);
-                console.log(this.imgName1);
                 params.append('sale_id',this.debitId);
                 params.append('advance_id',this.advanceId);
                 params.append('receive_money',money);
@@ -348,14 +346,13 @@
             };
         },
         created(){
-            console.log(this.advanceId);
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newSalePayment')
             params.append('saleId',this.debitId);
             params.append('advanceId',this.advanceId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.unReceiveMoney = number.number(data.unReceiveMoney)
                     var list = data.list

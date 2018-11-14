@@ -118,10 +118,10 @@
             axios.post(url, params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;//借款单审批列表数据
                     var tableDataarr =[];
-                    console.log(data);
+//                    console.log(data);
                     if(data.debitList){
                         for(var i =0; i < data.debitList.length; i++){
                             data.debitList[i].showMoney = number.number(data.debitList[i].money);

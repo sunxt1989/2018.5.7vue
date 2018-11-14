@@ -232,12 +232,12 @@
             let url = addUrl.addUrl('Initialization');
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     let currentYM = this.current_book_ym;
 
                     this.currentYM = currentYM.substring(0,4) + '年' + currentYM.substring(4,6) + '月'
-                    console.log(this.currentYM);
+//                    console.log(this.currentYM);
                     this.year = currentYM.substring(0,4)
                     this.ymName = currentYM.substring(4,6)
                     this.moonName1 = String(this.ymName) + '月前累计借方'
@@ -262,7 +262,6 @@
                     }
                     for(let i = 0; i < numArr.length; i++){
                         if(i == numArr.length - 1){
-                            console.log(data.assistantSubjectList.length - numArr[i]);
                             data.assistantSubjectList[numArr[i]].rowspan = data.assistantSubjectList.length - numArr[i]
                         }
                         if(numArr[i+1] - numArr[i] > 0){

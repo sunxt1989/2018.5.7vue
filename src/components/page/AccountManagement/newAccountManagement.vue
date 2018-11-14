@@ -267,11 +267,19 @@
                         this.$message.error('请正确输入统一社会信用代码');
                         this.loading = false;
                         return
-                    }else if(this.provinceCode == ''|| this.cityCode == '' || this.areaCode == ''){
+                    }else if(this.provinceCode == ''|| this.cityCode == ''){
                         this.$message.error('请正确输入企业所在地');
                         this.loading = false;
                         return
-                    }else if(this.companyType == ''){
+                    }else if( !(this.cityCode == '441900' ||
+                        this.cityCode == '442000'||
+                        this.cityCode == '460300' ||
+                        this.cityCode == '460400' ||
+                        this.cityCode == '620200') && this.areaCode == ''){
+                        this.$message.error('请正确输入企业所在地');
+                        this.loading = false;
+                        return
+                    } else if(this.companyType == ''){
                         this.$message.error('请正确输入企业所属行业');
                         this.loading = false;
                         return
@@ -352,7 +360,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$message({
                                 type: 'success',
@@ -372,7 +380,7 @@
                     })
             },
             axios(n){
-                console.log(this.provinceCode);
+//                console.log(this.provinceCode);
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('getArea')
 
@@ -381,7 +389,7 @@
 
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value
                         if(n == 1){
                             this.options2 = data
@@ -419,7 +427,7 @@
             var url = addUrl.addUrl('getArea')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     this.options1 = data
                     let date = new Date();
