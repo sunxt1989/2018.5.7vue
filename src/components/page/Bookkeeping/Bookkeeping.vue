@@ -4,10 +4,25 @@
             <div class="top">
                 <h2>记账凭证</h2>
                 <router-link to="/" class="back">返回</router-link>
+                <div class="time">
+                    <span class="tit2">凭证日期:</span>
+                    <el-date-picker
+                        class="iptData"
+                        v-model="documentDate"
+                        type="date"
+                        value-format="yyyy-MM-dd"
+                        :picker-options="pickerOptions1"
+                        placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+
             </div>
         </div>
         <div class="w">
-            <div class="content">
+            <div class="content" :style="{height:screenHeight}">
+                <!--<span class="">记自第<input type="text">号</span>-->
+
+                <!--<span>附单据<input type="text">张</span>-->
                 <table>
                     <col width="300px">
                     <col width="300px">
@@ -76,7 +91,7 @@
                             <i v-show="isTrueArr[0].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[0].subject" @change="subjectChange(0)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[0].subject" @change="subjectChange(0)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -86,6 +101,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[0].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[0].borrow.includes('-')}">{{borrowArr[0][0]}}</td>
@@ -126,7 +142,7 @@
                             <i v-show="isTrueArr[1].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[1].subject" @change="subjectChange(1)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[1].subject" @change="subjectChange(1)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -136,6 +152,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[1].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[1].borrow.includes('-')}">{{borrowArr[1][0]}}</td>
@@ -176,7 +193,7 @@
                             <i v-show="isTrueArr[2].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[2].subject" @change="subjectChange(2)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[2].subject" @change="subjectChange(2)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -186,6 +203,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[2].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[2].borrow.includes('-')}">{{borrowArr[2][0]}}</td>
@@ -225,7 +243,7 @@
                             <i v-show="isTrueArr[3].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[3].subject" @change="subjectChange(3)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[3].subject" @change="subjectChange(3)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -235,6 +253,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[3].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[3].borrow.includes('-')}">{{borrowArr[3][0]}}</td>
@@ -274,7 +293,7 @@
                             <i v-show="isTrueArr[4].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[4].subject" @change="subjectChange(4)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[4].subject" @change="subjectChange(4)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -284,6 +303,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[4].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[4].borrow.includes('-')}">{{borrowArr[4][0]}}</td>
@@ -323,7 +343,7 @@
                             <i v-show="isTrueArr[5].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[5].subject" @change="subjectChange(5)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[5].subject" @change="subjectChange(5)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -333,6 +353,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[5].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[5].borrow.includes('-')}">{{borrowArr[5][0]}}</td>
@@ -372,7 +393,7 @@
                             <i v-show="isTrueArr[6].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[6].subject" @change="subjectChange(6)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[6].subject" @change="subjectChange(6)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -382,6 +403,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[6].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[6].borrow.includes('-')}">{{borrowArr[6][0]}}</td>
@@ -421,7 +443,7 @@
                             <i v-show="isTrueArr[7].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[7].subject" @change="subjectChange(7)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[7].subject" @change="subjectChange(7)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -431,6 +453,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[7].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[7].borrow.includes('-')}">{{borrowArr[7][0]}}</td>
@@ -470,7 +493,7 @@
                             <i v-show="isTrueArr[8].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[8].subject" @change="subjectChange(8)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[8].subject" @change="subjectChange(8)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -480,6 +503,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[8].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[8].borrow.includes('-')}">{{borrowArr[8][0]}}</td>
@@ -519,7 +543,7 @@
                             <i v-show="isTrueArr[9].isTrue" class="icon iconfont icon-31xuanze green"></i>
                         </td>
                         <td>
-                            <el-select v-model="subjectArr[9].subject" @change="subjectChange(9)" filterable default-first-option placeholder="请选择">
+                            <el-select class="subject" v-model="subjectArr[9].subject" @change="subjectChange(9)" filterable default-first-option placeholder="请选择">
                                 <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -529,6 +553,7 @@
                                     <span style="float: right; color: #8492a6; font-size: 13px">{{ item.subjectName }}</span>
                                 </el-option>
                             </el-select>
+                            <p class="balance">科目余额：{{balanceArr[9].balance}}元</p>
                         </td>
 
                         <td class="debit" :class="{red:borrowsArr[9].borrow.includes('-')}">{{borrowArr[9][0]}}</td>
@@ -598,6 +623,7 @@
                 <el-button v-show="isShowAddBtn" @click="addEffective" class="add-effective" type="primary" icon="el-icon-plus">
                     新增条目
                 </el-button>
+                <el-button :loading="isLoading" @click="save" class="save">保存</el-button>
             </div>
         </div>
     </div>
@@ -612,6 +638,12 @@
     export default {
         data() {
             return {
+                documentDate:'',
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
                 isTrueArr:[
                     {isTrue:false},
                     {isTrue:false},
@@ -659,6 +691,18 @@
                     {subject:''},
                     {subject:''},
                     {subject:''},
+                ],//会计科目
+                balanceArr:[
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
                 ],//会计科目
                 borrowsArr:[
                     {borrow:''},
@@ -713,8 +757,9 @@
                 totalArr:['','','','','','','','','','','','','','','','','','','','','',''],//合计数组
 
                 options: [],
+                isLoading:false,
                 isShowAddBtn:true,//是否显示添加按钮
-                loading:false,
+                loading:true,
                 screenHeight: '' //页面初始化高度
             }
         },
@@ -755,12 +800,22 @@
             },
             //会计科目change事件
             subjectChange(n){
+                if(this.documentDate){
+                    this.balance(n)
+                }else{
+                    this.$message.error('请选择凭证日期')
+                    this.subjectArr[n].subject = ''
+                    Vue.set(this.subjectArr,n,this.subjectArr[n])
+                    return
+                }
                 let borrow = this.borrowsArr[n].borrow
                 let loan = this.loansArr[n].loan;
                 if(borrow || loan){
                     this.isTrueArr[n].isTrue = true;
                     this.totalChange()
+
                 }
+
             },
             //删除条目
             deleteEffective(n){
@@ -966,6 +1021,116 @@
                     this.loanArr[n] =  ['','','','','','','','','','','']
                     return false
                 }
+            },
+            //保存按钮事件
+            save(){
+                let isTrueArr = [];
+                if(this.documentDate == ''){
+                    this.$message.error('请选择凭证日期');
+                    return
+                }
+                for(let i in this.isTrueArr){
+                    isTrueArr.push(this.isTrueArr[i].isTrue)
+                }
+                console.log(isTrueArr);
+                if(!isTrueArr.includes(true)){
+                    this.$message.error('请至少填写一条有效条目');
+                    return
+                }else{
+                    this.isLoading = true;
+                    this.$confirm('确定是否保存？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(() => {
+                        this.loading = true;
+                        this.saveAjax(isTrueArr)
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                        this.loading = false;
+                        this.isLoading = false;
+                    });
+                }
+            },
+            //保存接口
+            saveAjax(isTrueArr){
+                let certificateArr = [];
+                let certificateString = '';
+                for(let i = 0; i < isTrueArr.length; i++){
+                    let obj = {}
+                    if(isTrueArr[i]){
+                        obj.subjectCode = this.subjectArr[i].subject
+                        obj.remark = this.abstractArr[i].abstract
+                        obj.debitAmout = this.borrowsArr[i].borrow
+                        obj.creditAmout = this.loansArr[i].loan
+                        certificateArr.push(obj)
+                    }
+                };
+                certificateString = JSON.stringify(certificateArr);
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('certificateSave')
+                params.append('date',this.documentDate);
+                params.append('certificateString',certificateString);
+                axios.post(url,params)
+                    .then(response=> {
+                        console.log(response);
+                        let msg = response.data.msg
+                        if(response.data.status == 200){
+                            this.$message.success('保存成功');
+                            this.$router.push('/Bookkeeping/Bookkeeping')
+                        }else if(response.data.status == 400){
+                            this.$message.error(msg)
+                        }
+                        this.loading = false;
+                        this.isLoading = false;
+                    }).catch(error=> {
+//                        console.log(error);
+//                alert('网络错误，不能访问');
+                    this.loading = false;
+                    this.isLoading = false;
+                })
+            },
+            //获取科目余额接口
+            balance(n){
+                //获取tree结构的axios请求
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('balance')
+                params.append('date',this.documentDate);
+                params.append('subjectCode',this.subjectArr[n].subject);
+                axios.post(url,params)
+                    .then(response=> {
+                    console.log(response);
+                        let data = response.data.value;//列表数据
+                        this.balanceArr[n].balance = number.number(data.amount)
+                        Vue.set(this.balanceArr,n,this.balanceArr[n])
+                        this.loading = false;
+                    }).catch(error=> {
+//                        console.log(error);
+//                alert('网络错误，不能访问');
+                    this.loading = false;
+                })
             }
         },
         mounted(){
@@ -988,10 +1153,10 @@
         },
         created(){
             //获取tree结构的axios请求
-            let url = addUrl.addUrl('subjectList')
+            let url = addUrl.addUrl('subjectList');
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;//列表数据
                     if(data.result == 1){
                         this.options = data.dataList
@@ -1035,6 +1200,14 @@
         position: absolute;
         right: 30px;
     }
+    .time {
+        position: absolute;
+        top:0px;
+        left: 30px;
+    }
+    .time .tit2{
+        font-size:18px;
+    }
     .content{
         width: 1120px;
         background-color: #fff;
@@ -1042,14 +1215,15 @@
         text-align: left;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
-        text-align: center;
     }
+
     table tr th,td{
         border: 1px solid #ccc;
     }
     table {
         color: #333;
         font-size:18px;
+        margin-top: 20px;
     }
     table tr th,td {
         vertical-align: middle;
@@ -1074,6 +1248,16 @@
     }
     table tbody tr .firTd{
         position: relative;
+    }
+    table tbody tr td .subject{
+        display: inline-block;
+        width:90%;
+    }
+    table tbody tr td .balance{
+        display: inline-block;
+        width:90%;
+        font-size:16px;
+        text-align: left;
     }
     table tbody tr td .icon-31xuanze{
         display: inline-block;
@@ -1131,6 +1315,9 @@
         border-right: 2px solid #efbbb9;
     }
     .content .add-effective{
+        margin-top: 50px;
+    }
+    .content .save{
         margin-top: 50px;
     }
 

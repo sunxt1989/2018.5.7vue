@@ -22,7 +22,7 @@
                             <span v-if="scope.row.type == 2">软件</span>
                             <span v-if="scope.row.type == 3">劳务服务</span>
                             <span v-if="scope.row.type == 4">技术服务</span>
-                            <span v-if="scope.row.type == 5">待销商品</span>
+                            <span v-if="scope.row.type == 5">库存商品</span>
                             <span v-if="scope.row.type == 6">固定资产</span>
                             <span v-if="scope.row.type == 7">电信服务</span>
                             <span v-if="scope.row.type == 8">设计服务</span>

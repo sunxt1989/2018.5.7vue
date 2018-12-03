@@ -123,7 +123,7 @@
                         <span class="tit">报销日期</span>
                         <el-date-picker
                             class="sel"
-                            v-model="debitDate"
+                            v-model="applicationDate"
                             type="date"
                             placeholder="选择日期"
                             :picker-options="pickerOptions1"
@@ -253,6 +253,7 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
+    import { mapState } from 'vuex'
     export default {
         data () {
             return {
@@ -260,7 +261,7 @@
                 originalTypeName: '',//报销名称
                 money: '',//总金额
                 simpleConfirmDate: '',//付款日期
-                debitDate: '',//报销日期
+                applicationDate: '',//报销日期
                 simpleReceiptDate: '',//费用发生日期
                 receiptCount: '',//票据张数
                 payType: '',//结算方式
@@ -327,6 +328,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         methods: {
             inputWithSelectChange(n, $event){
                 var str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
@@ -350,19 +352,24 @@
                 this.isShare = !this.isShare
             },
             model(n){
+                let applicationDate = Number(this.applicationDate.split('-').join('').substring(0,6));//选择的日期
+                let applicationDateYear = Number(this.applicationDate.substring(0,4));//选择的日期的年份
+                let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
                 this.loading = true
                 //找出费用单列表中时间最早的那一个，之后再和报销时间做对比
                 let receiptList = this.receiptList;
-                let simpleReceiptDate = ''//最早日期
-                for (let i in receiptList) {
-                    if (simpleReceiptDate) {
-                        if (simpleReceiptDate > Number((receiptList[i].simpleReceiptDate).split('-').join(''))) {
-                            simpleReceiptDate = Number((receiptList[i].simpleReceiptDate).split('-').join(''))
-                        }
-                    } else {
-                        simpleReceiptDate = Number((receiptList[i].simpleReceiptDate).split('-').join(''))
-                    }
+                let simpleReceiptDate = []//费用单中时间数组
+
+                for(let i in receiptList){//获取所有费用单中时间数组
+                    simpleReceiptDate.push(Number((receiptList[i].simpleReceiptDate).split('-').join('')));
                 }
+                simpleReceiptDate.sort(function(x,y){//将时间数组按照从小到打的的顺序排序
+                    if (x < y) return -1;
+                    if (x > y) return 1;
+                    return 0;
+                });
 
                 if (n == 0) {
                     if (this.isShowShare) {
@@ -385,7 +392,7 @@
                         let input3 = Number(this.input3)
                         let input4 = Number(this.input4)
                         let input5 = Number(this.input5)
-                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(2)
 //                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
                         if (allInput != 100) {
@@ -400,7 +407,6 @@
                             this.loading = false;
                             return
                         }
-
                     }
                     if (this.receiptList == '') {
                         this.$message.error('请添加费用单');
@@ -415,7 +421,7 @@
                         this.$message.error('请正确输入费用类别');
                         this.loading = false
                         return
-                    } else if (simpleReceiptDate > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
+                    } else if (simpleReceiptDate[0] > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
                         this.$message.error('报销日期不得早于费用发生日期');
                         this.loading = false
                         return
@@ -461,7 +467,7 @@
                         let input3 = Number(this.input3)
                         let input4 = Number(this.input4)
                         let input5 = Number(this.input5)
-                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(2)
 //                        console.log(allInput);
                         //判断所有填写的百分比是不是等于100
                         if (allInput != 100) {
@@ -486,15 +492,32 @@
                         this.$message.error('请正确输入报销日期');
                         this.loading = false
                         return
-                    } else if (this.type == '' || this.childType1 == '') {
+                    }
+                    if (this.type == '' || this.childType1 == '') {
                         this.$message.error('请正确输入费用类别');
                         this.loading = false
                         return
-                    } else if (simpleReceiptDate > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
+                    }
+                    if (simpleReceiptDate[0] > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
                         this.$message.error('报销日期不得早于费用发生日期');
                         this.loading = false
                         return
                     }
+
+                    if(this.isMonthlyKnots && !this.isAnnualKnots){
+                        if((applicationDateYear != lastYear) && applicationDate < current_book_ym){
+                            this.$message.error('请正确输入日期');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        if(applicationDate < current_book_ym ) {
+                            this.$message.error('报销日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
+                    }
+
                     this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
@@ -698,7 +721,7 @@
                     params.append('discription', this.discription);
                     params.append('money', money);
                     params.append('departmentJson', departmentJson);
-                    params.append('applicationDate', this.debitDate);
+                    params.append('applicationDate', this.applicationDate);
                     params.append('originalReceiptIds', this.originalReceiptIds);
                     params.append('receiptCount', this.receiptCount);
                     params.append('originalType', this.originalType);
@@ -708,7 +731,7 @@
                     params.append('discription', this.discription);
                     params.append('money', money);
                     params.append('departmentJson', departmentJson);
-                    params.append('applicationDate', this.debitDate);
+                    params.append('applicationDate', this.applicationDate);
                     params.append('originalReceiptIds', this.originalReceiptIds);
                     params.append('receiptCount', this.receiptCount);
                     params.append('originalType', this.originalType);
@@ -938,7 +961,7 @@
                     this.money = number.number(data.application.money)
                     this.simpleConfirmDate = data.application.simpleConfirmDate
                     this.simpleReceiptDate = data.application.simpleReceiptDate
-                    this.debitDate = this.simpleReceiptDate
+                    this.applicationDate = this.simpleReceiptDate
                     this.payType = data.application.payType
                     this.receiptCount = data.application.receiptCount
                     this.discription = data.application.discription

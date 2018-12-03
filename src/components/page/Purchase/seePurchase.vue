@@ -448,7 +448,7 @@
                     {value:'2',label:'软件'},
                     {value:'3',label:'劳务服务'},
                     {value:'4',label:'技术服务'},
-                    {value:'5',label:'待销商品'},
+                    {value:'5',label:'库存商品'},
                     {value:'11',label:'专利技术'},
                     {value:'12',label:'非专利技术'},
                     {value:'13',label:'商标'},
@@ -623,7 +623,7 @@
                 }
             }
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         methods: {
             inputWithSelectChange(n,$event){
                 var str = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
@@ -1242,7 +1242,7 @@
                         let input3 = Number(this.input3)
                         let input4 = Number(this.input4)
                         let input5 = Number(this.input5)
-                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(2)
                         //判断所有填写的百分比是不是等于100
                         if(allInput != 100 ){
                             this.$message.error('请正确输入分摊比例');
@@ -1262,29 +1262,56 @@
                         this.$message.error('请正确输入供应商');
                         this.loading = false;
                         return
-                    }else if(this.type == ''){
+                    }
+                    if(this.type == ''){
                         this.$message.error('请正确输入采购类别');
                         this.loading = false;
                         return
-                    }else if(this.taxFlg == ''){
+                    }
+                    if(this.taxFlg == ''){
                         this.$message.error('请正确输入发票类别');
                         this.loading = false;
                         return
-                    }else if(this.purchaseDate == ''){
+                    }
+                    if(this.purchaseDate == ''){
                         this.$message.error('请正确输入日期' );
                         this.loading = false;
                         return
-                    }else if(this.totalMoney == '' || this.totalMoney == '0.00'){
+                    }
+                    let purchaseDate = Number(this.purchaseDate.split('-').join('').substring(0,6));//当前选择日期
+                    let purchaseDateYear = Number(this.purchaseDate.substring(0,4));//当前选择日期的年份
+                    let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                    let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断已经12月月结但是还没年结时
+                        if(purchaseDate < current_book_ym){//先判断采购日期不得早于当前账期
+                            if(purchaseDateYear == lastYear && purchaseDate != annualKnots ){// 再判断选择的是否是去年12月份
+                                this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
+                                this.loading = false;
+                                return
+                            }else if(purchaseDateYear != lastYear){
+                                this.$message.error('采购日期不得早于当前账期');
+                                this.loading = false
+                                return
+                            }
+                        }
+                    } else{
+                        if(purchaseDate < current_book_ym ) {
+                            this.$message.error('采购日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
+                    }
+
+                    if(this.totalMoney == '' || this.totalMoney == '0.00'){
                         this.$message.error('请添加明细项');
                         this.loading = false;
                         return
-                    }else if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
+                    }
+                    if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
                         this.$message.error('请添加明细项');
                         this.loading = false;
-                        return
-                    }else if(Number(this.purchaseDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
-                        this.$message.error('采购日期不得早于当前账期');
-                        this.loading = false
                         return
                     }
                     this.isLoading = true;
@@ -1651,14 +1678,14 @@
                         this.loading = false;
                         this.isLoading = false;
 //                        console.log(response);
+                        let msg = response.data.msg;
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '提交成功'
+                                message: msg
                             });
                         }else if(response.data.status == 400){
-                            var msg = response.data.msg;
                             this.$message.error(msg);
                         }
                     })

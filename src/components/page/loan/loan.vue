@@ -96,6 +96,7 @@
                 <el-pagination
                     @current-change="changePage"
                     background
+                    :current-page.sync="currentPage"
                     layout="prev, pager, next"
                     :total='count'>
                 </el-pagination>

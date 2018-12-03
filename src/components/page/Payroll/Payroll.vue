@@ -501,7 +501,32 @@
                         let msg = response.data.msg
                         if(status == 200){
                             let data = response.data.value;
-                            this.tableData3 = data.sumList;
+                            let sumList = data.sumList
+                            //判断table列表中，金额如果为空时补填0.00
+                            for(let i in sumList){
+                                sumList[i].shouldWages = sumList[i].shouldWages ? sumList[i].shouldWages :'0.00'
+                                sumList[i].endowmentInsurancePerson = sumList[i].endowmentInsurancePerson ? sumList[i].endowmentInsurancePerson :'0.00'
+                                sumList[i].medicalInsurancePerson = sumList[i].medicalInsurancePerson ? sumList[i].medicalInsurancePerson :'0.00'
+                                sumList[i].unemploymentInsurancePerson = sumList[i].unemploymentInsurancePerson ? sumList[i].unemploymentInsurancePerson :'0.00'
+                                sumList[i].maternityInsurancePerson = sumList[i].maternityInsurancePerson ? sumList[i].maternityInsurancePerson :'0.00'
+                                sumList[i].employmentInjuryInsurancePerson = sumList[i].employmentInjuryInsurancePerson ? sumList[i].employmentInjuryInsurancePerson :'0.00'
+                                sumList[i].housingProvidentFundPerson = sumList[i].housingProvidentFundPerson ? sumList[i].housingProvidentFundPerson :'0.00'
+                                sumList[i].insuranceSumPerson = sumList[i].insuranceSumPerson ? sumList[i].insuranceSumPerson :'0.00'
+                                sumList[i].endowmentInsuranceCompany = sumList[i].endowmentInsuranceCompany ? sumList[i].endowmentInsuranceCompany :'0.00'
+                                sumList[i].medicalInsuranceCompany = sumList[i].medicalInsuranceCompany ? sumList[i].medicalInsuranceCompany :'0.00'
+                                sumList[i].unemploymentInsuranceCompany = sumList[i].unemploymentInsuranceCompany ? sumList[i].unemploymentInsuranceCompany :'0.00'
+                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
+                                sumList[i].employmentInjuryInsuranceCompany = sumList[i].employmentInjuryInsuranceCompany ? sumList[i].employmentInjuryInsuranceCompany :'0.00'
+                                sumList[i].housingProvidentFundCompany = sumList[i].housingProvidentFundCompany ? sumList[i].housingProvidentFundCompany :'0.00'
+                                sumList[i].insuranceSumCompany = sumList[i].insuranceSumCompany ? sumList[i].insuranceSumCompany :'0.00'
+                                sumList[i].taxableIncome = sumList[i].taxableIncome ? sumList[i].taxableIncome :'0.00'
+                                sumList[i].incomeTax = sumList[i].incomeTax ? sumList[i].incomeTax :'0.00'
+                                sumList[i].actualWages = sumList[i].actualWages ? sumList[i].actualWages :'0.00'
+                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
+                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
+                            }
+
+                            this.tableData3 = sumList;
                         }else if(status == 400){
                             this.$message.error(msg)
                             this.tableData3 = [];

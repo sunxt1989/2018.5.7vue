@@ -96,7 +96,7 @@
                 money:'',//本次还款
                 debitDate:'',//还款时间
                 tableData: [],//还款明细
-                debitDateYMD: [],//审核时间
+                debitDateYMD: [],//借款单确认日期
                 pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
@@ -142,11 +142,10 @@
                     }
                     //判断还款时间不能早于审核时间
                     if(Number(this.debitDateYMD.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
-                        this.$message.error('确认日期不得早于当前还款日期')
+                        this.$message.error('还款日期不得早于借款单确认日期');
                         this.loading = false;
                         return
                     }
-
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',

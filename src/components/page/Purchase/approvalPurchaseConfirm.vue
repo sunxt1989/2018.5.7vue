@@ -94,7 +94,7 @@
                             <span>确认日期</span>
                             <el-date-picker
                                 class="bankCode"
-                                v-model="debitDate"
+                                v-model="sendDate"
                                 type="date"
                                 :picker-options="pickerOptions1"
                                 placeholder="选择日期"
@@ -367,7 +367,7 @@
                 ],//结算方式列表
                 bankCode:'',//银行账户
                 bankAccountList:[],//银行账户列表
-                debitDate:'',//确认日期
+                sendDate:'',//确认日期
                 isCashier:false,//是否是出纳
                 isTrue:false,
 
@@ -407,7 +407,7 @@
                     {value:'2',label:'软件'},
                     {value:'3',label:'劳务服务'},
                     {value:'4',label:'技术服务'},
-                    {value:'5',label:'待销商品'},
+                    {value:'5',label:'库存商品'},
                     {value:'11',label:'专利技术'},
                     {value:'12',label:'非专利技术'},
                     {value:'13',label:'商标'},
@@ -462,6 +462,38 @@
                 screenHeight: '' //页面初始化高度
             }
         },
+        watch:{
+            newList1:function(val){
+//                console.log(val);
+                var totalMoney = 0;
+                var unTotalMoney = 0;
+                for(var i = 0; i < val.length; i++){
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
+                }
+                totalMoney += unTotalMoney;
+                this.totalMoney1 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2));
+
+                this.totalMoney = this.totalMoney1
+                this.unTotalMoney = this.unTotalMoney1
+            },
+            newList2:function(val){
+//                console.log(val);
+                var totalMoney = 0;
+                var unTotalMoney = 0;
+                for(var i = 0; i < val.length; i++){
+                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
+                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
+                }
+                totalMoney += unTotalMoney;
+                this.totalMoney2 = number.number(totalMoney.toFixed(2));
+                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
+
+                this.totalMoney = this.totalMoney2
+                this.unTotalMoney = this.unTotalMoney2
+            },
+        },
         methods: {
             //判断支付方式，如果选择银行支付，银行账户才能使用
             payTypeChange(){
@@ -497,8 +529,14 @@
                         msg = '确定是否驳回'
                     }else{
                         msg = '确定是否确认'
-                        if(this.debitDate == ''){
+                        if(this.sendDate == ''){
                             this.$message.error('请选择确认日期')
+                            this.loading = false
+                            return
+                        }
+                        //判断选择日期不能早于采购日期
+                        if(Number(this.sendDate.split('-').join('')) > Number(this.purchaseDate.split('-').join(''))){
+                            this.$message.error('确认日期不得早于采购单创建日期');
                             this.loading = false
                             return
                         }
@@ -539,7 +577,7 @@
                             type: 'info',
                             message: '已取消'
                         });
-                        this.loading = false
+                        this.loading = false;
                         this.isLoading = false;
                     });
                 }
@@ -556,7 +594,6 @@
                 this.dialogImageName2 = file.name;
                 this.dialogVisible2 = true;
             },
-
             submit(n){
                 this.loading = true;
                 var params = new URLSearchParams();
@@ -572,7 +609,7 @@
                 params.append('discription',this.discription2);
                 params.append('payType',this.payType);
                 params.append('bankCode',this.bankCode);
-                params.append('sendDate',this.debitDate);
+                params.append('sendDate',this.sendDate);
 
 //                console.log(url);
                 axios({
@@ -586,7 +623,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false;
-//                        console.log(response);
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -605,41 +642,8 @@
                         this.$message.error('提交失败，请重试！');
                     })
             },
-
         },
-        watch:{
-            newList1:function(val){
-//                console.log(val);
-                var totalMoney = 0;
-                var unTotalMoney = 0;
-                for(var i = 0; i < val.length; i++){
-                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
-                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
-                }
-                totalMoney += unTotalMoney;
-                this.totalMoney1 = number.number(totalMoney.toFixed(2));
-                this.unTotalMoney1 = number.number(unTotalMoney.toFixed(2));
-
-                this.totalMoney = this.totalMoney1
-                this.unTotalMoney = this.unTotalMoney1
-            },
-            newList2:function(val){
-//                console.log(val);
-                var totalMoney = 0;
-                var unTotalMoney = 0;
-                for(var i = 0; i < val.length; i++){
-                    unTotalMoney += parseFloat(unNumber.unNumber(val[i].money))
-                    totalMoney += parseFloat(unNumber.unNumber(val[i].taxMoney))
-                }
-                totalMoney += unTotalMoney;
-                this.totalMoney2 = number.number(totalMoney.toFixed(2));
-                this.unTotalMoney2 = number.number(unTotalMoney.toFixed(2));
-
-                this.totalMoney = this.totalMoney2
-                this.unTotalMoney = this.unTotalMoney2
-            },
-        },
-        computed:mapState(['isCashierFlg']),
+        computed:mapState(['isCashierFlg','current_book_ym']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -665,7 +669,7 @@
             params.append('purchase_send_id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value
                     var purchase = data.purchase
 
@@ -770,15 +774,15 @@
                     }
                     let date = new Date()
                     if(date.getMonth()+1 < 10){
-                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                        this.sendDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
                     }else{
-                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                        this.sendDate = date.getFullYear() + '-' + (date.getMonth()+1);
                     };
 
                     if(date.getDate() < 10){
-                        this.debitDate += '-0' + date.getDate()
+                        this.sendDate += '-0' + date.getDate()
                     }else{
-                        this.debitDate += '-' + date.getDate()
+                        this.sendDate += '-' + date.getDate()
                     }
 
                     this.loading = false

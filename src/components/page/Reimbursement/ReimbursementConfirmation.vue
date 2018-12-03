@@ -26,7 +26,7 @@
                         </el-select>
                     </li>
 
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem1" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" readonly>
                             <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -40,7 +40,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem2" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" readonly>
                             <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -54,7 +54,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem3" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" readonly>
                             <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -68,7 +68,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem4" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input4" class="input-with-select" readonly>
                             <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -106,7 +106,7 @@
                         <span class="tit">报销日期</span>
                         <el-date-picker
                             class="sel"
-                            v-model="simpleReceiptDate"
+                            v-model="simpleAccountDate"
                             type="date"
                             placeholder="选择日期"
                             disabled>
@@ -137,7 +137,7 @@
                             <span>{{scope.row.childTypeName}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="simpleReceiptDate" label="日期" sortable align="center"></el-table-column>
+                    <el-table-column prop="simpleAccountDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="discription" label="描述" sortable align="center"></el-table-column>
                     <el-table-column prop="operateUserName" label="姓名" sortable align="center"></el-table-column>
                     <el-table-column prop="money" label="金额" sortable align="center">
@@ -192,7 +192,7 @@
                     </li>
                     <li>
                         <span>银行账户</span>
-                        <el-select class="bankCode" v-model="bankCode" placeholder="请选择" :disabled="isTrue && isSettlement">
+                        <el-select class="bankCode" v-model="bankCode" placeholder="请选择" :disabled="isTrue || !isSettlement">
                             <el-option
                                 v-for="item in bankAccountList"
                                 :key="item.value"
@@ -205,7 +205,7 @@
                         <span>日期</span>
                         <el-date-picker
                             class="bankCode"
-                            v-model="debitDate"
+                            v-model="payDate"
                             type="date"
                             :picker-options="pickerOptions1"
                             placeholder="选择日期"
@@ -247,8 +247,8 @@
                 debitId:this.$route.params.debitId,//传参 ID
                 originalTypeName:'',//报销名称
                 money:'',//总金额
-                simpleConfirmDate:'',//付款日期
-                simpleReceiptDate:'',//报销日期
+                accountDate:'',//报销单日期
+                simpleAccountDate:'',//报销日期
                 receiptCount:'',//票据张数
                 discription:'',//事由
                 settlementMethod:'',//结算方式
@@ -283,7 +283,7 @@
                 offsetAmount:'',//冲抵金额
 
                 bankAccountList:[],//银行账户信息
-                debitDate:'',//日期
+                payDate:'',//日期
                 discription2:'同意',//审批意见
                 originalReceiptIds:'',//费用单id字符串（用逗号拼接）
                 payType:'2',//付款类型
@@ -314,7 +314,7 @@
         },
         methods:{
             model(n){
-                this.loading = true
+                this.loading = true;
                 if (n == 0) {
                     this.$confirm('是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -335,22 +335,53 @@
                         msg = '确定是否驳回'
                     }else{
                         msg = '确定是否确认'
-                        if(this.debitDate == ''){
-                            this.$message.error('请选择确认日期')
-                             this.loading = false
+                        if(this.payDate == ''){
+                            this.$message.error('请选择确认日期');
+                             this.loading = false;
                             return
                         }
-                        if(this.payType == '2' && this.bankCode == '' && this.isSettlement){
-                            this.$message.error('请选择银行账户')
-                             this.loading = false
-                            return
+                        let simpleAccountDate = Number(this.simpleAccountDate.split('-').join(''));//报销日期
+                        let payDate = Number(this.payDate.split('-').join(''));//报销单确认日期
+                        let payDateYear = Number(this.payDateYear.substring(0,4));//报销日期的年份
+                        let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                        let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
+                        let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                        if(this.isMonthlyKnots && !this.isAnnualKnots){//判断已经12月月结但是还没年结时
+                            if(this.payType != '3' && this.isSettlement){
+                                this.$message.error('补录去年业务数据,必须选择未支付');
+                                this.loading = false;
+                                return
+                            }
+                            if(payDate < current_book_ym || payDate < simpleAccountDate){//先判断确认日期不得早于当前账期和报销日期
+                                if(payDateYear == lastYear && payDate != annualKnots){//当报销日期的年份等于去年年份时 但是没有选择12月份
+                                    this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
+                                    this.loading = false;
+                                    return
+                                }else if(payDateYear != lastYear){
+                                    this.$message.error('请正确选择日期');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                        }else{
+                            if(this.payType == '2' && this.bankCode == '' && this.isSettlement){
+                                this.$message.error('请选择银行账户');
+                                this.loading = false;
+                                return
+                            }
+                            if(payDate < current_book_ym){
+                                this.$message.error('确认日期不得早于当前账期');
+                                this.loading = false
+                                return
+                            }
+                            if(payDate < simpleAccountDate){
+                                this.$message.error('确认日期不得早于报销日期');
+                                this.loading = false
+                                return
+                            }
                         }
-                        //判断选择日期不能早于报销日期
-                        if(Number(this.simpleReceiptDate.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
-                            this.$message.error('确认日期不得早于报销日期');
-                             this.loading = false
-                            return
-                        }
+
                     }
                     this.isLoading = true;
                     this.$confirm(msg, '提示', {
@@ -420,7 +451,7 @@
                 params.append('payType',this.payType);
                 params.append('bankCode',this.bankCode);
                 params.append('payMoney',payMoney);
-                params.append('payDate',this.debitDate);
+                params.append('payDate',this.payDate);
 
 //                console.log(url);
                 axios.post(url,params)
@@ -460,7 +491,7 @@
                 return list
             },
         },
-        computed:mapState(['isCashierFlg']),
+        computed:mapState(['isCashierFlg','isMonthlyKnots','isAnnualKnots','current_book_ym']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．
@@ -492,8 +523,8 @@
                     this.originalTypeName = data.application.originalTypeName
                     this.type = data.application.type
                     this.money = number.number(data.application.money)
-                    this.simpleConfirmDate = data.application.simpleConfirmDate
-                    this.simpleReceiptDate = data.application.simpleReceiptDate
+                    this.accountDate = data.accountDate
+                    this.simpleAccountDate = data.application.simpleAccountDate
                     this.receiptCount = data.application.receiptCount
                     this.discription = data.application.discription
                     this.originalType = data.application.originalType
@@ -565,15 +596,15 @@
                     }
                     let date = new Date()
                     if(date.getMonth()+1 < 10){
-                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                        this.payDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
                     }else{
-                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                        this.payDate = date.getFullYear() + '-' + (date.getMonth()+1);
                     };
 
                     if(date.getDate() < 10){
-                        this.debitDate += '-0' + date.getDate()
+                        this.payDate += '-0' + date.getDate()
                     }else{
-                        this.debitDate += '-' + date.getDate()
+                        this.payDate += '-' + date.getDate()
                     }
                 })
                 .catch(error=> {

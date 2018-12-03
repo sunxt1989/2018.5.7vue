@@ -4,8 +4,9 @@
             <div class="top">
                 <h2>固定资产详情</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-show="this.status < 3" size="small" type="primary" class="sub1" :loading="isLoading">处置</el-button>
-                <el-button @click="model(2)" v-show="this.status == 4" size="small" type="primary" class="sub1" :loading="isLoading">处置完成</el-button>
+                <el-button @click="model(1)" v-show="status < 3" size="small" type="primary" class="sub1" :loading="isLoading">处置</el-button>
+                <el-button @click="model(3)" v-show="status < 3" size="small" type="primary" class="sub3" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" v-show="status == 4" size="small" type="primary" class="sub1" :loading="isLoading">处置完成</el-button>
             </div>
         </div>
         <div class="w">
@@ -18,9 +19,7 @@
                         <span v-show="!isShare">折旧分摊</span>
                         <span v-show="isShare">取消折旧分摊</span>
                     </el-button>
-                    <el-button @click="saveShare" size="small" type="primary" class="sub2">{{saveName}}</el-button>
                 </div>
-
                 <ul class="list cf">
                     <li class="hd" v-show="!isShare">
                         <span class="tit">部门/项目</span>
@@ -105,7 +104,6 @@
                         </el-input>
                     </li>
                 </ul>
-
                 <ul class="list cf">
                     <li class="sm">
                         <span class="tit">名称</span>
@@ -129,7 +127,14 @@
                     </li>
                     <li class="sm">
                         <span class="tit">净残值率</span>
-                        <input class="ipt" type="text" v-model="salvageRate" readonly>
+                        <el-select class="sel" v-model="salvageRate" placeholder="请选择" :disabled="status >= 3">
+                            <el-option
+                                v-for="item in options5"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="sm">
                         <span class="tit">净值</span>
@@ -142,6 +147,17 @@
                     <li class="sm">
                         <span class="tit">已折旧月数</span>
                         <input class="ipt" type="text" v-model="usefulMonths" readonly>
+                    </li>
+                    <li class="sm" >
+                        <span class="tit">折旧方法</span>
+                        <el-select class="sel" v-model="depreciation" placeholder="请选择" :disabled="status >= 3">
+                            <el-option
+                                v-for="item in options4"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
 
                     <li class="sm" v-show="isHandle || isFinish">
@@ -174,28 +190,28 @@
                             placeholder="选择日期" :readonly="isFinish">
                         </el-date-picker>
                     </li>
-                    <!--<li class="sm" v-show="isHandle || isFinish">-->
-                        <!--<span class="tit2">收款方式</span>-->
-                        <!--<el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange">-->
-                            <!--<el-option-->
-                                <!--v-for="item in options3"-->
-                                <!--:key="item.value"-->
-                                <!--:label="item.label"-->
-                                <!--:value="item.value">-->
-                            <!--</el-option>-->
-                        <!--</el-select>-->
-                    <!--</li>-->
-                    <!--<li class="sm" v-show="isHandle || isFinish">-->
-                        <!--<span class="tit2">银行账户</span>-->
-                        <!--<el-select class="sel" v-model="bankCode" placeholder="请选择" :disabled="isTrue">-->
-                            <!--<el-option-->
-                                <!--v-for="item in bankList"-->
-                                <!--:key="item.value"-->
-                                <!--:label="item.bankNameShow"-->
-                                <!--:value="item.bankCode">-->
-                            <!--</el-option>-->
-                        <!--</el-select>-->
-                    <!--</li>-->
+                    <li class="sm" v-show="isHandle || isFinish">
+                        <span class="tit2">结算方式</span>
+                        <el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange" :disabled="isFinish">
+                            <el-option
+                                v-for="item in options3"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </li>
+                    <li class="sm" v-show="isHandle || isFinish">
+                        <span class="tit2">银行账户</span>
+                        <el-select class="sel" v-model="bankCode" placeholder="请选择" :disabled="isTrue || isFinish">
+                            <el-option
+                                v-for="item in bankList"
+                                :key="item.value"
+                                :label="item.bankNameShow"
+                                :value="item.bankCode">
+                            </el-option>
+                        </el-select>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -212,7 +228,6 @@
     export default{
         data(){
             return{
-                saveName:'保存',//保存按钮名称
                 department:'',//分摊部门/项目
                 input1:0,
                 input2:0,
@@ -234,10 +249,12 @@
                 usefulLife:'',//年限
                 originalMoney:'',//原值
                 usefulMoney:'',//累计折旧
-                salvageRate:'',//净残值率
+                salvageRate:0,//净残值率
                 salvageMoney:'',//净值
                 startDateYMD:'',//入账日期
                 usefulMonths:'',//已折旧月数
+                depreciation:'0',//折旧方法
+                money:'',//净值
 
                 isHandle:false,//是否在处置中状态
                 isFinish:false,//是否处置完成
@@ -261,7 +278,20 @@
                     {value:'2',label:'银行'},
                     {value:'5',label:'企业微信'},
                     {value:'6',label:'企业支付宝'},
-                    {value:'7',label:'企业借贷宝'},
+                    {value:'7',label:'企业借贷宝'}
+                ],
+                options4:[//折旧方法
+                    {value:'0',label:'默认折旧方法'},
+                    {value:'1',label:'一次性折旧'},
+                    {value:'2',label:'不折旧'},
+                ],
+                options5:[//净残值率
+                    {value:0,label:'0%'},
+                    {value:1,label:'1%'},
+                    {value:2,label:'2%'},
+                    {value:3,label:'3%'},
+                    {value:4,label:'4%'},
+                    {value:5,label:'5%'}
                 ],
                 bankCode:'',//银行账户
                 bankList:[],//银行列表
@@ -391,6 +421,25 @@
                         this.loading = false;
                         return
                     }
+                    let dealDateYMD = Number(this.dealDateYMD.split('-').join('').substring(0,6))
+                    let startDateYMD = Number(this.startDateYMD.split('-').join('').substring(0,6))
+                    let current_book_ym = Number(this.current_book_ym);//当前账期日期
+
+                    if(dealDateYMD < startDateYMD){
+                        this.$message.error('处置日期不得早于采购日期');
+                        this.loading = false
+                        return
+                    }
+                    if(dealDateYMD < current_book_ym){
+                        this.$message.error('处置日期不得早于当前账期');
+                        this.loading = false
+                        return
+                    }
+                    if(!this.isTrue && this.bankCode == ''){
+                        this.$message.error('请选择银行列表');
+                        this.loading = false;
+                        return
+                    }
                     this.isLoading = true;
                     this.$confirm('是否处置完成？', '提示', {
                         confirmButtonText: '确定',
@@ -418,11 +467,14 @@
                     }).then(() => {
                         let params = new URLSearchParams()
                         let url = addUrl.addUrl('fixedAssetsHandleFinish')
+//                        var url = 'http://192.168.2.190:8080/web/vue/assets/fixed/deal/receive/submit.html'
                         params.append('fixedId',this.debitId);
                         params.append('dealDate',this.dealDateYMD);
                         params.append('dealTaxRate',this.dealTaxRate);
                         params.append('dealTotalMoney',dealTotalMoney);
                         params.append('dealCost',dealCost);
+                        params.append('payType',this.payType);
+                        params.append('bankCode',this.bankCode);
 //                    console.log(url);
                         axios.post(url,params)
                             .then(response=> {
@@ -445,166 +497,193 @@
                         this.loading = false;
                         this.isLoading = false;
                     });
-                }
-            },
-            //保存分摊按钮
-            saveShare(){
-                this.loading = true;
-                let departmentJson =[];
-                let options = this.options;
-
-                if(this.isShare){
-                    let input1 = Number(this.input1)
-                    let input2 = Number(this.input2)
-                    let input3 = Number(this.input3)
-                    let input4 = Number(this.input4)
-                    let input5 = Number(this.input5)
-                    let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
+                }else if(n == 3){
+                    let departmentJson =[];
+                    let options = this.options;
+                    if(this.isShare){
+                        let input1 = Number(this.input1)
+                        let input2 = Number(this.input2)
+                        let input3 = Number(this.input3)
+                        let input4 = Number(this.input4)
+                        let input5 = Number(this.input5)
+                        let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(2)
 //                    console.log(allInput);
-                    //判断所有填写的百分比是不是等于100
-                    if(allInput != 100 ){
-                        this.$message.error('请正确输入分摊比例');
-                        this.loading = false;
-                        return
-                    }
-                }else{
-                    //没有分摊时是否填写了部门/项目
-                    if(this.department == ''){
-                        this.$message.error('请选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-                }
-
-                if(this.isShare){
-                    if (this.input1 != '0' && this.select1 != '') {
-                        let item1 = options.filter(x =>{
-                            return x.id == this.select1
-                        });
-                        item1[0].rate = this.input1;
-                        for(let i in departmentJson){
-                            if(departmentJson[i].id == this.select1){
-                                this.$message.error('分摊部门/项目不能相同，请重新选择');
-                                this.loading = false;
-                                return
-                            }
-                        }
-                        departmentJson.push(item1[0])
-                    }else if(this.input1 != '0' && this.select1 == ''){
-                        this.$message.error('请正确选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-
-                    if (this.input2 != '0' && this.select2 != '') {
-                        let item2 = options.filter(x =>{
-                            return x.id == this.select2
-                        })
-                        item2[0].rate = this.input2;
-                        for(let i in departmentJson){
-                            if(departmentJson[i].id == this.select2){
-                                this.$message.error('分摊部门/项目不能相同，请重新选择');
-                                this.loading = false;
-                                return
-                            }
-                        }
-                        departmentJson.push(item2[0])
-                    }else if(this.input2 != '0' && this.select2 == ''){
-                        this.$message.error('请正确选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-
-                    if (this.input3 != '0' && this.select3 != '') {
-                        let item3 = options.filter(x =>{
-                            return x.id == this.select3
-                        })
-                        item3[0].rate = this.input3;
-                        //判断是否有重复填写部门/项目的情况
-                        for (let i in departmentJson) {
-                            if (departmentJson[i].id == this.select3) {
-                                this.$message.error('分摊部门/项目不能相同，请重新选择');
-                                this.loading = false;
-                                return
-                            }
-                        }
-                        departmentJson.push(item3[0])
-                    }else if(this.input3 != '0' && this.select3 == ''){
-                        this.$message.error('请正确选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-
-                    if (this.input4 != '0' && this.select4 != '') {
-                        let item4 = options.filter(x =>{
-                            return x.id == this.select4
-                        })
-                        item4[0].rate = this.input4;
-                        for(let i in departmentJson){
-                            if(departmentJson[i].id == this.select4){
-                                this.$message.error('分摊部门/项目不能相同，请重新选择');
-                                this.loading = false;
-                                return
-                            }
-                        }
-                        departmentJson.push(item4[0])
-                    }else if(this.input4 != '0' && this.select4 == ''){
-                        this.$message.error('请正确选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-                    if (this.input5 != '0' && this.select5 != '') {
-                        let item5 = options.filter(x =>{
-                            return x.id == this.select5
-                        })
-                        item5[0].rate = this.input5;
-                        for(let i in departmentJson){
-                            if(departmentJson[i].id == this.select5){
-                                this.$message.error('分摊部门/项目不能相同，请重新选择');
-                                this.loading = false;
-                                return
-                            }
-                        }
-                        departmentJson.push(item5[0])
-                    }else if(this.input5 != '0' && this.select5 == ''){
-                        this.$message.error('请正确选择部门/项目');
-                        this.loading = false;
-                        return
-                    }
-                } else {
-                    let item6 = options.filter(x =>{
-                        return x.id == this.department
-                    })
-                    departmentJson.push(item6[0])
-                }
-                departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
-//                console.log(departmentJson);
-
-                let params = new URLSearchParams();
-                let url = addUrl.addUrl('fixedAssetsSave')
-                params.append('fixedId',this.debitId)
-                params.append('departmentJson',departmentJson)
-
-                axios.post(url,params)
-                    .then(response=>{
-//                        console.log(response);
-                        let status = response.data.status;
-                        let msg = response.data.msg
-                        if(status == 200){
-                            this.$message.success(msg);
-                            this.axios();
-                        }else if(status == 400){
-                            this.$message.error(msg);
+                        //判断所有填写的百分比是不是等于100
+                        if(allInput != 100 ){
+                            this.$message.error('请正确输入分摊比例');
                             this.loading = false;
+                            return
                         }
-                    })
+                    }else{
+                        //没有分摊时是否填写了部门/项目
+                        if(this.department == ''){
+                            this.$message.error('请选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                    }
 
+                    if(this.isShare){
+                        if (this.input1 != '0' && this.select1 != '') {
+                            let item1 = options.filter(x =>{
+                                return x.id == this.select1
+                            });
+                            item1[0].rate = this.input1;
+                            for(let i in departmentJson){
+                                if(departmentJson[i].id == this.select1){
+                                    this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                            departmentJson.push(item1[0])
+                        }else if(this.input1 != '0' && this.select1 == ''){
+                            this.$message.error('请正确选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
 
+                        if (this.input2 != '0' && this.select2 != '') {
+                            let item2 = options.filter(x =>{
+                                return x.id == this.select2
+                            })
+                            item2[0].rate = this.input2;
+                            for(let i in departmentJson){
+                                if(departmentJson[i].id == this.select2){
+                                    this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                            departmentJson.push(item2[0])
+                        }else if(this.input2 != '0' && this.select2 == ''){
+                            this.$message.error('请正确选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+
+                        if (this.input3 != '0' && this.select3 != '') {
+                            let item3 = options.filter(x =>{
+                                return x.id == this.select3
+                            })
+                            item3[0].rate = this.input3;
+                            //判断是否有重复填写部门/项目的情况
+                            for (let i in departmentJson) {
+                                if (departmentJson[i].id == this.select3) {
+                                    this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                            departmentJson.push(item3[0])
+                        }else if(this.input3 != '0' && this.select3 == ''){
+                            this.$message.error('请正确选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+
+                        if (this.input4 != '0' && this.select4 != '') {
+                            let item4 = options.filter(x =>{
+                                return x.id == this.select4
+                            })
+                            item4[0].rate = this.input4;
+                            for(let i in departmentJson){
+                                if(departmentJson[i].id == this.select4){
+                                    this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                            departmentJson.push(item4[0])
+                        }else if(this.input4 != '0' && this.select4 == ''){
+                            this.$message.error('请正确选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                        if (this.input5 != '0' && this.select5 != '') {
+                            let item5 = options.filter(x =>{
+                                return x.id == this.select5
+                            })
+                            item5[0].rate = this.input5;
+                            for(let i in departmentJson){
+                                if(departmentJson[i].id == this.select5){
+                                    this.$message.error('分摊部门/项目不能相同，请重新选择');
+                                    this.loading = false;
+                                    return
+                                }
+                            }
+                            departmentJson.push(item5[0])
+                        }else if(this.input5 != '0' && this.select5 == ''){
+                            this.$message.error('请正确选择部门/项目');
+                            this.loading = false;
+                            return
+                        }
+                    } else {
+                        let item6 = options.filter(x =>{
+                            return x.id == this.department
+                        })
+                        departmentJson.push(item6[0])
+                    }
+                    departmentJson = JSON.stringify(departmentJson);//将json格式转成字符串传参
+                    this.isLoading = true;
+                    this.$confirm('是否保存？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(() => {
+                        let params = new URLSearchParams()
+                        let url = addUrl.addUrl('fixedSave');
+                        params.append('id',this.debitId);
+                        params.append('salvageRate',this.salvageRate);
+                        params.append('deprecitionMethod',this.depreciation);
+                        params.append('departmentJson',departmentJson)
+//                    console.log(url);
+                        axios.post(url,params)
+                            .then(response=> {
+//                            console.log(response);
+                                let status = response.data.status
+                                let msg = response.data.msg
+                                if(status == 200){
+                                    this.$message.success('保存成功');
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                    this.axios();
+                                }else if(status == 400){
+                                    this.$message.error(msg);
+                                    this.loading = false;
+                                    this.isLoading = false;
+                                }
+                            })
+                    }).catch(() => {
+                        this.loading = false;
+                        this.isLoading = false;
+                    });
+                }
             },
             axios(){
                 let params = new URLSearchParams();
                 params.append('fixedId',this.debitId);
-                let url = addUrl.addUrl('fixedAssets')
+                let url = addUrl.addUrl('fixedAssets');
+//                var url = 'http://192.168.2.190:8080/web/vue/assets/fixed/item.html'
                 axios.post(url,params)
                     .then(response=> {
 //                        console.log(response);
@@ -619,6 +698,7 @@
                         this.usefulLife = fixedAssets.usefulLife;
                         this.originalMoney = number.number(fixedAssets.originalMoney);
                         this.salvageRate = fixedAssets.salvageRate;
+                        this.depreciation = fixedAssets.deprecitionMethod ? String(fixedAssets.deprecitionMethod) : '0';
                         this.money = number.number(fixedAssets.money);
                         this.startDateYMD = fixedAssets.startDateYMD;
                         this.usefulMonths = fixedAssets.usefulMonths;
@@ -631,17 +711,17 @@
                             this.department = fixedAssets.departmentIdString1
                         }else if(this.divideFlg == 1){
                             this.isShare =true
-                            this.select1 = fixedAssets.departmentIdString1
-                            this.select2 = fixedAssets.departmentIdString2
-                            this.select3 = fixedAssets.departmentIdString3
-                            this.select4 = fixedAssets.departmentIdString4
-                            this.select5 = fixedAssets.departmentIdString5
+                            this.select1 = fixedAssets.departmentIdString1;
+                            this.select2 = fixedAssets.departmentIdString2;
+                            this.select3 = fixedAssets.departmentIdString3;
+                            this.select4 = fixedAssets.departmentIdString4;
+                            this.select5 = fixedAssets.departmentIdString5;
 
-                            this.input1 = fixedAssets.projectDivRate || 0
-                            this.input2 = fixedAssets.projectDivRate2 || 0
-                            this.input3 = fixedAssets.projectDivRate3 || 0
-                            this.input4 = fixedAssets.projectDivRate4 || 0
-                            this.input5 = fixedAssets.projectDivRate5 || 0
+                            this.input1 = fixedAssets.projectDivRate || 0;
+                            this.input2 = fixedAssets.projectDivRate2 || 0;
+                            this.input3 = fixedAssets.projectDivRate3 || 0;
+                            this.input4 = fixedAssets.projectDivRate4 || 0;
+                            this.input5 = fixedAssets.projectDivRate5 || 0;
                         }
 
                         if(this.status < 3){
@@ -687,11 +767,6 @@
             },
             //分摊按钮
             shareClick(){
-                if(this.isShare){
-                    this.saveName = '保存'
-                }else{
-                    this.saveName = '保存分摊'
-                }
                 this.isShare = !this.isShare
             },
         },
@@ -718,11 +793,13 @@
             var params = new URLSearchParams();
             params.append('fixedId',this.debitId);
             var url = addUrl.addUrl('fixedAssets')
+//            var url = 'http://192.168.2.190:8080/web/vue/assets/fixed/item.html'
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
+                    this.bankList = data.bankList
                     let fixedAssets = data.fixedAssets
 
                     this.name = fixedAssets.name;
@@ -736,15 +813,16 @@
                     this.usefulMonths = fixedAssets.usefulMonths;
                     this.usefulMoney = number.number(fixedAssets.usefulMoney);
                     this.status = fixedAssets.status;
+                    this.bankCode = fixedAssets.bankCode ? '': fixedAssets.bankCode;
+                    this.payType = String(fixedAssets.payType == 0 ? '1': fixedAssets.payType);
+                    this.depreciation = fixedAssets.deprecitionMethod ? String(fixedAssets.deprecitionMethod) : '0';
 
                     //判断是否分摊，给部门/项目赋值
                     if(this.divideFlg == 0){
                         this.isShare =false
-                        this.saveName = '保存'
                         this.department = fixedAssets.departmentIdString1
                     }else if(this.divideFlg == 1){
                         this.isShare =true
-                        this.saveName = '保存分摊'
                         this.select1 = fixedAssets.departmentIdString1
                         this.select2 = fixedAssets.departmentIdString2
                         this.select3 = fixedAssets.departmentIdString3
@@ -778,7 +856,7 @@
                 })
                 .catch(error=> {
                     this.loading = false
-//                    console.log(error);
+                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         }
@@ -809,7 +887,12 @@
         right:110px;
         font-size:12px;
     }
-
+    .top .sub3{
+        position: absolute;
+        right:200px;
+        font-size:12px;
+        margin: 0;
+    }
     .content{
         width: 1120px;
         background-color: #fff;
@@ -880,13 +963,19 @@
         margin-left: 80px;
         float: left;
     }
-    .sub2{
+    .content .sub2{
         display: block;
         margin-top: 10px;
         margin-left: 60px;
         float: left;
     }
     .input-select{
+        width:200px;
+    }
+    .input-with-select{
+
+    }
+    .select-with-input{
         width:200px;
     }
 

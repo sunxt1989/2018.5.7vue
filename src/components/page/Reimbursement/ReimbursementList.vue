@@ -81,6 +81,7 @@
                 <el-pagination
                     @current-change="changePage"
                     background
+                    :current-page.sync="currentPage"
                     layout="prev, pager, next"
                     :total='count'>
                 </el-pagination>
@@ -257,7 +258,6 @@
                         alert('网络错误，不能访问');
                     })
             },
-
             //分页器
             changePage(val){
                 this.loading = true

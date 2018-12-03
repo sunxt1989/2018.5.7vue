@@ -10,6 +10,7 @@
     import $ from 'jquery'
     import topH from '@/components/common/top-h'
     import bg from '@/components/common/bg'
+
     import { mapState } from 'vuex'
     export default {
         name: 'App',

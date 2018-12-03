@@ -171,7 +171,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['current_book_ym','current_company_scale']),
+        computed:mapState(['current_book_ym','current_company_scale','isMonthlyKnots','isAnnualKnots']),
         methods: {
             //发票张数change事件
             receiptCountChange(){
@@ -211,7 +211,11 @@
                 }
             },
             model(n){
-                this.loading = true
+                this.loading = true;
+                let receiptDate = Number(this.receiptDate.split('-').join('').substring(0,6));//选择的日期
+                let receiptDateYear = Number(this.receiptDate.substring(0,4));//选择的日期的年份
+                let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
                 if(n == 0){
                     if(this.isSee){
                         this.$router.go(-1)
@@ -232,20 +236,32 @@
                         this.$message.error('请正确输入金额');
                         this.loading = false;
                         return
-                    }else if(this.debitDate == ''){
+                    }
+                    if(this.debitDate == ''){
                         this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
-                    }else if(this.type == '' || this.childType1 == ''){
+                    }
+                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断是否12月月结且未年结
+                        if((receiptDateYear != lastYear) && receiptDate < current_book_ym){
+                            this.$message.error('请正确输入日期');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        if(receiptDate < current_book_ym ) {
+                            this.$message.error('费用日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
+                    }
+                    if(this.type == '' || this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
                         this.loading = false;
                         return
-                    }else if(this.aimType == ''&& this.type == 1){
+                    }
+                    if(this.aimType == ''&& this.type == 1){
                         this.$message.error('请正确输入出差目的');
-                        this.loading = false;
-                        return
-                    }else if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
-                        this.$message.error('费用发生日期不得早于当前账期');
                         this.loading = false;
                         return
                     }
@@ -401,6 +417,7 @@
                 this.imgName2 = finalName[1] ? finalName[1] : '';
                 this.imgName3 = finalName[2] ? finalName[2] : '';
                 this.imgName4 = finalName[3] ? finalName[3] : '';
+
                 params.append('receiptId',this.id);
                 params.append('type',this.type);
                 params.append('childType1',this.childType1);
@@ -525,8 +542,7 @@
                         this.optionList(index);
                         this.typeShow = true;
                         this.destination = true
-                    }
-                    else{
+                    }else{
                         this.typeShow = false
                         this.destination = false
                     }

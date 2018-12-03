@@ -336,7 +336,7 @@
                 customPersonPhone2:'',//紧急联系电话
                 type:'1',//销售类别类别
                 options:[//销售类别列表
-                    {value:'1',label:'待销商品'},
+                    {value:'1',label:'库存商品'},
                     {value:'2',label:'技术服务'},
                     {value:'3',label:'技术开发'},
                     {value:'4',label:'技术咨询'},
@@ -480,12 +480,12 @@
                 }
             }
         },
-        computed:mapState(['current_book_ym','current_company_scale']),
+        computed:mapState(['current_book_ym','current_company_scale','isMonthlyKnots','isAnnualKnots']),
         methods: {
             //销售类别change事件，当选择设备时明细列表进行修改
             typeChange(){
                 var type = this.type;
-                //type=1时 选择了待销商品，isShowLow = true；
+                //type=1时 选择了库存商品，isShowLow = true；
 //                console.log(type);
                 if(this.newList1.length != 0 || this.newList2.length != 0){
                     this.$confirm('修改销售类别后，销售明细中项目所有销售类别将一同变化，是否清空销售明细列表?','提示',{
@@ -576,11 +576,11 @@
                         this.loading = false;
                         return
                     }
-                    //判断待销商品是否在明细中重复选择
+                    //判断库存商品是否在明细中重复选择
                     if(newList1 != ''){
                         for(let i in newList1){
                             if(inventoryId == newList1[i].inventoryId){
-                                this.$message.error('待销商品不可重复选择');
+                                this.$message.error('库存商品不可重复选择');
                                 this.loading = false;
                                 return
                             }
@@ -795,11 +795,11 @@
                         this.loading = false;
                         return
                     }
-                    //判断待销商品是否在明细中重复选择，如果修改的是愿条目通过id判断则不受影响
+                    //判断库存商品是否在明细中重复选择，如果修改的是愿条目通过id判断则不受影响
                     if(newList1 != ''){
                         for(let i in newList1){
                             if(inventoryId == newList1[i].inventoryId && id != newList1[i].id){
-                                this.$message.error('待销商品不可重复选择');
+                                this.$message.error('库存商品不可重复选择');
                                 this.loading = false;
                                 return
                             }
@@ -1050,37 +1050,72 @@
                         this.$message.error('请选择部门/项目');
                         this.loading = false;
                         return
-                    }else if(this.tradeName == ''){
+                    }
+                    if(this.tradeName == ''){
                         this.$message.error('请正确输入客户');
                         this.loading = false;
                         return
-                    }else if(this.type == ''){
+                    }
+                    if(this.type == ''){
                         this.$message.error('请正确输入销售类别');
                         this.loading = false;
                         return
-                    }else if(this.taxFlg == ''){
+                    }
+                    if(this.taxFlg == ''){
                         this.$message.error('请正确输入发票类别');
                         this.loading = false;
                         return
-                    }else if(this.saleDate == ''){
+                    }
+                    if(this.saleDate == ''){
                         this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
-                    }else if(this.totalMoney == '' || this.totalMoney == '0.00'){
+                    }
+                    let saleDate = Number(this.saleDate.split('-').join('').substring(0,6));//当前选择日期
+                    let saleDateYear = Number(this.saleDate.substring(0,4));//当前选择日期的年份
+                    let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                    let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断已经12月月结但是还没年结时
+                        if(saleDate < current_book_ym){//先判断销售日期不得早于当前账期
+                            if(saleDateYear == lastYear && saleDate != annualKnots ){// 再判断选择的是否是去年12月份
+                                this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
+                                this.loading = false;
+                                return
+                            }else if(saleDateYear != lastYear){
+                                this.$message.error('销售日期不得早于当前账期');
+                                this.loading = false
+                                return
+                            }
+                        }
+                    } else{
+                        if(saleDate < current_book_ym ) {
+                            this.$message.error('销售日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
+                    }
+
+                    if(this.totalMoney == '' || this.totalMoney == '0.00'){
                         this.$message.error('请添加明细项');
                         this.loading = false;
-                        return
-                    }else if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
-                        this.$message.error('请添加明细项');
-                        this.loading = false;
-                        return
-                    }else if(Number(this.saleDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
-                        this.$message.error('销售日期不得早于当前账期');
-                        this.loading = false
                         return
                     }
+                    if(this.unTotalMoney == '' || this.unTotalMoney == '0.00'){
+                        this.$message.error('请添加明细项');
+                        this.loading = false;
+                        return
+                    }
+
                     this.isLoading = true;
-                    this.$confirm('确定是否提交？', '提示', {
+                    let message = ''
+                    if(n == 1){
+                        message = '确定是否保存？'
+                    }else if(n == 2){
+                        message = '确定是否提交？'
+                    }
+                    this.$confirm(message, '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         showClose: false,
@@ -1264,8 +1299,10 @@
                 var submitUrl = addUrl.addUrl('newSaleSubmit')
                 if(n == 1){
                     url = saveUrl
+                    url = 'http://192.168.2.192:8080/web/vue/sale/save.html'
                 }else if(n == 2){
                     url = submitUrl
+                    url = 'http://192.168.2.192:8080/web/vue/sale/submit.html'
                 }
 //                console.log(saveUrl);
 //                console.log(url);
@@ -1281,14 +1318,14 @@
                         this.loading = false;
                         this.isLoading = false;
 //                        console.log(response);
+                        let msg = response.data.msg;
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '提交成功'
+                                message: msg
                             });
                         }else if(response.data.status == 400){
-                            var msg = response.data.msg;
                             this.$message.error(msg);
                         }
                     })

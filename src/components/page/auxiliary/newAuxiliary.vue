@@ -21,16 +21,17 @@
                             </el-option>
                         </el-select>
                     </li>
-                    <li class="pt">
+                    <li class="pt" style="position: relative;">
                         <span class="tit">交易方</span>
-                        <el-select class="sel" v-model="tradeId" placeholder="请选择">
+                        <el-select class="sel" v-model="tradeName" placeholder="请选择">
                             <el-option
                                 v-for="item in tradeList"
                                 :key="item.value"
                                 :label="item.tradeName"
-                                :value="item.idString">
+                                :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input class="opt" type="text" v-model="tradeName" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="pt">
                         <span class="tit">金额</span>
@@ -48,7 +49,7 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">收款方式</span>
+                        <span class="tit">结算方式</span>
                         <el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange">
                             <el-option
                                 v-for="item in options2"
@@ -98,7 +99,7 @@
                 payType:'1',//收款方式
                 bankCode:'',//银行账户
                 bankList:[],//银行列表
-                tradeId:'',//交易方ID
+                tradeName:'',//交易方名称
                 tradeList:[],//交易方列表
 
                 options2:[//收款方式列表
@@ -120,7 +121,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['start_ym']),
+        computed:mapState(['current_book_ym']),
         methods: {
             //金额的change事件
             changeMoney(){
@@ -158,7 +159,7 @@
                         this.loading = false;
                         return
                     }
-                    if(this.tradeId == ''){
+                    if(this.tradeName == ''){
                         this.$message.error('请选择交易方')
                         this.loading = false;
                         return
@@ -173,13 +174,8 @@
                         this.loading = false;
                         return
                     }
-                    if(this.businessDate == ''){
-                        this.$message.error('请选择日期')
-                        this.loading = false;
-                        return
-                    }
-                    if(Number(this.businessDate.split('-').join('').substring(0,6)) < Number(this.start_ym) ){
-                        this.$message.error('选择日期不得早于账套开账日期');
+                    if(Number(this.businessDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                        this.$message.error('选择日期不得早于当前日期');
                         this.loading = false;
                         return
                     }
@@ -227,17 +223,10 @@
             submit(){
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('auxiliarySubmit');
-                let tradeList = this.tradeList;
-                let tradeName = '';
-                for(let i in tradeList){
-                    if(tradeList[i].idString == this.tradeId){
-                        tradeName = tradeList[i].tradeName
-                    }
-                }
-                params.append('debitId',0);
+
+                params.append('businessId','');
                 params.append('subjectCode',this.subjectCode);
-                params.append('tradeId',this.tradeId);
-                params.append('tradeName',tradeName);
+                params.append('tradeName',this.tradeName);
                 params.append('money',unNumber.unNumber(this.money));
                 params.append('businessDate',this.businessDate);
                 params.append('payType',this.payType);
@@ -296,7 +285,7 @@
             let url = addUrl.addUrl('auxiliaryShow')
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value
                     this.bankList = data.bankList
                     this.tradeList = data.tradeList
@@ -422,5 +411,16 @@
         font-size:14px;
         border-radius: 3px;
         border: 1px solid #ccc;
+    }
+    .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:285px;
+        outline:none;
+        color: #333;
     }
 </style>

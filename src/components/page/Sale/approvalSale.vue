@@ -227,7 +227,7 @@
                 customPersonPhone2:'',//紧急联系电话
                 type:'1',//销售类别类别
                 options:[//销售类别列表
-                    {value:'1',label:'待销商品'},
+                    {value:'1',label:'库存商品'},
                     {value:'2',label:'技术服务'},
                     {value:'3',label:'技术开发'},
                     {value:'4',label:'技术咨询'},

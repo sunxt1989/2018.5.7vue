@@ -123,7 +123,6 @@
                 this.axios()
             },
             axios(){
-//                console.log(this.currentPage);
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('auxiliaryList');
                 params.append('pageNo',this.currentPage);

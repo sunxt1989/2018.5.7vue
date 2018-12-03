@@ -178,7 +178,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         methods:{
             back(){
                 var params = new URLSearchParams();
@@ -210,6 +210,8 @@
             },
             model(n){
                 this.loading = true;
+                let debitDate = Number(this.debitDate.split('-').join('').substring(0,6));//当前选择日期
+                let current_book_ym = Number(this.current_book_ym);//当前账期日期
                 if(n == 0){
                     if(!this.isReject){
                         this.$confirm('填写的信息还未提交，是否返回？', '提示', {
@@ -264,16 +266,19 @@
                         this.$message.error('请正确输入金额');
                         this.loading = false;
                         return
-                    }else if(this.debitDate == ''){
+                    }
+                    if(this.debitDate == ''){
                         this.$message.error('请正确输入借款日期');
                         this.loading = false;
                         return
-                    }else if(this.departmentId == ''){
-                        this.$message.error('请正确输入借款部门');
-                        this.loading = false;
-                        return
-                    }else if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
+                    }
+                    if(debitDate < current_book_ym ) {
                         this.$message.error('借款日期不得早于当前账期');
+                        this.loading = false
+                        return
+                    }
+                    if(this.departmentId == ''){
+                        this.$message.error('请正确输入借款部门');
                         this.loading = false;
                         return
                     }

@@ -102,10 +102,11 @@
             },
             axios(n){
                 let url = addUrl.addUrl('login')
+//                let url = 'http://192.168.2.190:8881/web/vue/user/get/info/all.html'
                 axios.post(url)
                     .then(response=> {
 //                        console.log(response);
-                        let data = response.data.value
+                        let data = response.data.value;
                         if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
                             let url2 = addUrl.addUrl('initialize')
                             window.location.href = url2;
@@ -115,13 +116,15 @@
                             this.bookId = data.current_book_id;
                             this.faceUri = data.faceUri ? data.faceUri : 'static/images/gongjuxiang.png';
                             let obj = {}
+                            console.log(data);
                             let start_ym = data.current_start_date.substring(0,7)//账套开账时间
                             let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
+                            let auth_json = data.book_user.auth_json;//判断身份列表
                             let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
                             let menu_json = (data.book_user.menu_json == '') ? ['#loan','#bookkeeping'] : (data.book_user.menu_json).split(',');//默认配置桌面功能显示借款单，记账
-                            let auth_json = data.book_user.auth_json
+
                             let current_account_standard = data.current_account_standard //会计准则判定 1：小企业 2：企业
                             let current_company_scale = data.current_company_scale //当前账套纳税人性质 1 小规模纳税人 2 一般纳税人
                             let current_book_level = data.current_book_level//用户类型 0 普通用户 1：代记账会计 2：代记账管理人员
@@ -129,6 +132,8 @@
                             let isAccountBookkeeping = (user_type > 0 && current_book_level == 3)? true : false//是否为代记账，true 为是代记账账套 false 为普通账套
                             let account_type = data.account_type//代记账会计身份，1为普通会计 >1会计
                             let name = data.name;
+                            let isMonthlyKnots = data.carry_prev_month12_flg ? true : false;
+                            let isAnnualKnots = data.carry_prev_year_flg ? true : false;
 
                             obj.start_ym = start_ym.split('-').join('');
                             obj.current_book_ym = current_book_ym;
@@ -144,6 +149,8 @@
                             obj.isAccountBookkeeping = isAccountBookkeeping
                             obj.account_type = account_type
                             obj.name = name
+                            obj.isMonthlyKnots = isMonthlyKnots
+                            obj.isAnnualKnots = isAnnualKnots
 //                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
@@ -161,17 +168,16 @@
                         console.log('没有登录信息');
                         alert('请您重新登录')
                         let url = addUrl.addUrl('logout')
-                        alert(url);
+//                        alert(url);
                         window.location.href = url
                     });
             },
-
         },
         computed:{
             ...mapState(["current_book_ym","name"]),
         },
         created(){
-            this.password = addUrl.addUrl('password')
+            this.password = addUrl.addUrl('password');
             this.axios();
         },
 

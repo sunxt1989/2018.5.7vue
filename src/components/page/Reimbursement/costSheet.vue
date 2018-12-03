@@ -28,7 +28,7 @@
                 <el-table :data="tableList" class="tableList" :show-header=false >
                     <el-table-column property="" label="" align="center" width="40px">
                         <template slot-scope="scope">
-                                <span class="checkbox">
+                            <span class="checkbox">
                                 <input name=checked type="checkbox" :value=scope.row.idString class="inputcheckbox listInput" @click="inputcheckboxClick">
                                 <i class="iconfont icon-31xuanze"></i>
                             </span>
@@ -305,7 +305,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false
                     var data = response.data.value;//费用列表
 //                    console.log(data);

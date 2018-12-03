@@ -10,7 +10,99 @@
                 <div class="content cf">
                     <el-tabs type="border-card" v-model="activeName">
                         <el-tab-pane name='1' label="科目">
-                            <el-tabs tab-position="right" style="height:500px;">
+                            <el-tabs tab-position="right" style="height:500px;" v-if="current_account_standard == 2">
+                                <el-tab-pane label=" 资产">
+                                    <el-table class="single" :data="tableData11" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="负债">
+                                    <el-table class="single" :data="tableData12" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="共同类">
+                                    <el-table class="single" :data="tableData13" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="权益">
+                                    <el-table class="single" :data="tableData14" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="成本">
+                                    <el-table class="single" :data="tableData15" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="损益">
+                                    <el-table class="single" :data="tableData16" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                            </el-tabs>
+                            <el-tabs tab-position="right" style="height:500px;" v-if="current_account_standard == 1">
                                 <el-tab-pane label=" 资产">
                                     <el-table class="single" :data="tableData11" height="500">
                                         <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
@@ -42,21 +134,6 @@
                                     </el-table>
                                 </el-tab-pane>
                                 <el-tab-pane label="权益">
-                                    <el-table class="single" :data="tableData13" height="500">
-                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
-                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
-                                        <el-table-column align="center" prop="debitCredit" label="方向">
-                                            <template slot-scope="scope">
-                                                <span v-if="scope.row.debitCredit == 1">借</span>
-                                                <span v-if="scope.row.debitCredit == 2">贷</span>
-                                            </template>
-                                        </el-table-column>
-                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
-                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
-                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
-                                    </el-table>
-                                </el-tab-pane>
-                                <el-tab-pane label="成本">
                                     <el-table class="single" :data="tableData14" height="500">
                                         <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
                                         <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
@@ -71,8 +148,23 @@
                                         <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
                                     </el-table>
                                 </el-tab-pane>
-                                <el-tab-pane label="损益">
+                                <el-tab-pane label="成本">
                                     <el-table class="single" :data="tableData15" height="500">
+                                        <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
+                                        <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
+                                        <el-table-column align="center" prop="debitCredit" label="方向">
+                                            <template slot-scope="scope">
+                                                <span v-if="scope.row.debitCredit == 1">借</span>
+                                                <span v-if="scope.row.debitCredit == 2">贷</span>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column align="center" prop="debitAmount" :label=moonName1></el-table-column>
+                                        <el-table-column align="center" prop="creditAmount" :label=moonName2></el-table-column>
+                                        <el-table-column align="center" prop="endAmount" label="期末余额"></el-table-column>
+                                    </el-table>
+                                </el-tab-pane>
+                                <el-tab-pane label="损益">
+                                    <el-table class="single" :data="tableData16" height="500">
                                         <el-table-column align="center" prop="subjectCode" label="科目编号"></el-table-column>
                                         <el-table-column align="center" prop="subjectName" label="科目名称"></el-table-column>
                                         <el-table-column align="center" prop="debitCredit" label="方向">
@@ -100,7 +192,6 @@
                                 <el-table-column align="center" prop="qmye" label="期末余额"></el-table-column>
                             </el-table>
                         </el-tab-pane>
-
                         <el-tab-pane name='3' label="银行账户">
                             <el-table class="single" :data="tableData3" height="500">
                                 <el-table-column align="center" prop="bankAccountType" label="账户类别">
@@ -198,9 +289,11 @@
                 year:'',
                 tableData11:[],//科目-资产
                 tableData12:[],//科目-负债
-                tableData13:[],//科目-权益
-                tableData14:[],//科目-成本
-                tableData15:[],//科目-损益
+                tableData13:[],//科目-共同类
+                tableData14:[],//科目-权益
+                tableData15:[],//科目-成本
+                tableData16:[],//科目-损益
+
                 tableData2:[],//辅助科目
                 tableData3:[],//银行账户
                 tableData4:[],//固定资产列表
@@ -227,12 +320,13 @@
                 }
             },
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','current_account_standard']),
         created(){
+            console.log(this.current_account_standard);
             let url = addUrl.addUrl('Initialization');
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value
                     let currentYM = this.current_book_ym;
 
@@ -244,14 +338,22 @@
                     this.moonName2 = this.ymName + '月前累计贷方'
 
                     let subjectList = data.subjectList//科目列表
-                    this.tableData11 = subjectList[0]
-                    this.tableData12 = subjectList[1]
-                    for(let i = 4 ; i >= 0; i--){
-                        subjectList[3].unshift(subjectList[2][i])
+                    //判断会计准则1：小企业 2：企业
+                    if(this.current_account_standard == 1){
+                        this.tableData11 = subjectList[0]
+                        this.tableData12 = subjectList[1]
+                        this.tableData14 = subjectList[2]
+                        this.tableData15 = subjectList[3]
+                        this.tableData16 = subjectList[4]
+                    }else{
+                        this.tableData11 = subjectList[0]
+                        this.tableData12 = subjectList[1]
+                        this.tableData13 = subjectList[2]
+                        this.tableData14 = subjectList[3]
+                        this.tableData15 = subjectList[4]
+                        this.tableData16 = subjectList[5]
                     }
-                    this.tableData13 = subjectList[3]
-                    this.tableData14 = subjectList[4]
-                    this.tableData15 = subjectList[5]
+
 
                     //为辅助科目和并列生成新参数rowspan
                     let numArr = [];
@@ -375,6 +477,7 @@
     .see{
         text-decoration: none;
     }
+
 
 
 </style>

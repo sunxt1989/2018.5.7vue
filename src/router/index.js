@@ -16,7 +16,7 @@ import repaymentConfirmationList from '@/components/page/loan/repaymentConfirmat
 import repaymentConfirmation from '@/components/page/loan/repaymentConfirmation'//还款单确认
 //报销
 import costSheet from '@/components/page/Reimbursement/costSheet'//费用单列表
-import costSheetHistory from '@/components/page/Reimbursement/costSheetHistory'//费用单列表
+import costSheetHistory from '@/components/page/Reimbursement/costSheetHistory'//历史费用单列表
 import newCost from '@/components/page/Reimbursement/newCost'//新建费用单
 import seeCost from '@/components/page/Reimbursement/seeCost'//查看费用单
 import ReimbursementList from '@/components/page/Reimbursement/ReimbursementList'//报销单列表
@@ -104,7 +104,6 @@ import taxationHistory from '@/components/page/Taxation/taxationHistory'//税费
 import calculation from '@/components/page/Taxation/calculation'//计提企业所得税
 import taxationPay from '@/components/page/Taxation/taxationPay'//缴纳
 
-
 //账务处理
 import Initialization from '@/components/page/AccountingTreatment/Initialization'//账务处理-初始化
 import voucherList from '@/components/page/AccountingTreatment/voucherList'//查看凭证列表
@@ -141,8 +140,14 @@ import seeCollection from '@/components/page/Collection/seeCollection' //查看�
 import Bookkeeping from '@/components/page/Bookkeeping/Bookkeeping' //记账凭证
 
 //杜邦分析
-import DuPont from '@/components/page/DuPont/DuPont' //记账凭证
-Vue.use(Router)
+import DuPont from '@/components/page/DuPont/DuPont' //杜邦分析
+
+//发票
+import invoiceDeduction from '@/components/page/invoice/invoiceDeduction' //发票抵扣列表
+import newInvoice from '@/components/page/invoice/newInvoice' //新建发票
+import seeInvoice from '@/components/page/invoice/seeInvoice' //查看发票
+
+Vue.use(Router);
 
 
 export default new Router({
@@ -719,6 +724,21 @@ export default new Router({
             path:'/DuPont/DuPont',
             name:'DuPont',
             component:DuPont
+        },
+        {
+            path:'/invoice/invoiceDeduction',
+            name:'invoiceDeduction',
+            component:invoiceDeduction
+        },
+        {
+            path:'/invoice/newInvoice',
+            name:'newInvoice',
+            component:newInvoice
+        },
+        {
+            path:'/invoice/seeInvoice',
+            name:'seeInvoice',
+            component:seeInvoice
         },
 
     ]

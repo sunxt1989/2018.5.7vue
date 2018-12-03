@@ -2,9 +2,11 @@
  * Created by who on 2018/7/4.
  */
 function addUrl(name){
-    var url = 'http://192.168.2.105:8881/web';
-    //var url = 'http://192.168.2.190:8080/web';
+    //var url = 'http://192.168.2.105:8881/web';
+    //var url = 'http://192.168.2.190:8881/web';
+    var url = 'http://192.168.2.190:8080/web';
     //var url = 'http://192.168.2.191:8080/web';
+    //var url = 'http://192.168.2.192:8080/web';
     //var url = 'http://www.cloudaccounting.cn'
 
     //借款单列表
@@ -382,6 +384,10 @@ function addUrl(name){
     if(name == 'fixedAssets'){
         return url + '/vue/assets/fixed/item.html'
     }
+    //固定资产保存
+    if(name == 'fixedSave'){
+        return url + '/vue/assets/fixed/updateWorth.html'
+    }
     //固定资产详情保存分摊
     if(name == 'fixedAssetsSave'){
         return url + '/vue/assets/change/department.html'
@@ -394,6 +400,8 @@ function addUrl(name){
     if(name == 'fixedAssetsHandleFinish'){
         return url + '/vue/assets/fixed/deal/receive/submit.html'
     }
+
+
     //无形资产列表
     if(name == 'intangibleAssetsList'){
         return url + '/vue/assets/intangible/list.html'
@@ -554,6 +562,10 @@ function addUrl(name){
     //保存新建账套信息
     if(name == 'AccountManagementSave'){
         return url + '/vue/user/book/save.html'
+    }
+    //保存新建账套信息
+    if(name == 'AccountManagementUpdate'){
+        return url + '/vue/user/book/update.html'
     }
     //加入张涛
     if(name == 'join'){
@@ -980,7 +992,35 @@ function addUrl(name){
     if(name == 'DuPont'){
         return url + '/vue/financial/analysis/du/pont/analysis.html'
     }
+    //凭证-获取科目余额
+    if(name == 'balance'){
+        return url + '/vue/account/certificate/subject/amount.html'
+    }
+    //凭证-保存凭证
+    if(name == 'certificateSave'){
+        return url + '/vue/account/certificate/save.html'
+    }
 
+    //发票业务-专票列表
+    if(name == 'invoiceList'){
+        return url + '/vue/bill/list.html'
+    }
+    //发票业务-专票删除
+    if(name == 'invoiceDelete'){
+        return url + '/vue/bill/delete.html'
+    }
+    //发票业务-专票详情
+    if(name == 'newInvoice'){
+        return url + '/vue/bill/item.html'
+    }
+    //发票业务-专票保存
+    if(name == 'invoiceSave'){
+        return url + '/vue/bill/save.html'
+    }
+    //发票业务-专票抵扣
+    if(name == 'invoiceReduce'){
+        return url + '/vue/bill/reduce.html'
+    }
 }
 export default{
     addUrl

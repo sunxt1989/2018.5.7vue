@@ -320,7 +320,7 @@
                 customPersonPhone2:'',//紧急联系电话
                 type:'1',//销售类别类别
                 options:[//销售类别列表
-                    {value:'1',label:'待销商品'},
+                    {value:'1',label:'库存商品'},
                     {value:'2',label:'技术服务'},
                     {value:'3',label:'技术开发'},
                     {value:'4',label:'技术咨询'},
@@ -349,7 +349,7 @@
                 unTotalMoney2:'',//不含税总价2
 
                 isShowLow:true,//是否显示明细列表 设备相关信息列
-
+                receive_date:'',//销售收款单审批日期
                 userDebitAuditRecordList:[],//审批意见
                 opinion:'同意',//select框
                 opinionList:[
@@ -412,6 +412,12 @@
                         msg = '确定是否确认'
                         if(this.debitDate == ''){
                             this.$message.error('请选择确认日期')
+                            this.loading = false
+                            return
+                        }
+                        //判断选择日期不能早于销售日期
+                        if(Number(this.debitDate.split('-').join('')) > Number(this.saleDate.split('-').join(''))){
+                            this.$message.error('确认日期不得早于销售单创建日期');
                             this.loading = false
                             return
                         }

@@ -49,7 +49,7 @@
                             <span class="tit"><span class="red">*</span>费用发生日期</span>
                             <el-date-picker
                                 class="iptData"
-                                v-model="debitDate"
+                                v-model="receiptDate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 :picker-options="pickerOptions1"
@@ -123,7 +123,7 @@
                 destination:false,//是否显示目的地
                 money:0,//金额
                 taxMoney:0,//税额
-                debitDate:'',//上传日期（格式修改后的）
+                receiptDate:'',//上传日期（格式修改后的）
                 aimType:'',//出差目的
                 receiptCount:'1',//票据张数
                 discription:'',//借款事由
@@ -162,7 +162,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['current_book_ym','current_company_scale']),
+        computed:mapState(['current_book_ym','current_company_scale','isMonthlyKnots','isAnnualKnots']),
         methods: {
             //发票张数change事件
             receiptCountChange(){
@@ -214,7 +214,7 @@
                 }
             },
             model(n){
-                this.loading = true
+                this.loading = true;
                 if(n == 0){
                     this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -230,25 +230,44 @@
                         this.$message.error('请正确输入费用类别');
                         this.loading = false;
                         return
-                    }else if(Number(this.type) < 4 && this.childType1 == ''){
+                    }
+                    if(Number(this.type) < 4 && this.childType1 == ''){
                         this.$message.error('请正确输入费用类别');
                         this.loading = false;
                         return
-                    }else if(this.money <= 0){
+                    }
+                    if(this.money <= 0){
                         this.$message.error('请正确输入金额');
                         this.loading = false;
                         return
-                    }else if(this.debitDate == ''){
+                    }
+                    if(this.receiptDate == ''){
                         this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
-                    }else if(this.type == 1 && this.aimType == ''){
+                    }
+                    let receiptDate = Number(this.receiptDate.split('-').join('').substring(0,6));//选择的日期
+                    let receiptDateYear = Number(this.receiptDate.substring(0,4));//选择的日期的年份
+                    let current_book_ym = Number(this.current_book_ym);//当前账期日期
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断是否12月月结且未年结
+                        if((receiptDateYear != lastYear) && receiptDate < current_book_ym){
+                            this.$message.error('请正确输入日期');
+                            this.loading = false;
+                            return
+                        }
+                    }else{
+                        if(receiptDate < current_book_ym ) {
+                            this.$message.error('费用日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
+                    }
+
+                    if(this.type == 1 && this.aimType == ''){
                         this.$message.error('请正确输入出差目的');
                         this.loading = false;
-                        return
-                    }if(Number(this.debitDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
-                        this.$message.error('费用发生日期不得早于当前账期');
-                        this.loading = false
                         return
                     }
                     this.isLoading = true;
@@ -379,7 +398,7 @@
                 params.append('aimType',this.aimType);
                 params.append('discription',this.discription);
                 params.append('receiptCount',this.receiptCount);
-                params.append('receiptDate',this.debitDate);
+                params.append('receiptDate',this.receiptDate);
 
                 params.append('imgUrl1',this.imgUrl1);
                 params.append('imgName1',this.imgName1);
@@ -470,18 +489,19 @@
 //                    console.log(response);
                     var data = response.data.value;
                     this.options = data;
+//                    console.log(options);
                     let date = new Date();
 
                     if(date.getMonth()+1 < 10){
-                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                        this.receiptDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
                     }else{
-                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                        this.receiptDate = date.getFullYear() + '-' + (date.getMonth()+1);
                     };
 
                     if(date.getDate() < 10){
-                        this.debitDate += '-0' + date.getDate()
+                        this.receiptDate += '-0' + date.getDate()
                     }else{
-                        this.debitDate += '-' + date.getDate()
+                        this.receiptDate += '-' + date.getDate()
                     }
                     this.loading = false
                 })

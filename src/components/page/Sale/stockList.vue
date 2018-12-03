@@ -12,18 +12,13 @@
                     <el-table-column prop="commodityName" label="名称" sortable align="center"></el-table-column>
                     <el-table-column prop="" label="类名" sortable align="center">
                         <template slot-scope="scope">
-                            <span>待销商品</span>
+                            <span>库存商品</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="count" label="数量" sortable align="center"></el-table-column>
-                    <el-table-column prop="perPrice" label="单价" sortable align="center">
+                    <el-table-column prop="totalMoney" label="总金额" sortable align="center">
                         <template slot-scope="scope">
                             <span>{{ scope.row.showMoney }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="" label="费用" sortable align="center">
-                        <template slot-scope="scope">
-                            <span>0.00</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="simpleInventoryDate" label="采购日期" sortable align="center"></el-table-column>
@@ -75,7 +70,7 @@
                     let data = response.data.value;//列表数据
                     this.tableData = data.list
                     for(let i in this.tableData){
-                        this.tableData[i].showMoney = number.number(this.tableData[i].perPrice)
+                        this.tableData[i].showMoney = number.number(this.tableData[i].totalMoney)
                     }
                 })
                 .catch(error=> {

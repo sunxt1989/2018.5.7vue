@@ -26,7 +26,7 @@
                         </el-select>
                     </li>
 
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem1" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input1" class="input-with-select" readonly>
                             <el-select v-model="select1" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -40,7 +40,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem2" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input2" class="input-with-select" readonly>
                             <el-select v-model="select2" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -54,7 +54,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem3" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input3" class="input-with-select" readonly>
                             <el-select v-model="select3" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -68,7 +68,7 @@
                             <template slot="append">%</template>
                         </el-input>
                     </li>
-                    <li class="sm" v-if="isShowShareItem5" v-show="isShare">
+                    <li class="sm" v-if="isShowShareItem4" v-show="isShare">
                         <span class="tit"><span class="red">*</span>部门/项目</span>
                         <el-input placeholder="分摊比例" v-model="input4" class="input-with-select" readonly>
                             <el-select v-model="select4" slot="prepend" placeholder="请选择" class="input-select" disabled>
@@ -388,7 +388,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;
                     this.originalTypeName = data.application.originalTypeName

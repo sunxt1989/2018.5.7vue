@@ -90,31 +90,75 @@
                     </li>
                     <li class="pt">
                         <span class="tit">企业会计准则</span>
-                        <input class="ipt" type="text" v-model="accountStandard" readonly>
+                        <el-select class="sel" v-model="accountStandard" placeholder="请选择" :disabled="initialStatus != 0">
+                            <el-option
+                                v-for="item in options7"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">固定资产折旧规则</span>
-                        <input class="ipt" type="text" v-model="fixedDeprecitionType" readonly>
+                         <el-select class="sel" v-model="fixedDeprecitionType" placeholder="请选择" :disabled="initialStatus != 0">
+                            <el-option
+                                v-for="item in options8"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">无形资产摊销规则</span>
-                        <input class="ipt" type="text" v-model="intangibleDeprecitionType" readonly>
+                         <el-select class="sel" v-model="intangibleDeprecitionType" placeholder="请选择" :disabled="initialStatus != 0">
+                            <el-option
+                                v-for="item in options9"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">成本计算方法</span>
-                        <input class="ipt" type="text" v-model="inventoryCostType" readonly>
+                         <el-select class="sel" v-model="inventoryCostType" placeholder="请选择" :disabled="initialStatus != 0">
+                            <el-option
+                                v-for="item in options10"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">所得税缴税周期</span>
-                        <input class="ipt" type="text" v-model="incomeTaxPeroidType" readonly>
+                        <el-select class="sel" v-model="incomeTaxPeroidType" placeholder="请选择" :disabled="initialStatus == 2">
+                            <el-option
+                                v-for="item in options6"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">增值税缴税周期</span>
-                        <input class="ipt" type="text" v-model="addedTaxPeroidType" readonly>
+                        <el-select class="sel" v-model="addedTaxPeroidType" placeholder="请选择" :disabled="initialStatus == 2">
+                            <el-option
+                                v-for="item in options6"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                        </el-select>
                     </li>
                     <li class="pt">
                         <span class="tit">是否科技型企业</span>
-                        <input class="ipt" type="text" v-model="highTechInfo" readonly>
+                        <el-radio class="radio" v-model="techScaleType" label="1">一般科技企业</el-radio>
+                        <el-radio class="radio" v-model="techScaleType" label="2">科技型中小企业</el-radio>
+                        <el-checkbox v-model="highTechFlg">高新技术企业</el-checkbox>
                     </li>
                     <li class="ptx">
                         <span class="tit">营业执照</span>
@@ -137,6 +181,9 @@
                             <img width="100%" :src="dialogImageUrl" alt="">
                         </el-dialog>
                     </li>
+                    <li class="btn">
+                        <el-button @click="model" type="primary" class="sub1" >保存</el-button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -149,6 +196,7 @@
     import addUrl from '../../../../static/js/addUrl'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
+    import { mapState } from 'vuex';
     export default{
         data(){
             return{
@@ -185,7 +233,31 @@
                     {value:1,label:'小规模纳税人'},
                     {value:2,label:'一般纳税人'},
                 ],
-
+                options6:[
+                    {value:1,label:'按月度'},
+                    {value:2,label:'按季度'},
+                ],
+                options7:[
+                    {value:1,label:'小企业会计准则'},
+                    {value:2,label:'企业会计准则'},
+                    {value:3,label:'企业会计制度'},
+                ],//企业会计准则
+                options8:[
+                    {value:1,label:'年限平均法'},
+                    {value:2,label:'年数总和法'},
+                    {value:3,label:'双倍余额递减法'},
+                ],//固定资产折旧规则
+                options9:[
+                    {value:1,label:'直线法'},
+                    {value:2,label:'年数总和法'},
+                    {value:3,label:'余额递减法'},
+                ],//无形资产摊销规则
+                options10:[
+                    {value:1,label:'个别计价法'},
+                    {value:2,label:'先进先出法'},
+                    {value:3,label:'先进先出法'},
+                    {value:4,label:'移动加权平均法'},
+                ],//成本计算方法
                 provinceCode:'',//省
                 cityCode:'',//市
                 areaCode:'',//区
@@ -206,8 +278,10 @@
                 inventoryCostType:'',//成本计算方法
                 incomeTaxPeroidType:'',//所得税缴税周期
                 addedTaxPeroidType:'',//增值税缴税周期
-                highTechInfo:'',//是否科技型企业
+                techScaleType:'',//科技企业规模标记 1：一般科技企业 2：科技中小企业
+                highTechFlg:'',//是否科技型企业
 
+                initialStatus:'',//是否可以修改
 
                 pickerOption1:{
                     disabledDate(time) {
@@ -218,7 +292,110 @@
                 screenHeight: '' //页面初始化高度
             }
         },
+        watch:{
+            techScaleType:function(val){
+                if(val == 1){
+                    this.highTechFlg = false
+                }
+            },
+            highTechFlg:function(val){
+                if(this.techScaleType == 1){
+                    this.highTechFlg =false
+                }
+            }
+        },
+        computed:mapState(['start_ym','current_book_ym']),
         methods: {
+            model(n){
+                this.loading = true
+                if(n == 0){
+                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$router.go(-1)
+                    }).catch(() => {
+                        this.loading = false
+                    });
+                }else{
+
+                    this.$confirm('确定是否保存？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(() => {
+                        this.submit();
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                }
+            },
+            submit(){
+//                var url = addUrl.addUrl('AccountManagementUpdate');
+                var url = 'http://192.168.2.192:8080/web/vue/user/book/update.html';
+                var params = new URLSearchParams();
+                let highTechFlg = this.highTechFlg ? '1' : '0'
+                console.log(this.incomeTaxPeroidType);
+                params.append('accountStandard',this.accountStandard);
+                params.append('fixedDeprecitionType',this.fixedDeprecitionType);
+                params.append('intangibleDeprecitionType',this.intangibleDeprecitionType);
+                params.append('inventoryCostType',this.inventoryCostType);
+                params.append('incomeTaxPeroidType',this.incomeTaxPeroidType);
+                params.append('addedTaxPeroidType',this.addedTaxPeroidType);
+                params.append('techScaleType',this.techScaleType);
+                params.append('highTechFlg',highTechFlg);
+
+                axios({
+                    method:'post',
+                    url:url,
+                    data:params,
+                    headers:{
+                        'Content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+                    }
+                },params)
+                    .then(response=> {
+                        console.log(response);
+                        var msg = response.data.msg;
+                        if(response.data.status == 200){
+                            this.$message({
+                                type: 'success',
+                                message: '保存成功'
+                            });
+                            this.$router.go(-1);
+                        }else if(response.data.status == 400){
+                            this.$message.error(msg);
+                        }
+                        this.loading = false;
+                    })
+                    .catch(error=> {
+                        this.loading = false;
+//                        console.log(error);
+                        this.$message.error('提交失败，请重试！');
+                    })
+            },
             //更换邀请码
             changeInviteCode(){
                 this.loading = true
@@ -262,10 +439,11 @@
             };
         },
         created(){
-            let url = addUrl.addUrl('seeAccountManagement')
+//            let url = addUrl.addUrl('seeAccountManagement')
+            let url = 'http://192.168.2.192:8080/web/vue/user/book/item.html'
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value.item
 
                     this.companyName = data.companyName
@@ -274,19 +452,21 @@
                     this.inviteCode = data.inviteCode
                     this.registeredCapital = data.registeredCapital
 
-                    this.companyType = data.companyType
-                    this.companyScale = data.companyScale
-                    this.provinceCode = data.province
-                    this.cityCode = data.city
-                    this.areaCode = data.district
-                    this.attachUrlJson = [{name: '', url: data.idNumberUri}]
-                    this.accountStandard = data.accountStandard
-                    this.fixedDeprecitionType = data.fixedDeprecitionType
-                    this.intangibleDeprecitionType = data.intangibleDeprecitionType
-                    this.inventoryCostType = data.inventoryCostType
-                    this.incomeTaxPeroidType = data.incomeTaxPeroidType
-                    this.addedTaxPeroidType = data.addedTaxPeroidType
-                    this.highTechInfo = data.highTechInfo
+                    this.companyType = data.companyType;
+                    this.companyScale = data.companyScale;
+                    this.provinceCode = data.province;
+                    this.cityCode = data.city;
+                    this.areaCode = data.district;
+                    this.attachUrlJson = [{name: '', url: data.idNumberUri}];
+                    this.accountStandard = data.accountStandard;
+                    this.fixedDeprecitionType = data.fixedDeprecitionType;
+                    this.intangibleDeprecitionType = data.intangibleDeprecitionType;
+                    this.inventoryCostType = data.inventoryCostType;
+                    this.incomeTaxPeroidType = data.incomeTaxPeroidType;
+                    this.addedTaxPeroidType = data.addedTaxPeroidType;
+                    this.highTechFlg = data.highTechFlg ? true : false;
+                    this.techScaleType = String(data.techScaleType);
+                    this.initialStatus = data.initialStatus
 
 
                     this.loading = false
@@ -350,6 +530,10 @@
         line-height: 36px;
         margin-top: 20px;
         float: left;
+    }
+    .list .pt .radio{
+        margin-left:0px;
+        margin-right: 30px;
     }
     .list .btn{
         width:100%;

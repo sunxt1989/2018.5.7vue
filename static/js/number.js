@@ -10,7 +10,7 @@ function number(value){
     }
 
     var intPart = value < 0 ? Math.ceil(value) : Math.floor(value); //获取整数部分 向下取整
-    var intPartFormat = intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,'); //将整数部分逢三一断
+    var intPartFormat = (value < 0 && value > -1) ? '-0' : intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
     var floatPart = ".00"; //预定义小数部分
 
     if(value.includes('.')){

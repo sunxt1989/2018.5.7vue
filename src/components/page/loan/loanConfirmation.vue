@@ -159,7 +159,7 @@
                 money:'',//借款金额
                 creditMoney:'',//已还金额
                 unCreditMoney:'',//待还款金额
-                nowdata:'',//当前借款日期
+                debitDateYMD:'',//借款单审批日期
                 debitDate:'',//上传日期（格式修改后的）
                 userName:'',//借款人
                 auditFlg:'',//0 仅保存；1 驳回；2等待审核；3 等待出纳确认；4 通过；5 等待财务负责人审核；6 等待企业负责人审核；7 已对冲
@@ -219,17 +219,18 @@
                             this.loading = false;
                             return
                         }
+                        //判断选择日期不能早于借款审批日期
+                        if(Number(this.debitDateYMD.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
+                            this.$message.error('确认日期不得早于借款审批日期')
+                            this.loading = false;
+                            return
+                        }
                         if(this.payType == '2' && this.bankCode == ''){
                             this.$message.error('请选择银行账户')
                             this.loading = false;
                             return
                         }
-                        //判断选择日期不能早于当前借款日期
-                        if(Number(this.nowdata.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
-                            this.$message.error('确认日期不得早于当前借款日期')
-                            this.loading = false;
-                            return
-                        }
+
                     }
                     this.isLoading = true;
                     this.$confirm(msg, '提示', {
@@ -355,7 +356,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     let userDebitAuditRecordList = data.userDebitAuditRecordList
@@ -365,11 +366,11 @@
                     this.money = number.number(data.userDebitItem.money);
                     this.creditMoney = number.number(data.userDebitItem.creditMoney);
                     this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
-                    this.nowdata = data.userDebitItem.debitDateYMD;
                     this.userName = data.userDebitItem.userName;
                     this.auditFlg = data.userDebitItem.auditFlg;
                     this.attachUrlJson = data.userDebitItem.attachUrlJson;
                     this.departmentId = data.userDebitItem.departmentIdStr;
+                    this.debitDateYMD = data.userDebitItem.debitDateYMD;
                     this.bankAccountList = data.bankAccountList;
                     //判断是否是出纳，如果是允许操作
                     if(this.isCashierFlg){

@@ -218,7 +218,7 @@
                     let input3 = Number(this.input3)
                     let input4 = Number(this.input4)
                     let input5 = Number(this.input5)
-                    let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(0)
+                    let allInput = parseFloat(input1 + input2 + input3 + input4 + input5).toFixed(2)
 //                    console.log(allInput);
                     //判断所有填写的百分比是不是等于100
                     if(allInput != 100 ){

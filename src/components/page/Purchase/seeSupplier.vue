@@ -63,7 +63,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
-                        <input class="ipt" type="text" v-model="bankCode" maxlength="21">
+                        <input class="ipt" type="text" v-model="bankCode" maxlength="50">
                     </li>
                     <li class="sm">
                         <span class="tit">身份选择</span>
@@ -97,7 +97,7 @@
                                 <span v-if="scope.row.type == 3">软件</span>
                                 <span v-if="scope.row.type == 4">劳务服务</span>
                                 <span v-if="scope.row.type == 5">技术服务</span>
-                                <span v-if="scope.row.type == 6">待销商品</span>
+                                <span v-if="scope.row.type == 6">库存商品</span>
                                 <span v-if="scope.row.type == 7">电信服务</span>
                                 <span v-if="scope.row.type == 8">设计服务</span>
                                 <span v-if="scope.row.type == 9">广告服务</span>
@@ -229,7 +229,7 @@
                         }
                     }
                     if(bankCode != ''){
-                        if(bankCode.length < 16 && typeof bankCode != 'number'){
+                        if(bankCode.length < 6 && typeof bankCode != 'number'){
                             this.$message.error('请正确输入银行卡号');
                              this.loading = false
                             return

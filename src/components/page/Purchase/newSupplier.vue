@@ -64,7 +64,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
-                        <input class="ipt" type="text" v-model="bankCode" maxlength="21">
+                        <input class="ipt" type="text" v-model="bankCode" maxlength="50">
                     </li>
 
                     <li class="sm">
@@ -150,7 +150,7 @@
                         }
                     }
                     if(bankCode != ''){
-                        if(bankCode.length < 16 || !(str3.test(bankCode))){
+                        if(bankCode.length < 6 || !(str3.test(bankCode))){
                             this.$message.error('请正确输入银行卡号');
                             this.loading = false
                             return

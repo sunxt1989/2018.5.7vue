@@ -459,6 +459,17 @@
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('bookkeeping')"></i>
                         </div>
+                        <div class="item" data-id="40" id="bookkeepingVoucher">
+                            <div @mousedown="mousedown" @mouseup="mouseup('bookkeepingVoucher',$event)">
+                                <div class="item-content">
+                                    <div class="itemLink">
+                                        <img src="static/images/homePage/bookkeepingVoucher.png" alt="">
+                                    </div>
+                                    <span class="itemName">记账凭证</span>
+                                </div>
+                            </div>
+                            <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('bookkeepingVoucher')"></i>
+                        </div>
                     </div>
 
                     <el-dialog class="dialog cf" title="常用功能选择" :visible.sync="dialogSseTableVisible" showConfirmButton="true"
@@ -541,7 +552,8 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="items2.isShowBankList || items2.isShowBankMoneyList">
+
+                        <div class="items cf" v-if="items2.isShowBankList || items2.isShowBankMoneyList || items2.isShowCashDayAccount || items2.isShowBankJournal">
                             <span class="items-tit">银行业务</span>
                             <!--银行账户-->
                             <div class="checkbox" v-if="items2.isShowBankList">
@@ -555,6 +567,20 @@
                                 <el-checkbox v-model="items1.bankMoneyList" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[9].src alt="" class="itemImg">
                                     <span class="name">{{items[9].name}}</span>
+                                </el-checkbox>
+                            </div>
+                            <!--现金日记账-->
+                            <div class="checkbox" v-if="items2.isShowCashDayAccount">
+                                <el-checkbox v-model="items1.cashDayAccount" class="homePage-checkbox" @change="checkboxChange">
+                                    <img :src=items[24].src alt="" class="itemImg">
+                                    <span class="name">{{items[24].name}}</span>
+                                </el-checkbox>
+                            </div>
+                            <!--银行存款日记账-->
+                            <div class="checkbox" v-if="items2.isShowBankJournal">
+                                <el-checkbox v-model="items1.bankJournal" class="homePage-checkbox" @change="checkboxChange">
+                                    <img :src=items[25].src alt="" class="itemImg">
+                                    <span class="name">{{items[25].name}}</span>
                                 </el-checkbox>
                             </div>
                         </div>
@@ -632,8 +658,7 @@
                         </div>
 
                         <div class="items cf" v-if="items2.isShowInitialization || items2.isShowVoucherList || items2.isShowMonthlyKnot
-                        || items2.isShowGeneralLedger || items2.isShowDetailAccount || items2.isShowSubjectBalance || items2.isShowAuxiliarySubjectBalance
-                        || items2.isShowCashDayAccount || items2.isShowBankJournal">
+                        || items2.isShowGeneralLedger || items2.isShowDetailAccount || items2.isShowSubjectBalance || items2.isShowAuxiliarySubjectBalance">
                             <span class="items-tit">账务处理</span>
                             <!--账务处理-->
                             <div class="checkbox" v-if="items2.isShowInitialization">
@@ -682,20 +707,6 @@
                                 <el-checkbox v-model="items1.auxiliarySubjectBalance" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[23].src alt="" class="itemImg">
                                     <span class="name">{{items[23].name}}</span>
-                                </el-checkbox>
-                            </div>
-                            <!--现金日记账-->
-                            <div class="checkbox" v-if="items2.isShowCashDayAccount">
-                                <el-checkbox v-model="items1.cashDayAccount" class="homePage-checkbox" @change="checkboxChange">
-                                    <img :src=items[24].src alt="" class="itemImg">
-                                    <span class="name">{{items[24].name}}</span>
-                                </el-checkbox>
-                            </div>
-                            <!--银行存款日记账-->
-                            <div class="checkbox" v-if="items2.isShowBankJournal">
-                                <el-checkbox v-model="items1.bankJournal" class="homePage-checkbox" @change="checkboxChange">
-                                    <img :src=items[25].src alt="" class="itemImg">
-                                    <span class="name">{{items[25].name}}</span>
                                 </el-checkbox>
                             </div>
                         </div>
@@ -826,6 +837,17 @@
                                 <el-checkbox v-model="items1.stockList" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[6].src alt="" class="itemImg">
                                     <span class="name">{{items[6].name}}</span>
+                                </el-checkbox>
+                            </div>
+                        </div>
+
+                        <div class="items cf" v-if="user_type >= 10">
+                            <span class="items-tit">记账凭证</span>
+                            <!--记账凭证-->
+                            <div class="checkbox">
+                                <el-checkbox v-model="items1.bookkeepingVoucher" class="homePage-checkbox" @change="checkboxChange">
+                                    <img :src=items[39].src alt="" class="itemImg">
+                                    <span class="name">{{items[39].name}}</span>
                                 </el-checkbox>
                             </div>
                         </div>
@@ -1068,6 +1090,11 @@
                         id:'#Entrust',
                         src:'static/images/homePage/Entrust.png',
                     },
+                    {
+                        name:'记账凭证',//39 - 1
+                        id:'#bookkeepingVoucher',
+                        src:'static/images/homePage/bookkeepingVoucher.png',
+                    },
                 ],//菜单列表数据
                 items1:{
                     costSheet:false,
@@ -1109,6 +1136,7 @@
                     recordSheet:false,
                     bookkeeping:false,
                     Entrust:false,
+                    bookkeepingVoucher:false,
                 },//判断这个模块是否在桌面显示
                 items2:{
                     isShowLoan:false,
@@ -1150,6 +1178,7 @@
                     isShowRecordSheet:false,
                     isShowBookkeeping:false,
                     isShowEntrust:false,
+                    isShowBookkeepingVoucher:false,
                 },//判断这个模块是否在菜单中显示（身份不同显示的模块不同）
                 isFirst:true,//计数器，判断menuArr这个公共参数是否有值
                 newsList:[],//消息列表
@@ -1277,14 +1306,15 @@
                         let addBoss = addUrl.addUrl('addBoss');
                         window.open(addBoss);
                     }else if(id == 'invoiceDeduction'){
-                        let invoiceDeduction = addUrl.addUrl('invoiceDeduction');
-                        window.open(invoiceDeduction);
+                        this.$router.push('/invoice/invoiceDeduction')
                     }else if(id == 'recordSheet'){
                         let recordSheet = addUrl.addUrl('recordSheet');
                         window.open(recordSheet);
                     }else if(id == 'bookkeeping'){
                         let bookkeeping = addUrl.addUrl('bookkeeping');
                         window.open(bookkeeping);
+                    }else if(id == 'bookkeepingVoucher'){
+                        this.$router.push('/Bookkeeping/Bookkeeping')
                     }
                 }else{
                     this.isSave = true;
@@ -1569,10 +1599,10 @@
                     if (menuArr[i] == '#auxiliarySubjectBalance' && auth_json.accounting_chakan == 1) {//辅助科目余额
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#cashDayAccount' && auth_json.accounting_chakan == 1) {//现金日记账
+                    if (menuArr[i] == '#cashDayAccount' && auth_json.bank_chakan == 1) {//现金日记账
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#bankJournal' && auth_json.accounting_chakan == 1) {//银行存款日记账
+                    if (menuArr[i] == '#bankJournal' && auth_json.bank_chakan == 1) {//银行存款日记账
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#auxiliaryList' && auth_json.bank_chakan == 1  && this.current_book_level != 3) {//辅助业务
@@ -1611,6 +1641,9 @@
                     if (menuArr[i] == '#bookkeeping' && this.user_type > 0 && this.current_book_level == 3 && this.account_type > 1) {//记账
                         newMenuArr.push(menuArr[i])
                     }
+                    if (menuArr[i] == '#bookkeepingVoucher' && this.user_type >= 10 ) {//记账凭证
+                        newMenuArr.push(menuArr[i])
+                    }
                 }
                 //判断功能权限,将无权限的项目隐藏不显示
                 if (auth_json.application_chakan == 1 && this.current_book_level != 3) {//费用单
@@ -1639,7 +1672,6 @@
                     this.items2.isShowStockList = false;
                 }
 
-
                 if (auth_json.purchase_chakan == 1 && this.current_book_level != 3) {//采购单
                     this.items2.isShowPurchaseList = true;
                 } else {
@@ -1658,9 +1690,13 @@
                 if (auth_json.bank_chakan == 1) {//银行账户、银行现金业务、红冲、辅助业务
                     this.items2.isShowBankList = true;
                     this.items2.isShowBankMoneyList = true;
+                    this.items2.isShowCashDayAccount = true;
+                    this.items2.isShowBankJournal = true;
                 } else {
                     this.items2.isShowBankList = false;
                     this.items2.isShowBankMoneyList = false;
+                    this.items2.isShowCashDayAccount = false;
+                    this.items2.isShowBankJournal = false;
                 }
                 if (auth_json.bank_chakan == 1 && this.current_book_level != 3) {//红冲、辅助业务
                     this.items2.isShowRedFlush = true;
@@ -1698,6 +1734,7 @@
                     this.items2.isShowTaxationList = false;
                     this.items2.isShowCollection = false;
                 }
+
                 if (auth_json.accounting_chakan == 1) {
                     this.items2.isShowInitialization = true;
                     this.items2.isShowVoucherList = true;
@@ -1706,8 +1743,6 @@
                     this.items2.isShowDetailAccount = true;
                     this.items2.isShowSubjectBalance = true;
                     this.items2.isShowAuxiliarySubjectBalance = true;
-                    this.items2.isShowCashDayAccount = true;
-                    this.items2.isShowBankJournal = true;
                     this.items2.isShowDevelop = true;
                     this.items2.isShowCostCollection = true;
                     this.items2.isShowSummary = true;
@@ -1720,8 +1755,6 @@
                     this.items2.isShowDetailAccount = false;
                     this.items2.isShowSubjectBalance = false;
                     this.items2.isShowAuxiliarySubjectBalance = false;
-                    this.items2.isShowCashDayAccount = false;
-                    this.items2.isShowBankJournal = false;
                     this.items2.isShowDevelop = false;
                     this.items2.isShowCostCollection = false;
                     this.items2.isShowSummary = false;
@@ -1751,6 +1784,11 @@
                     this.items2.isShowInvoiceDeduction = false;
                     this.items2.isShowRecordSheet = false;
                     this.items2.isShowBookkeeping = false;
+                }
+                if (this.user_type >= 10) {//记账凭证
+                    this.items2.isShowBookkeepingVoucher = true;
+                }else{
+                    this.items2.isShowBookkeepingVoucher = false;
                 }
 
 //                console.log(newMenuArr,'newMenuArr');
@@ -1815,7 +1853,7 @@
             let url = addUrl.addUrl('newsList');
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     let list = data.list
                     for(let i in list){

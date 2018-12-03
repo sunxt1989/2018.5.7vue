@@ -19,6 +19,8 @@ const state ={
     isAccountBookkeeping:'',//是否为代记账，true 为是代记账账套 false 为普通账套
     account_type:'',//代记账会计身份，1为普通会计 >1会计
     name:'',//用户名称
+    isMonthlyKnots:false,//是否12月月结
+    isAnnualKnots:false,//是否去年年结
 }
 const mutations={
     add(state,obj){
@@ -36,6 +38,8 @@ const mutations={
         state.isAccountBookkeeping = obj.isAccountBookkeeping ? obj.isAccountBookkeeping : state.isAccountBookkeeping;
         state.account_type = obj.account_type ? obj.account_type : state.account_type;
         state.name = obj.name ? obj.name : state.name;
+        state.isMonthlyKnots = obj.isMonthlyKnots ? obj.isMonthlyKnots : state.isMonthlyKnots;
+        state.isAnnualKnots = obj.isAnnualKnots ? obj.isAnnualKnots : state.isAnnualKnots;
     },
 }
 

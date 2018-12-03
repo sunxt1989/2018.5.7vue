@@ -103,7 +103,7 @@
                                         <span v-if="scope.row.type == 2">软件</span>
                                         <span v-if="scope.row.type == 3">劳务服务</span>
                                         <span v-if="scope.row.type == 4">技术服务</span>
-                                        <span v-if="scope.row.type == 5">待销商品</span>
+                                        <span v-if="scope.row.type == 5">库存商品</span>
                                         <span v-if="scope.row.type == 11">专利技术</span>
                                         <span v-if="scope.row.type == 12">非专利技术</span>
                                         <span v-if="scope.row.type == 13">商标</span>
@@ -181,7 +181,7 @@
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
                                 <el-table-column align="center" prop="type" label="类别">
                                     <template slot-scope="scope">
-                                        <span v-if="scope.row.type == 1">待销商品</span>
+                                        <span v-if="scope.row.type == 1">库存商品</span>
                                         <span v-else-if="scope.row.type == 2">技术服务</span>
                                         <span v-else-if="scope.row.type == 3">技术开发</span>
                                         <span v-else-if="scope.row.type == 4">技术咨询</span>

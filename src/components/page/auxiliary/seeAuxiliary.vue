@@ -26,14 +26,15 @@
                     </li>
                     <li class="pt">
                         <span class="tit">交易方</span>
-                        <el-select class="sel" v-model="tradeId" placeholder="请选择" :disabled="!isReject">
+                        <el-select class="sel" v-model="tradeName" placeholder="请选择" :disabled="!isReject">
                             <el-option
                                 v-for="item in tradeList"
                                 :key="item.value"
                                 :label="item.tradeName"
-                                :value="item.idString">
+                                :value="item.tradeName">
                             </el-option>
                         </el-select>
+                        <input v-if="isReject" class="opt" type="text" v-model="tradeName" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="pt">
                         <span class="tit">金额</span>
@@ -52,7 +53,7 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">收款方式</span>
+                        <span class="tit">结算方式</span>
                         <el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange" :disabled="!isReject">
                             <el-option
                                 v-for="item in options2"
@@ -164,7 +165,7 @@
                 payType:'1',//收款方式
                 bankCode:'',//银行账户
                 bankList:[],//银行列表
-                tradeId:'',//交易方ID
+                tradeName:'',//交易方名称
                 tradeList:[],//交易方列表
 
                 options2:[//收款方式列表
@@ -253,7 +254,7 @@
                         this.loading = false;
                         return
                     }
-                    if(this.tradeId == ''){
+                    if(this.tradeName == ''){
                         this.$message.error('请选择交易方')
                         this.loading = false;
                         return
@@ -322,17 +323,10 @@
             submit(){
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('auxiliarySubmit');
-                let tradeList = this.tradeList;
-                let tradeName = '';
-                for(let i in tradeList){
-                    if(tradeList[i].idString == this.tradeId){
-                        tradeName = tradeList[i].tradeName
-                    }
-                }
+
                 params.append('businessId',this.debitId);
                 params.append('subjectCode',this.subjectCode);
-                params.append('tradeId',this.tradeId);
-                params.append('tradeName',tradeName);
+                params.append('tradeName',this.tradeName);
                 params.append('money',unNumber.unNumber(this.money));
                 params.append('businessDate',this.businessDate);
                 params.append('payType',this.payType);
@@ -416,7 +410,7 @@
                     this.money = number.number(item.amount);
                     this.subjectCode = item.subjectCode
                     this.bankCode = item.bankCode
-                    this.tradeId = item.relationIdString
+                    this.tradeName = item.relationName
                     this.businessDate = item.businessDateYMD
                     this.payType = String(item.payType)
                     this.discription = item.discription
@@ -592,5 +586,16 @@
     }
     .grayList{
         margin-top: 20px;
+    }
+    .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:275px;
+        outline:none;
+        color: #333;
     }
 </style>

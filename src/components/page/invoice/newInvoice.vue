@@ -2,34 +2,60 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>新建银行账户</h2>
+                <h2>录入抵扣专票</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" :loading="isLoading">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" :loading="isLoading">启用</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub" :loading="isLoading">保存</el-button>
             </div>
         </div>
         <div class="w">
             <div class="content" :style="{height:screenHeight}">
                 <div class="line">
-                    <span>新建银行账户</span>
+                    <span>录入抵扣专票</span>
                 </div>
                 <ul class="list cf">
-                    <li class="sm">
-                        <span class="tit">银行名称</span>
-                        <input class="ipt" type="text" v-model="bankName" maxlength="50">
+                    <li class="sm" style=" position: relative;">
+                        <span class="tit"><span class="red">*</span>公司</span>
+                        <el-select class='sel' v-model="receiptName">
+                            <el-option v-for="item in tradeList"
+                                       :key="item.value"
+                                       :label="item.tradeName"
+                                       :value="item.tradeName">
+                            </el-option>
+                        </el-select>
+                        <input class="opt" type="text" v-model="receiptName" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="sm">
-                        <span class="tit">开户行</span>
-                        <input class="ipt" type="text" v-model="bankChildName" maxlength="50">
+                        <span class="tit"><span class="red">*</span>日期</span>
+                        <el-date-picker
+                            class="iptData"
+                            v-model="receiptDate"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            :picker-options="pickerOptions1"
+                            placeholder="选择日期">
+                        </el-date-picker>
                     </li>
                     <li class="sm">
-                        <span class="tit">银行卡号</span>
-                        <input class="ipt" type="text" v-model="bankCode" maxlength="50" @change="changeCode">
+                        <span class="tit"><span class="red">*</span>价税合计</span>
+                        <input class="ipt" type="text" v-model.lazy="money"  maxlength="20">
                     </li>
                     <li class="sm">
-                        <span class="tit">账户余额</span>
-                        <input class="ipt" type="text" v-model="initialAmount" readonly>
+                        <span class="tit"><span class="red">*</span>税额</span>
+                        <input class="ipt" type="text" v-model.lazy="taxMoney" maxlength="20">
                     </li>
+                    <li class="sm">
+                        <span class="tit">发票类型</span>
+                        <input class="ipt" type="text" value="专票" readonly>
+                    </li>
+                    <li class="sm">
+                        <span class="tit">进销项</span>
+                        <input class="ipt" type="text" value="进项" readonly>
+                    </li>
+                    <li class="pt cf">
+                        <span class="tit2"><span class="red">*</span>明细</span>
+                        <textarea class="tex" v-model="discription" maxlength="50"></textarea>
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -39,34 +65,49 @@
 
 <script type="text/ecmascript-6">
     import axios from 'axios'
+    import addUrl from '../../../../static/js/addUrl'
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
-    import addUrl from '../../../../static/js/addUrl'
     export default{
         data() {
             return{
-                bankName:'',//银行名称
-                bankChildName:'',//开户行
-                bankCode:'',//银行卡号
-                initialAmount:'0.00',//账户余额
+                receiptName:'',//公司名称
+                receiptDate:'',//日期
+                money:'',//价税合计
+                taxMoney:'',//税额
+                discription:'',//发票明细
+                tradeList:[],
 
-                loading:false,
+                pickerOptions1:{
+                    disabledDate(time) {
+                        return time.getTime() > Date.now();
+                    },
+                },
+                loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
-        methods: {
-            changeCode(){
-                let bankCode = this.bankCode
-                let str = /^\d+$/;//判断只允许输入正整数
-                if(!str.test(bankCode)){
-                    this.$message.error('请正确输入银行卡号');
-                    this.bankCode = 0;
-                    return
+        watch:{
+            money:function(val){
+                if(val < 0){
+                    this.money = '0.00'
+                }else{
+                    this.money = number.number(val)
                 }
+
             },
+            taxMoney:function(val){
+                if(val < 0){
+                    this.taxMoney = '0.00'
+                }else{
+                    this.taxMoney = number.number(val)
+                }
+            }
+        },
+        methods: {
             model(n){
-                this.loading = true;
+                this.loading = true
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -75,31 +116,40 @@
                     }).then(() => {
                         this.$router.go(-1)
                     }).catch(() => {
-                        this.loading = false;
+                        this.loading = false
                     });
                 }else{
-                    if (this.bankName == '') {
-                        this.$message.error('请正确输入银行名称');
+                    if (this.receiptName == '') {
+                        this.$message.error('请正确输入公司名称');
                         this.loading = false;
                         return
-                    } else if (this.bankChildName == '') {
-                        this.$message.error('请正确输入开户行');
+                    } else if (this.receiptDate == '') {
+                        this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
                     }
-                    if (this.bankCode.length < 6 ) {
-                        this.$message.error('请正确输入银行卡号');
+                    if (this.money == '' || this.money == '0.00') {
+                        this.$message.error('请正确输入价税合计');
+                        this.loading = false;
+                        return
+                    }
+                    if(this.taxMoney == '' || this.taxMoney == '0.00'){
+                        this.$message.error('请正确输入税额');
+                        this.loading = false;
+                        return
+                    }
+                    if(unNumber.unNumber(this.money) < unNumber.unNumber(this.taxMoney)){
+                        this.$message.error('输入的税额不得大于价税合计');
+                        this.loading = false;
+                        return
+                    }
+                    if(this.discription == ''){
+                        this.$message.error('请正确输入发票明细');
                         this.loading = false;
                         return
                     }
                     this.isLoading = true;
-                    let message = ''
-                    if(n == 1){
-                        message = '确定是否保存？'
-                    }else if(n == 2){
-                        message = '确定是否启用？'
-                    }
-                    this.$confirm(message, '提示', {
+                    this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         showClose: false,
@@ -123,28 +173,28 @@
                             }
                         }
                     }).then(() => {
-                        this.axios(n);
+                        this.axios();
                     }).catch(() => {
                         this.$message({
                             type: 'info',
                             message: '已取消'
                         });
-                        this.loading = false;
+                        this.loading = false
                         this.isLoading = false;
                     });
                 }
             },
-            axios(n){
-                var params = new URLSearchParams();
-                var url = addUrl.addUrl('bankSave')
+            axios(){
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('invoiceSave')
+//                let url = 'http://192.168.2.190:8080/web/vue/bill/save.html'
+                params.append('receipt_id','');
+                params.append('receipt_name',this.receiptName);
+                params.append('receipt_money',unNumber.unNumber(this.money));
+                params.append('receipt_tax_money',unNumber.unNumber(this.taxMoney));
+                params.append('receipt_discription',this.discription);
+                params.append('receipt_date',this.receiptDate);
 
-                params.append('bankId','');
-                params.append('bankAccountType',2);
-                params.append('bankName',this.bankName);
-                params.append('bankChildName',this.bankChildName);
-                params.append('bankCode',this.bankCode);
-                params.append('initialAmount','0');
-                params.append('bookStatus',(n - 1));
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
@@ -154,7 +204,7 @@
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '成功'
+                                message: '保存成功'
                             });
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
@@ -187,6 +237,24 @@
                 that.screenHeight = `${document.documentElement.clientHeight - topHeight - headerHeight - 85}px`;
             };
         },
+        created(){
+            var url = addUrl.addUrl('newInvoice');
+//            var url = 'http://192.168.2.190:8080/web/vue/bill/item.html'
+            axios.post(url)
+                .then(response=> {
+//                    console.log(response);
+                    let data = response.data.value;
+                    this.tradeList = data.tradelist
+//                    console.log(this.tradeList);
+                    this.loading = false
+                })
+                .catch(error=> {
+                    this.loading = false
+//                    console.log(error);
+                    alert('网络错误，不能访问');
+                });
+        }
+
     }
 </script>
 
@@ -244,9 +312,9 @@
         vertical-align: middle;
         padding: 3px 10px;
     }
-    .list li .check{
-        height:28px;
-        padding: 5px 10px;
+    .list li .iptData{
+        width:322px;
+        height:36px;
     }
 
     .list li .sel{
@@ -267,17 +335,31 @@
         width:150px;
         text-align: right;
         margin-right: 20px;
-        vertical-align: middle;
+        vertical-align: top;
     }
-    .top .sub1{
+    .list li .tex{
+        width:76.7%;
+        height:60px;
+        resize: none;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 5px 10px;
+    }
+    .top .sub{
         position: absolute;
         right:110px;
         font-size:12px;
     }
-    .top .sub2{
+    .opt{
+        width:260px;
+        height:28px;
+        border: none;
+        font-size:14px;
         position: absolute;
-        right:190px;
-        font-size:12px;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
     }
 
 </style>

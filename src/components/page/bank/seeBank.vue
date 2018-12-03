@@ -24,7 +24,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">银行卡号</span>
-                        <input class="ipt" type="text" v-model="bankCode" maxlength="21" @change="changeCode" :readonly="isEnable">
+                        <input class="ipt" type="text" v-model="bankCode" maxlength="50" @change="changeCode" :readonly="isEnable">
                     </li>
                     <li class="sm">
                         <span class="tit">账户余额</span>
@@ -133,7 +133,7 @@
                         this.loading = false;
                         return
                     }
-                    if (this.bankCode == '0' || this.bankCode == '') {
+                    if (this.bankCode.length < 6 ) {
                         this.$message.error('请正确输入银行卡号');
                         this.loading = false;
                         return

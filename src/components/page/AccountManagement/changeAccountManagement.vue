@@ -159,7 +159,6 @@
                     {value:1,label:'小规模纳税人'},
                     {value:2,label:'一般纳税人'},
                 ],
-
                 provinceCode:'',//省
                 cityCode:'',//市
                 areaCode:'',//区

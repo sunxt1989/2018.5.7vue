@@ -187,8 +187,9 @@
                 discription:'',//备注
                 discriptionName:'',//备注名称
                 discriptionFlg:'',//是否显示备注
+                payFlg:'',//0：没有结算方式，1：有结算方式
 
-                pickerOptions1:{
+            pickerOptions1:{
                     disabledDate(time) {
                         return time.getTime() > Date.now();
                     },
@@ -198,7 +199,7 @@
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         watch:{
             //对部门项目显示做判断1：只显示部门2：只显示项目3：显示部门和项目
             projectDepartmentFlg:function(val){
@@ -262,7 +263,7 @@
                 params.append('id',this.scene);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -284,6 +285,7 @@
                         this.taxRateName = data.taxRateName
                         this.taxMoneyFlg = data.taxMoneyFlg
                         this.taxMoneyName = data.taxMoneyName
+                        this.payFlg = response.data.value.payFlg
                         this.loading = false
                     })
                     .catch(error=> {
@@ -294,10 +296,6 @@
             },
             model(n){
                 this.loading = true;
-                let businessDate = this.businessDate.substring(0,7)
-                let current_book_ym = Number(this.current_book_ym);
-                let nowDate = Number(businessDate.split('-').join(''));
-
                 if(n == 0){
                     this.$confirm('填写的信息还未保存，是否返回？', '提示', {
                         confirmButtonText: '确定',
@@ -314,16 +312,40 @@
                         this.loading = false;
                         return
                     }
-                    if (businessDate == ''&& this.businessDateFlg == 1) {
-                        this.$message.error('请选择业务日期');
-                        this.loading = false;
-                        return
+                    let businessDate =  Number(this.businessDate.split('-').join('').substring(0,6))
+                    let businessDateYear = Number(this.businessDate.substring(0,4));//当前选择日期的年份
+                    let current_book_ym = Number(this.current_book_ym);
+                    let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                    if(this.businessDateFlg == 1){//先判断是否显示了日期选择
+                        if (this.businessDate == '') {
+                            this.$message.error('请选择业务日期');
+                            this.loading = false;
+                            return
+                        }
+                        if(this.isMonthlyKnots && !this.isAnnualKnots && this.payFlg == 0){//判断已经12月月结但是还没年结时
+                            if(businessDate < current_book_ym){//先判断业务日期不得早于当前账期
+                                if(businessDateYear == lastYear && businessDate != annualKnots ){// 再判断选择的是否是去年12月份
+                                    this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
+                                    this.loading = false;
+                                    return
+                                }else if(businessDateYear != lastYear){
+                                    this.$message.error('业务日期不得早于当前账期');
+                                    this.loading = false
+                                    return
+                                }
+                            }
+                        }else{
+                            if(businessDate < current_book_ym ) {
+                                this.$message.error('业务日期不得早于当前账期');
+                                this.loading = false;
+                                return
+                            }
+                        }
                     }
-                    if (current_book_ym > nowDate && this.businessDateFlg == 1) {
-                        this.$message.error('业务日期不得早于当前账期');
-                        this.loading = false;
-                        return
-                    }
+
+
                     if (this.department == '' && this.projectDepartmentFlg == 1) {
                         this.$message.error('请选择部门/项目');
                         this.loading = false;
@@ -331,6 +353,11 @@
                     }
                     if(this.money == '0.00' && this.moneyFlg == 1){
                         this.$message.error('请正确输入金额');
+                        this.loading = false;
+                        return
+                    }
+                    if(unNumber.unNumber(this.money) < unNumber.unNumber(this.taxAmount)){
+                        this.$message.error('输入的税额不得大于金额');
                         this.loading = false;
                         return
                     }
@@ -345,7 +372,7 @@
                         return
                     }
                     this.isLoading = true;
-                    let message = ''
+                    let message = '';
                     if(n == 1){
                         message = '确定是否保存？'
                     }else if(n == 2){
@@ -394,7 +421,7 @@
                 }else if(n == 2){
                     url = addUrl.addUrl('collectionSubmit')
                 }
-                let departmentJson = ''
+                let departmentJson = '';
                 for(let i in this.departmentAndProjectList){
                     if(this.departmentAndProjectList[i].id == this.department){
                         departmentJson = JSON.stringify(this.departmentAndProjectList[i])
@@ -460,7 +487,7 @@
             var url = addUrl.addUrl('collection')
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     this.bankCodeList = data.bankList
                     this.departmentAndProjectList = data.departmentList

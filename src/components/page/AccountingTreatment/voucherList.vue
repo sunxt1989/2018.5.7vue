@@ -68,6 +68,9 @@
                         <el-tab-pane name="12">
                             <span slot="label" class="mon">12月</span>
                         </el-tab-pane>
+                        <el-tab-pane name="13">
+                            <span slot="label" class="mon">13月</span>
+                        </el-tab-pane>
                     </el-tabs>
 
                     <el-table class="single voucherList" :data="tableData"  @selection-change="handleSelectionChange" :default-expand-all="true"  >
@@ -266,7 +269,6 @@
                             })
 
                         }
-
                         this.tableData = certificateList;
                         this.loading = false
                     })

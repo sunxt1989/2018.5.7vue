@@ -8,6 +8,7 @@
             </div>
             <div class="w">
                 <div class="content cf">
+                    <el-checkbox v-if="isMonthlyKnots && !isAnnualKnots" v-model="flg" class="flg">是否为补录</el-checkbox>
                     <table class="table-top">
                         <col width="20%">
                         <col width="25%">
@@ -184,6 +185,7 @@
                 t9HandleFlag:false,//教育费附加税操作状态（true：已操作；false：未操作）
                 t10HandleFlag:false,//地方教育费附加税操作状态（true：已操作；false：未操作）
                 t11HandleFlag:false,//企业所得税税操作状态（true：已操作；false：未操作）
+                flg:'',//是否补录标记
 
                 t7DJZ:'0.00',//待结转增值税 判断逻辑：t7HandleFlag为true:t7DJZ为0
                 t7YJZ:'0.00',//已结转增值税
@@ -436,11 +438,13 @@
             },
             //计提、结转操作
             Calculation(taxTypeDes,handleType,amount){
+                let flg = this.flg ? '1': '0'
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('operation')
                 params.append('taxTypeDes',taxTypeDes);
                 params.append('handleType',handleType);
                 params.append('amount',amount);
+                params.append('flg',flg);
 
                 axios.post(url,params)
                     .then(response=> {
@@ -532,6 +536,7 @@
                     })
             }
         },
+        computed:mapState(['isMonthlyKnots','isAnnualKnots']),
         created(){
            this.axios()
         }
@@ -588,10 +593,14 @@
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }
+    .flg{
+        margin-left: 20px;
+    }
     .table-top{
         width:100%;
         border: 1px solid #ccc;
         font-size:12px;
+        margin-top: 10px;
     }
     .table-top th,td{
         border: 1px solid #ccc;

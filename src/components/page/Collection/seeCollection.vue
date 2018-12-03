@@ -188,6 +188,7 @@
                 discription:'',//备注
                 discriptionName:'',//备注名称
                 discriptionFlg:'',//是否显示备注
+                payFlg:'',//0：没有结算方式，1：有结算方式
 
                 pickerOptions1:{
                     disabledDate(time) {
@@ -254,6 +255,7 @@
                         this.taxRateName = data.taxRateName
                         this.taxMoneyFlg = data.taxMoneyFlg
                         this.taxMoneyName = data.taxMoneyName
+                        this.payFlg = response.data.value.payFlg
                         this.loading = false
                     })
                     .catch(error=> {
@@ -322,6 +324,8 @@
                         this.taxRateName = data.taxRateName
                         this.taxMoneyFlg = data.taxMoneyFlg
                         this.taxMoneyName = data.taxMoneyName
+                        this.payFlg = response.data.value.payFlg
+
                         this.loading = false
                     })
                     .catch(error=> {
@@ -332,10 +336,6 @@
             },
             model(n){
                 this.loading = true;
-                let businessDate = this.businessDate.substring(0,7)
-                let current_book_ym = Number(this.current_book_ym);
-                let nowDate = Number(businessDate.split('-').join(''));
-
                 if(n == 0){
                     if(this.isChange){
                         this.$confirm('填写的信息还未保存，是否返回？', '提示', {
@@ -356,15 +356,37 @@
                         this.loading = false;
                         return
                     }
-                    if (businessDate == ''&& this.businessDateFlg == 1) {
-                        this.$message.error('请选择业务日期');
-                        this.loading = false;
-                        return
-                    }
-                    if (current_book_ym > nowDate && this.businessDateFlg == 1) {
-                        this.$message.error('业务日期不得早于当前账期');
-                        this.loading = false;
-                        return
+                    let businessDate =  Number(this.businessDate.split('-').join('').substring(0,6))
+                    let businessDateYear = Number(this.businessDate.substring(0,4));//当前选择日期的年份
+                    let current_book_ym = Number(this.current_book_ym);
+                    let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+
+                    if(this.businessDateFlg == 1){//先判断是否显示了日期选择
+                        if (this.businessDate == '') {
+                            this.$message.error('请选择业务日期');
+                            this.loading = false;
+                            return
+                        }
+                        if(this.isMonthlyKnots && !this.isAnnualKnots && this.payFlg == 0){//判断已经12月月结但是还没年结时
+                            if(businessDate < current_book_ym){//先判断业务日期不得早于当前账期
+                                if(businessDateYear == lastYear && businessDate != annualKnots ){// 再判断选择的是否是去年12月份
+                                    this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
+                                    this.loading = false;
+                                    return
+                                }else if(businessDateYear != lastYear){
+                                    this.$message.error('业务日期不得早于当前账期');
+                                    this.loading = false
+                                    return
+                                }
+                            }
+                        }else{
+                            if(businessDate < current_book_ym ) {
+                                this.$message.error('业务日期不得早于当前账期');
+                                this.loading = false;
+                                return
+                            }
+                        }
                     }
                     if (this.department == '' && this.projectDepartmentFlg == 1) {
                         this.$message.error('请选择部门/项目');
@@ -373,6 +395,11 @@
                     }
                     if(this.money == '0.00' && this.moneyFlg == 1){
                         this.$message.error('请正确输入金额');
+                        this.loading = false;
+                        return
+                    }
+                    if(unNumber.unNumber(this.money) < unNumber.unNumber(this.taxAmount)){
+                        this.$message.error('输入的税额不得大于金额');
                         this.loading = false;
                         return
                     }

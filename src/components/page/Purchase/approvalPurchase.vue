@@ -310,7 +310,7 @@
                     {value:'2',label:'软件'},
                     {value:'3',label:'劳务服务'},
                     {value:'4',label:'技术服务'},
-                    {value:'5',label:'待销商品'},
+                    {value:'5',label:'库存商品'},
                     {value:'11',label:'专利技术'},
                     {value:'12',label:'非专利技术'},
                     {value:'13',label:'商标'},

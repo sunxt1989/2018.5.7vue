@@ -246,6 +246,7 @@
                             },5000)
                         }else if(status == 400){
                             this.loading = false;
+                            this.loading2 = true;
                             this.$message.error(msg)
                         }
 
