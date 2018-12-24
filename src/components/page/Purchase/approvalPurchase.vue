@@ -617,7 +617,6 @@
                 })
                 .catch(error=> {
                     this.loading = false
-
 //                    console.log(error);
                     alert('网络错误，不能访问');
                 });

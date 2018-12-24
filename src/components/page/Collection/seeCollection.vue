@@ -62,7 +62,7 @@
                                 :value="item.tradeName">
                             </el-option>
                         </el-select>
-                        <input class="opt" type="text" v-model="supplier" maxlength="18" placeholder="请选择或输入">
+                        <input v-show="isChange" class="opt" type="text" v-model="supplier" maxlength="18" placeholder="请选择或输入">
                     </li>
                     <li class="sm" v-show="payTypeFlg == 1">
                         <span class="tit"><span class="red">*</span>{{payTypeName}}</span>
@@ -196,13 +196,14 @@
                     },
                 },
                 debitId:this.$route.params.debitId,
+                isRedFlush:this.$route.params.isRedFlush,
                 isChange:true,//是否能修改页面
                 loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
             }
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         watch:{
             //对部门项目显示做判断1：只显示部门2：只显示项目3：显示部门和项目
             projectDepartmentFlg:function(val){
@@ -233,7 +234,7 @@
                 params.append('id',val);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -361,7 +362,6 @@
                     let current_book_ym = Number(this.current_book_ym);
                     let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
                     let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
-
                     if(this.businessDateFlg == 1){//先判断是否显示了日期选择
                         if (this.businessDate == '') {
                             this.$message.error('请选择业务日期');
@@ -375,14 +375,14 @@
                                     this.loading = false;
                                     return
                                 }else if(businessDateYear != lastYear){
-                                    this.$message.error('业务日期不得早于当前账期');
+                                    this.$message.error('业务日期不得早于当前账期1');
                                     this.loading = false
                                     return
                                 }
                             }
                         }else{
                             if(businessDate < current_book_ym ) {
-                                this.$message.error('业务日期不得早于当前账期');
+                                this.$message.error('业务日期不得早于当前账期2');
                                 this.loading = false;
                                 return
                             }
@@ -464,6 +464,7 @@
                 }else if(n == 2){
                     url = addUrl.addUrl('collectionSubmit')
                 }
+
 
                 let departmentJson = ''
                 for(let i in this.departmentAndProjectList){

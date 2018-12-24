@@ -7,7 +7,6 @@
             </div>
             <div class="w">
                 <div class="content cf">
-
                     <el-tabs v-model="activeName" type="card" @tab-click="handleClick" >
                         <el-tab-pane label="还款红冲" name="1">
                             <el-table class="single" :data="tableData1">
@@ -78,7 +77,7 @@
                                 <el-table-column align="center" prop="" label="查看">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'seeReimbursement',params:{debitId:scope.row.idString}}" class="see">
+                                            <router-link :to="{name:'seeReimbursement',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
                                         </span>
@@ -255,6 +254,83 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
+                        <el-tab-pane label="收容业务红冲" name="8">
+                               <el-table class="single" :data="tableData8">
+                                <el-table-column align="center" prop="sceneName" label="业务名称"></el-table-column>
+                                <el-table-column align="center" prop="businessDateYMD" label="业务日期"></el-table-column>
+                                <el-table-column align="center" prop="money" label="业务金额">
+                                    <template slot-scope="scope">
+                                        <span>{{scope.row.showMoney}}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="" label="查看">
+                                    <template slot-scope="scope">
+                                        <span class="operation">
+                                            <router-link :to="{name:'seeCollection',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
+                                                <i class="icon iconfont icon-kanguo blue"></i>
+                                            </router-link>
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="" label="红冲">
+                                    <template slot-scope="scope">
+                                        <span class="operation">
+                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.idString)"></i>
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane v-if="current_book_level == 3 && user_type >= 1" label="流水红冲" name="9">
+                            <el-table class="single" :data="tableData9">
+                                <el-table-column align="center" prop="receipt_in_out_flg" label="类型">
+                                    <template slot-scope="scope">
+                                        <span v-if="scope.row.receipt_in_out_flg == 1">支</span>
+                                        <span v-else>收</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="receipt_type_name" label="项目"></el-table-column>
+                                <el-table-column align="center" prop="receipt_date" label="日期"></el-table-column>
+                                <el-table-column align="center" prop="receiveMoney" label="金额">
+                                    <template slot-scope="scope">
+                                        <span>{{scope.row.showMoney}}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="receipt_trade_name" label="交易方"></el-table-column>
+                                <el-table-column align="center" prop="" label="红冲">
+                                    <template slot-scope="scope">
+                                        <span class="operation">
+                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.idString)"></i>
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
+                        <el-tab-pane v-if="current_book_level == 3 && user_type >= 1" label="票据红冲" name="10">
+                            <el-table class="single" :data="tableData10">
+                                <el-table-column align="center" prop="receipt_in_out_flg" label="类型">
+                                    <template slot-scope="scope">
+                                        <span v-if="scope.row.receipt_in_out_flg == 1">支</span>
+                                        <span v-else>收</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="receipt_type_name" label="项目"></el-table-column>
+                                <el-table-column align="center" prop="receipt_date" label="日期"></el-table-column>
+                                <el-table-column align="center" prop="receiveMoney" label="金额">
+                                    <template slot-scope="scope">
+                                        <span>{{scope.row.showMoney}}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column align="center" prop="receipt_trade_name" label="交易方"></el-table-column>
+                                <el-table-column align="center" prop="" label="红冲">
+                                    <template slot-scope="scope">
+                                        <span class="operation">
+                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.idString)"></i>
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
                     </el-tabs>
 
                     <el-dialog :title="title" :visible.sync="repaymentModel" center>
@@ -276,7 +352,6 @@
                             </li>
                         </ul>
                     </el-dialog>
-
                 </div>
             </div>
         </div>
@@ -317,6 +392,9 @@
                 tableData5:[],//采购付款红冲列表
                 tableData6:[],//销售红冲列表
                 tableData7:[],//销售收款红冲列表
+                tableData8:[],//收容业务列表
+                tableData9:[],//流水列表
+                tableData10:[],//票据列表
                 loading:true
             }
         },
@@ -340,6 +418,12 @@
                     url = addUrl.addUrl('saleRedFlushSubmit');
                 }else if(this.activeName == 7){
                     url = addUrl.addUrl('salePaymentRedFlushSubmit');
+                }else if(this.activeName == 8){
+                    url = addUrl.addUrl('businessRedFlushSubmit');
+                }else if(this.activeName == 9){
+                    url = addUrl.addUrl('invoiceRedFlushSubmit');
+                }else if(this.activeName == 10){
+                    url = addUrl.addUrl('invoiceRedFlushSubmit');
                 }
                 params.append('id',this.isId);
                 params.append('discription',this.discription);
@@ -431,6 +515,33 @@
                         }
                     }
                     this.title = '销售收款红冲'
+                }else if(this.activeName == 8){
+                    let tableData = this.tableData8
+                    for(let i in tableData){
+                        if(id == tableData[i].idString){
+                            this.money = tableData[i].showMoney
+                            this.day = tableData[i].businessDateYMD
+                        }
+                    }
+                    this.title = '收容项业务红冲'
+                }else if(this.activeName == 9){
+                    let tableData = this.tableData9
+                    for(let i in tableData){
+                        if(id == tableData[i].idString){
+                            this.money = tableData[i].showMoney
+                            this.day = tableData[i].receipt_date
+                        }
+                    }
+                    this.title = '流水红冲'
+                }else if(this.activeName == 10){
+                    let tableData = this.tableData10
+                    for(let i in tableData){
+                        if(id == tableData[i].idString){
+                            this.money = tableData[i].showMoney
+                            this.day = tableData[i].receipt_date
+                        }
+                    }
+                    this.title = '票据红冲'
                 }
                 this.repaymentModel = true
 
@@ -442,6 +553,7 @@
             axios(){
                 this.loading = true
                 let url
+                let params = new URLSearchParams();
                 if(this.activeName == 1){//还款
                     url = addUrl.addUrl('repaymentRedFlush');
                 }else if(this.activeName == 2){//借款
@@ -456,11 +568,19 @@
                     url = addUrl.addUrl('saleRedFlush');
                 }else if(this.activeName == 7){//销售收款
                     url = addUrl.addUrl('salePaymentRedFlush');
+                }else if(this.activeName == 8){//收容项
+                    url = addUrl.addUrl('businessRedFlush');
+                    params.append('audit_flg','4');
+                }else if(this.activeName == 9){//流水
+                    url = addUrl.addUrl('invoiceRedFlush');
+                    params.append('cashFlg','1');
+                }else if(this.activeName == 10){//票据
+                    url = addUrl.addUrl('invoiceRedFlush');
+                    params.append('cashFlg','99');
                 }
-
-                axios.post(url)
+                axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -505,6 +625,25 @@
                                     data[i].showMoney = number.number(data[i].receiveMoney)
                                 }
                                 this.tableData7 = data;
+                            }else if(this.activeName == 8){
+                                let list = data.list
+                                console.log(list);
+                                for (let i in list) {
+                                    list[i].showMoney = number.number(list[i].money)
+                                }
+                                this.tableData8 = list;
+                            }else if(this.activeName == 9){
+                                let list = data.list
+                                for (let i in list) {
+                                    list[i].showMoney = number.number(list[i].receipt_money)
+                                }
+                                this.tableData9 = list;
+                            }else if(this.activeName == 10){
+                                let list = data.list
+                                for (let i in list) {
+                                    list[i].showMoney = number.number(list[i].receipt_money)
+                                }
+                                this.tableData10 = list;
                             }
 
                         }else if(status == 400){
@@ -518,7 +657,7 @@
                     })
             }
         },
-        computed:mapState(['start_ym']),
+        computed:mapState(['start_ym','current_book_level','user_type']),
         created(){
             this.axios()
         }
@@ -561,7 +700,6 @@
         position: absolute;
         right: 20px;
     }
-
     .see{
         text-decoration: none;
     }

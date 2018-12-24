@@ -234,7 +234,7 @@
                                     <div class="itemLink">
                                         <img src="static/images/homePage/monthlyKnot.png" alt="">
                                     </div>
-                                    <span class="itemName">月结</span>
+                                    <span class="itemName">结转</span>
                                 </div>
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('monthlyKnot')"></i>
@@ -469,6 +469,17 @@
                                 </div>
                             </div>
                             <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('bookkeepingVoucher')"></i>
+                        </div>
+                        <div class="item" data-id="41" id="viewingList">
+                            <div @mousedown="mousedown" @mouseup="mouseup('viewingList',$event)">
+                                <div class="item-content">
+                                    <div class="itemLink">
+                                        <img src="static/images/homePage/viewingList.png" alt="">
+                                    </div>
+                                    <span class="itemName">查看功能</span>
+                                </div>
+                            </div>
+                            <i class="icon iconfont icon-shanchu1 red" @click="deleteClick('viewingList')"></i>
                         </div>
                     </div>
 
@@ -852,6 +863,17 @@
                             </div>
                         </div>
 
+                        <div class="items cf" v-if="isBossFlg">
+                            <span class="items-tit">查看功能</span>
+                            <!--记账凭证-->
+                            <div class="checkbox">
+                                <el-checkbox v-model="items1.viewingList" class="homePage-checkbox" @change="checkboxChange">
+                                    <img :src=items[40].src alt="" class="itemImg">
+                                    <span class="name">{{items[40].name}}</span>
+                                </el-checkbox>
+                            </div>
+                        </div>
+
                         <el-button @click="seeBack" class="newBack" size="small">返回</el-button>
                         <el-button @click="seeSave" class="newSave" size="small" type="primary">保存</el-button>
                     </el-dialog>
@@ -991,7 +1013,7 @@
                         src:'static/images/homePage/voucherList.png',
                     },
                     {
-                        name:'月结',
+                        name:'结转',
                         id:'#monthlyKnot',
                         src:'static/images/homePage/monthlyKnot.png',
                     },
@@ -1095,6 +1117,11 @@
                         id:'#bookkeepingVoucher',
                         src:'static/images/homePage/bookkeepingVoucher.png',
                     },
+                    {
+                        name:'查看功能',//40 - 1
+                        id:'#viewingList',
+                        src:'static/images/homePage/viewingList.png',
+                    },
                 ],//菜单列表数据
                 items1:{
                     costSheet:false,
@@ -1137,6 +1164,7 @@
                     bookkeeping:false,
                     Entrust:false,
                     bookkeepingVoucher:false,
+                    viewingList:false,
                 },//判断这个模块是否在桌面显示
                 items2:{
                     isShowLoan:false,
@@ -1179,6 +1207,7 @@
                     isShowBookkeeping:false,
                     isShowEntrust:false,
                     isShowBookkeepingVoucher:false,
+                    isShowViewingList:false,
                 },//判断这个模块是否在菜单中显示（身份不同显示的模块不同）
                 isFirst:true,//计数器，判断menuArr这个公共参数是否有值
                 newsList:[],//消息列表
@@ -1209,7 +1238,7 @@
                 }
             }
         },
-        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type']),
+        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type','isBossFlg']),
         methods:{
             //选择菜单配置的时候的change事件
             checkboxChange(e){
@@ -1315,6 +1344,8 @@
                         window.open(bookkeeping);
                     }else if(id == 'bookkeepingVoucher'){
                         this.$router.push('/Bookkeeping/Bookkeeping')
+                    }else if(id == 'viewingList'){
+                        this.$router.push('/viewing/viewingList')
                     }
                 }else{
                     this.isSave = true;
@@ -1617,7 +1648,7 @@
                     if (menuArr[i] == '#XJLLeport' && auth_json.report_chakan == 1) {//现金流量表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#RedFlush' && auth_json.bank_chakan == 1  && this.current_book_level != 3) {//红冲
+                    if (menuArr[i] == '#RedFlush' && auth_json.bank_chakan == 1) {//红冲
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#staffList' && auth_json.manage_chakan == 1 && this.current_book_level != 3) {//员工列表
@@ -1642,6 +1673,9 @@
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#bookkeepingVoucher' && this.user_type >= 10 ) {//记账凭证
+                        newMenuArr.push(menuArr[i])
+                    }
+                    if (menuArr[i] == '#viewingList' && this.isBossFlg ) {//记账凭证
                         newMenuArr.push(menuArr[i])
                     }
                 }
@@ -1687,22 +1721,23 @@
                 } else {
                     this.items2.isShowPayroll = false;
                 }
-                if (auth_json.bank_chakan == 1) {//银行账户、银行现金业务、红冲、辅助业务
+                if (auth_json.bank_chakan == 1) {//银行账户、银行现金业务、红冲
                     this.items2.isShowBankList = true;
                     this.items2.isShowBankMoneyList = true;
                     this.items2.isShowCashDayAccount = true;
                     this.items2.isShowBankJournal = true;
+                    this.items2.isShowRedFlush = true;
                 } else {
                     this.items2.isShowBankList = false;
                     this.items2.isShowBankMoneyList = false;
                     this.items2.isShowCashDayAccount = false;
                     this.items2.isShowBankJournal = false;
+                    this.items2.isShowRedFlush = false;
                 }
-                if (auth_json.bank_chakan == 1 && this.current_book_level != 3) {//红冲、辅助业务
-                    this.items2.isShowRedFlush = true;
+
+                if (auth_json.bank_chakan == 1 && this.current_book_level != 3) {//辅助业务
                     this.items2.isShowAuxiliaryList = true;
                 } else {
-                    this.items2.isShowRedFlush = false;
                     this.items2.isShowAuxiliaryList = false;
                 }
                 if (auth_json.assets_chakan == 1) {//固定资产、无形资产
@@ -1790,6 +1825,11 @@
                 }else{
                     this.items2.isShowBookkeepingVoucher = false;
                 }
+                if (this.isBossFlg) {//记账凭证
+                    this.items2.isShowViewingList = true;
+                }else{
+                    this.items2.isShowViewingList = false;
+                }
 
 //                console.log(newMenuArr,'newMenuArr');
                 let newArr = this.changeElement(newMenuArr);
@@ -1859,17 +1899,17 @@
                     for(let i in list){
                         if(list[i].type == '5'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '借款单审批'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '6'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '借款单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '7'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '还款单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '8'){
@@ -1894,12 +1934,12 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '10'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '报销单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '11'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '报销单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '12'){
@@ -1914,7 +1954,7 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '13'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '采购单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '14'){
@@ -1929,12 +1969,12 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '15'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '采购付款单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '17'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '采购付款单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '18'){
@@ -1949,7 +1989,7 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '19'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '销售单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '20'){
@@ -1964,12 +2004,12 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '21'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '销售收款单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '23'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '销售收款单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '24'){
@@ -1984,7 +2024,7 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '27'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '缴税单审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '28'){
@@ -1999,12 +2039,12 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '29'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '缴税单确认'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '25' || list[i].type == '30' ||list[i].type == '32' ||list[i].type == '34' ||list[i].type == '36' ||list[i].type == '38'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '银行业务审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '26'|| list[i].type == '31' ||list[i].type == '33' ||list[i].type == '35' ||list[i].type == '37' ||list[i].type == '39'){
@@ -2019,7 +2059,7 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '41'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '辅助科目审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '42'){
@@ -2034,7 +2074,7 @@
                             list[i].personnel = '审批人'
                         }else if(list[i].type == '43'){
                             list[i].state = '待办'
-                            list[i].class = 'yellow'
+                            list[i].class = 'blue'
                             list[i].business = '辅助科目收付款审核'
                             list[i].personnel = '提交人'
                         }else if(list[i].type == '44'){
@@ -2165,7 +2205,7 @@
         padding: 5px;
     }
 
-    .news .news-list .yellow{
+    .news .news-list .blue{
         display: inline-block;
         width:30px;
         height:20px;

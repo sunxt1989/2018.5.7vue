@@ -74,11 +74,11 @@
             };
         },
         created(){
-            var url = addUrl.addUrl('collectionList')
+            var url = addUrl.addUrl('collectionList');
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value.list;
                     for(let i in data){
                         data[i].showMoney =number.number(data[i].money)

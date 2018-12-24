@@ -114,7 +114,7 @@
                                 <el-table-column prop="housingProvidentFundCompany" label="住房公积金"></el-table-column>
                                 <el-table-column prop="insuranceSumCompany" label="五险一金合计"></el-table-column>
                             </el-table-column>
-                            <el-table-column prop="taxableIncome" label="应纳税所得额"></el-table-column>
+                            <el-table-column prop="taxableIncome" label="应纳所得税额"></el-table-column>
                             <el-table-column prop="incomeTax" label="个人所得税"></el-table-column>
                             <el-table-column prop="actualWages" label="实发工资"></el-table-column>
                         </el-table>

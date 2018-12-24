@@ -28,7 +28,7 @@
                     </li>
                     <li class="sm">
                         <span class="tit">时间</span>
-                        <input class="ipt" type="text" v-model="nowdata" readonly>
+                        <input class="ipt" type="text" v-model="debitDateYMD" readonly>
                     </li>
                     <li class="sm">
                         <span class="tit">借款人</span>

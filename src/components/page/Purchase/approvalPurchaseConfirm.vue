@@ -534,12 +534,18 @@
                             this.loading = false
                             return
                         }
+                        if(Number(this.sendDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym)){
+                            this.$message.error('确认日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
                         //判断选择日期不能早于采购日期
-                        if(Number(this.sendDate.split('-').join('')) > Number(this.purchaseDate.split('-').join(''))){
+                        if(Number(this.sendDate.split('-').join('')) < Number(this.purchaseDate.split('-').join(''))){
                             this.$message.error('确认日期不得早于采购单创建日期');
                             this.loading = false
                             return
                         }
+
                         if(this.payType == '2' && this.bankCode == ''){
                             this.$message.error('请选择银行账户')
                             this.loading = false

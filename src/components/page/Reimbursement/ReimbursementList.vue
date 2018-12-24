@@ -309,9 +309,11 @@
                     var $count = response.data.value.count;//总条目数
                     let tableDataarr =[];
 //                    console.log(data);
+
                     for(var i =0; i < data.length; i++){
                         tableDataarr.push(data[i])
                     }
+
                     this.count = $count;
                     this.tableData = this.addUrl(tableDataarr);
                 })

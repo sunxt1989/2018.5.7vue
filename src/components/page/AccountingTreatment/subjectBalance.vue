@@ -477,7 +477,7 @@
             };
         },
         created(){
-            this.startTime = this.start_ym.substring(0,4) + '-' +this.start_ym.substring(4,6)
+            this.startTime = this.current_book_ym.substring(0,4) + '-01'
             this.endTime = this.current_book_ym.substring(0,4) + '-' +this.current_book_ym.substring(4,6);
             this.axios()
         },

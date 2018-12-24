@@ -8,7 +8,6 @@
             </div>
             <div class="w">
                 <div class="content cf">
-                    <el-checkbox v-if="isMonthlyKnots && !isAnnualKnots" v-model="flg" class="flg">是否为补录</el-checkbox>
                     <table class="table-top">
                         <col width="20%">
                         <col width="25%">
@@ -84,7 +83,7 @@
                                 <td>企业所得税（{{incomeTaxPeroidType}}）</td>
                                 <td>
                                     <input v-model="t11DJT" type="text" class="table-top-input" @change="changeInput(t11DJT,'t11DJT')">
-                                    <div class="btn3" v-if="!t11HandleFlag">
+                                    <div class="btn3" v-if="!(isMonthlyKnots && !isAnnualKnots) && !t11HandleFlag">
                                         <router-link :to="{name:'calculation',params:{lirunzonge:lirunzonge,jianmiansuodeshuie:jianmiansuodeshuie,shijiyijiaonasuodeshuie:shijiyijiaonasuodeshuie}}" class="see">
                                             计提
                                         </router-link>
@@ -164,6 +163,17 @@
                         </tbody>
                     </table>
                 </div>
+                <el-dialog title="提示" :visible.sync="dialogGrant1" :before-close="handleClose" width="500px">
+                    <p class="dialog-p">税种：{{name}}</p>
+                    <p class="dialog-p">结转金额：{{amount}}</p>
+                    <span v-if="isMonthlyKnots && !isAnnualKnots" class="wagesName">是否补录去年业务</span>
+                    <el-radio  v-if="isMonthlyKnots && !isAnnualKnots" v-model="flg" label="1">是</el-radio>
+                    <el-radio  v-if="isMonthlyKnots && !isAnnualKnots" v-model="flg" label="0">否</el-radio>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogGrant1 = false" size="small">取 消</el-button>
+                        <el-button @click="Calculation" size="small" type="primary" :loading="isLoading">确 定</el-button>
+                    </div>
+                </el-dialog>
             </div>
         </div>
     </div>
@@ -185,7 +195,13 @@
                 t9HandleFlag:false,//教育费附加税操作状态（true：已操作；false：未操作）
                 t10HandleFlag:false,//地方教育费附加税操作状态（true：已操作；false：未操作）
                 t11HandleFlag:false,//企业所得税税操作状态（true：已操作；false：未操作）
-                flg:'',//是否补录标记
+                flg:'0',//是否补录标记
+
+                handleType:'',//
+                amount:'',//
+                taxTypeDes:'',//
+                name:'',
+                dialogGrant1:false,//结转/免征模态框；
 
                 t7DJZ:'0.00',//待结转增值税 判断逻辑：t7HandleFlag为true:t7DJZ为0
                 t7YJZ:'0.00',//已结转增值税
@@ -235,11 +251,23 @@
                 shijiyijiaonasuodeshuie:'',//实际缴纳所得税额
                 addedTaxPeroidType:'',//增值税及附加税的申报方式（1：按月度；2：按季度）控制税种（月）中的申报方式
                 incomeTaxPeroidType:'',//企业所得税的申报方式（1：按月度；3：按季度）
-
+                isLoading:false,
                 loading:false
             }
         },
         methods: {
+            handleClose(done){
+                this.grantLoading = false;
+                this.isLoading = false,
+                done();
+            },
+            //当企业所得税不是补录时，跳转到且所得税计提页面
+            toCalculation(){
+                this.$router.push({name:'calculation',
+                    params:{lirunzonge:this.lirunzonge,
+                        jianmiansuodeshuie:this.jianmiansuodeshuie,
+                        shijiyijiaonasuodeshuie:this.shijiyijiaonasuodeshuie}})
+            },
             //input change事件，将每个数字转成带千分号
             changeInput(val,id){
                 let value = unNumber.unNumber(val)
@@ -294,7 +322,6 @@
                 if(id == 't6DJN'){
                     this.t6DJN = number.number(value)
                 }
-
             },
             //点击缴纳按钮
             clickPay(val,id){
@@ -308,148 +335,62 @@
             },
             //点击结转按钮
             clickKnots(){
-                this.loading = true
                 if(this.t7DJZ == '0.00'){
                     this.$message.error('请正确输入金额')
-                    this.loading = false
                     return
                 }
-                let taxTypeDes = ''
-                let handleType = 3
-                let amount = unNumber.unNumber(this.t7DJZ)
-                if(this.companyScaless == 1){
-                    taxTypeDes = 't7MZ'
-                }else{
-                    taxTypeDes = 't7DJZ'
-                }
-                const h = this.$createElement;
-                this.$msgbox({
-                    title: '消息',
-                    message: h('p', null, [
-                        h('span', {style: 'margin:0px 146px 0px 30px'}, '税种：'),
-                        h('span', null, '增值税'),
-                        h('p',null,''),
-                        h('span', {style: 'margin:0px 120px 0px 30px'}, '结转金额：'),
-                        h('span',null , this.t7DJZ),
-                    ]),
-                    showCancelButton: true,
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    showClose: false,
-                    closeOnClickModal: false,
-                    closeOnPressEscape: false,
-                    beforeClose: (action, instance, done) => {
-                        if (action === 'confirm') {
-                            instance.confirmButtonLoading = true;
-                            instance.cancelButtonLoading = true;
-                            instance.confirmButtonText = '执行中...';
-                            setTimeout(() => {
-                                done();
-                                setTimeout(() => {
-                                    instance.confirmButtonLoading = false;
-                                    instance.cancelButtonLoading = false;
-                                }, 300);
-                            }, 300);
-                        } else {
-                            done();
-                        }
-                    }
-                }).then(()=> {
-                    this.Calculation(taxTypeDes,handleType,amount)
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消'
-                    });
-                    this.loading = false
-                });
+                this.name = '增值税'
+                this.handleType = 3
+                this.amount = unNumber.unNumber(this.t7DJZ);
+                this.taxTypeDes = this.companyScaless == 1 ? 't7MZ' : 't7DJZ';
+                this.dialogGrant1 = true;
             },
             //点击计提按钮
             clickCalculation(val,id){
-                this.loading = true
-                let taxTypeDes = id
-                let handleType = 1;
-                let amount ='';
-                let name = ''
+                this.taxTypeDes = id
+                this.handleType = 1;
                 if(val == '0.00'){
                     this.$message.error('请正确填写金额')
                     this.loading = false
                     return
                 }
-                if(taxTypeDes == 't8DJT'){
-                    amount = this.t8DJT
-                    name = '附加税-城市维护建设税'
+                if(this.taxTypeDes == 't8DJT'){
+                    this.amount = number.number(this.t8DJT);
+                    this.name = '附加税-城市维护建设税'
                 }
-                if(taxTypeDes == 't9DJT'){
-                    amount = this.t9DJT
-                    name = '附加税-教育费附加税'
+                if(this.taxTypeDes == 't9DJT'){
+                    this.amount = number.number(this.t9DJT);
+                    this.name = '附加税-教育费附加税'
                 }
-                if(taxTypeDes == 't10DJT'){
-                    amount = this.t10DJT
-                    name = '附加税-地方教育费附加税'
+                if(this.taxTypeDes == 't10DJT'){
+                    this.amount = number.number(this.t10DJT);
+                    this.name = '附加税-地方教育费附加税'
                 }
-                if(taxTypeDes == 't11DJT'){
-                    amount = this.t11DJT
-                    name = '企业所得税'
+                if(this.taxTypeDes == 't11DJT'){
+                    this.amount = number.number(this.t11DJT);
+                    this.name = '企业所得税'
                 }
-
-                const h = this.$createElement;
-                this.$msgbox({
-                    title: '消息',
-                    message: h('p', null, [
-                        h('span', {style: 'margin:0px 106px 0px 30px'}, '税种：'),
-                        h('span', null, name),
-                        h('p',null,''),
-                        h('span', {style: 'margin:0px 80px 0px 30px'}, '结转金额：'),
-                        h('span',null,amount),
-                    ]),
-                    showCancelButton: true,
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    showClose: false,
-                    closeOnClickModal: false,
-                    closeOnPressEscape: false,
-                    beforeClose: (action, instance, done) => {
-                        if (action === 'confirm') {
-                            instance.confirmButtonLoading = true;
-                            instance.cancelButtonLoading = true;
-                            instance.confirmButtonText = '执行中...';
-                            setTimeout(() => {
-                                done();
-                                setTimeout(() => {
-                                    instance.confirmButtonLoading = false;
-                                    instance.cancelButtonLoading = false;
-                                }, 300);
-                            }, 300);
-                        } else {
-                            done();
-                        }
-                    }
-                }).then(()=> {
-                    amount = unNumber.unNumber(amount)
-                    this.Calculation(taxTypeDes,handleType,amount)
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消'
-                    });
-                    this.loading = false
-                });
+                this.dialogGrant1 = true;
             },
             //计提、结转操作
-            Calculation(taxTypeDes,handleType,amount){
-                let flg = this.flg ? '1': '0'
+            Calculation(){
+                if(this.taxTypeDes == 't11DJT' && !this.t11HandleFlag && this.flg == '0'){
+                    this.toCalculation()
+                    return
+                }
+                this.isLoading = true
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('operation')
-                params.append('taxTypeDes',taxTypeDes);
-                params.append('handleType',handleType);
-                params.append('amount',amount);
-                params.append('flg',flg);
+                params.append('taxTypeDes',this.taxTypeDes);
+                params.append('handleType',this.handleType);
+                params.append('amount',unNumber.unNumber(this.amount));
+                params.append('flg',this.flg);
 
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        this.isLoading = false
+                        console.log(response);
                         if(response.data.value.result == '1'){
                             this.axios()
                             this.$message({
@@ -460,9 +401,12 @@
                             var msg = response.data.value.msg;
                             this.$message.error(msg);
                         }
+                        this.dialogGrant1 =false
                     })
                     .catch(error=> {
                         this.loading = false;
+                        this.isLoading = false;
+                        this.dialogGrant1 =false
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
@@ -593,9 +537,6 @@
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }
-    .flg{
-        margin-left: 20px;
-    }
     .table-top{
         width:100%;
         border: 1px solid #ccc;
@@ -699,6 +640,12 @@
     .see{
         color: #fff;
         text-decoration: none;
+    }
+    .w .dialog-p{
+        margin-bottom: 10px;
+    }
+    .w .wagesName{
+        margin-right: 20px;
     }
 
 </style>

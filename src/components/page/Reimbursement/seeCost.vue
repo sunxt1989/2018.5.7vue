@@ -49,7 +49,7 @@
                             <span class="tit"><span class="red">*</span>费用发生日期</span>
                             <el-date-picker
                                 class="iptData"
-                                v-model="debitDate"
+                                v-model="receiptDate"
                                 type="date"
                                 value-format="yyyy-MM-dd"
                                 :picker-options="pickerOptions1"
@@ -131,7 +131,7 @@
                 destination:false,//是否显示目的地
                 money:0,//金额
                 taxMoney:0,//税额
-                debitDate:'',//费用发生日期
+                receiptDate:'',//费用发生日期
                 aimType:'',//出差目的
                 receiptCount:'1',//票据张数
                 discription:'',//借款事由
@@ -212,10 +212,6 @@
             },
             model(n){
                 this.loading = true;
-                let receiptDate = Number(this.receiptDate.split('-').join('').substring(0,6));//选择的日期
-                let receiptDateYear = Number(this.receiptDate.substring(0,4));//选择的日期的年份
-                let current_book_ym = Number(this.current_book_ym);//当前账期日期
-                let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
                 if(n == 0){
                     if(this.isSee){
                         this.$router.go(-1)
@@ -237,20 +233,25 @@
                         this.loading = false;
                         return
                     }
-                    if(this.debitDate == ''){
+                    if(this.receiptDate == ''){
                         this.$message.error('请正确输入日期');
                         this.loading = false;
                         return
                     }
-                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断是否12月月结且未年结
-                        if((receiptDateYear != lastYear) && receiptDate < current_book_ym){
-                            this.$message.error('请正确输入日期');
+                    let receiptDateYear = Number(this.receiptDate.substring(0,4));//选择的日期的年份
+                    let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+                    let thisYear = Number(this.current_book_ym.substring(0,4));//今年年份
+                    if(this.isAnnualKnots){//判断去年是否年结
+//                        console.log('年结');
+                        if(receiptDateYear < thisYear){
+                            this.$message.error('该账套已年结，不能录入上年度数据。');
                             this.loading = false;
                             return
                         }
                     }else{
-                        if(receiptDate < current_book_ym ) {
-                            this.$message.error('费用日期不得早于当前账期');
+//                        console.log('未年结');
+                        if(receiptDateYear < lastYear) {
+                            this.$message.error('该账套已年结，不能录入上年度数据。');
                             this.loading = false
                             return
                         }
@@ -426,7 +427,7 @@
                 params.append('aimType',this.aimType);
                 params.append('discription',this.discription);
                 params.append('receiptCount',this.receiptCount);
-                params.append('receiptDate',this.debitDate);
+                params.append('receiptDate',this.receiptDate);
 
                 params.append('imgUrl1',this.imgUrl1);
                 params.append('imgName1',this.imgName1);
@@ -529,7 +530,7 @@
                     this.aimType = data.originalReceipt.aimType;
                     this.discription = data.originalReceipt.discription;
                     this.receiptCount = data.originalReceipt.receiptCount;
-                    this.debitDate = data.originalReceipt.simpleReceiptDate;
+                    this.receiptDate = data.originalReceipt.simpleReceiptDate;
                     this.attachUrlJson = data.originalReceipt.attachUrlJson;
                     this.type = String(data.originalReceipt.type);
 

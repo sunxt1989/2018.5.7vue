@@ -229,7 +229,7 @@
                         }
                     }
                     if(bankCode != ''){
-                        if(bankCode.length < 6 && typeof bankCode != 'number'){
+                        if(bankCode.length < 6 && !(str3.test(bankCode))){
                             this.$message.error('请正确输入银行卡号');
                              this.loading = false
                             return

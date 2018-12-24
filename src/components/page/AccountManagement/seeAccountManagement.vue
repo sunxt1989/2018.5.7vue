@@ -354,8 +354,7 @@
                 }
             },
             submit(){
-//                var url = addUrl.addUrl('AccountManagementUpdate');
-                var url = 'http://192.168.2.192:8080/web/vue/user/book/update.html';
+                var url = addUrl.addUrl('AccountManagementUpdate');
                 var params = new URLSearchParams();
                 let highTechFlg = this.highTechFlg ? '1' : '0'
                 console.log(this.incomeTaxPeroidType);
@@ -439,8 +438,7 @@
             };
         },
         created(){
-//            let url = addUrl.addUrl('seeAccountManagement')
-            let url = 'http://192.168.2.192:8080/web/vue/user/book/item.html'
+            let url = addUrl.addUrl('seeAccountManagement')
             axios.post(url)
                 .then(response=> {
                     console.log(response);

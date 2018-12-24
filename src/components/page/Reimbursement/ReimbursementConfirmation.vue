@@ -137,7 +137,7 @@
                             <span>{{scope.row.childTypeName}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="simpleAccountDate" label="日期" sortable align="center"></el-table-column>
+                    <el-table-column prop="simpleReceiptDate" label="日期" sortable align="center"></el-table-column>
                     <el-table-column prop="discription" label="描述" sortable align="center"></el-table-column>
                     <el-table-column prop="operateUserName" label="姓名" sortable align="center"></el-table-column>
                     <el-table-column prop="money" label="金额" sortable align="center">
@@ -227,8 +227,8 @@
                     </li>
                     <li class="opinionItem">
                         <span>审批意见</span>
-                            <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="!isCashier">
-                            </textarea>
+                        <textarea v-model="discription2" name="opinionItem" id="opinionItem" maxlength="50" :disabled="!isCashier">
+                        </textarea>
                     </li>
                 </ul>
             </div>
@@ -278,7 +278,6 @@
 
                 receiptList:[],//消费明细列表
                 auditRecordList:[],//审批记录列表
-                auditFlg:'',//报销单状态： 0 未提交 1 驳回；2/5/6 待审核； 3 待出纳确认；4 通过；7 已红冲；
                 payMoney:'',//报销金额
                 offsetAmount:'',//冲抵金额
 
@@ -342,28 +341,34 @@
                         }
                         let simpleAccountDate = Number(this.simpleAccountDate.split('-').join(''));//报销日期
                         let payDate = Number(this.payDate.split('-').join(''));//报销单确认日期
-                        let payDateYear = Number(this.payDateYear.substring(0,4));//报销日期的年份
+                        let payDateYear = Number(this.payDate.substring(0,4));//报销日期的年份
                         let current_book_ym = Number(this.current_book_ym);//当前账期日期
                         let annualKnots = Number((this.current_book_ym.substring(0,4)-1) + '12');//去年12月
                         let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
 
                         if(this.isMonthlyKnots && !this.isAnnualKnots){//判断已经12月月结但是还没年结时
-                            if(this.payType != '3' && this.isSettlement){
-                                this.$message.error('补录去年业务数据,必须选择未支付');
+                            if(this.payType != '3' && this.isSettlement && payDateYear == lastYear){
+                                this.$message.error('上年货币资金已封账，不能进行更改');
                                 this.loading = false;
                                 return
                             }
-                            if(payDate < current_book_ym || payDate < simpleAccountDate){//先判断确认日期不得早于当前账期和报销日期
+                            if(this.payType == '2' && this.bankCode == '' && this.isSettlement){
+                                this.$message.error('请选择银行账户');
+                                this.loading = false;
+                                return
+                            }
+                            if(payDate < current_book_ym){//先判断确认日期不得早于当前账期
                                 if(payDateYear == lastYear && payDate != annualKnots){//当报销日期的年份等于去年年份时 但是没有选择12月份
                                     this.$message.error('补录去年业务数据，日期必须选择在去年12月份');
                                     this.loading = false;
                                     return
                                 }else if(payDateYear != lastYear){
-                                    this.$message.error('请正确选择日期');
+                                    this.$message.error('确认日期不得早于当前账期');
                                     this.loading = false;
                                     return
                                 }
                             }
+
                         }else{
                             if(this.payType == '2' && this.bankCode == '' && this.isSettlement){
                                 this.$message.error('请选择银行账户');
@@ -375,13 +380,13 @@
                                 this.loading = false
                                 return
                             }
-                            if(payDate < simpleAccountDate){
-                                this.$message.error('确认日期不得早于报销日期');
-                                this.loading = false
-                                return
-                            }
                         }
 
+                        if(payDate < simpleAccountDate){
+                            this.$message.error('确认日期不得早于报销日期');
+                            this.loading = false;
+                            return
+                        }
                     }
                     this.isLoading = true;
                     this.$confirm(msg, '提示', {
@@ -479,7 +484,7 @@
             },
 
             addUrl(list){
-//                console.log(list);
+                console.log(list);
                 for(var i = 0; i < list.length; i++){
                     list[i].showMoney = number.number(list[i].money);
                     if(list[i].type <=3){
@@ -517,7 +522,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
 //                    console.log(data);
                     this.originalTypeName = data.application.originalTypeName
@@ -530,9 +535,7 @@
                     this.originalType = data.application.originalType
                     this.reimbursementDepartment = data.application.departmentIdString
                     this.settlementMethod = data.application.settlementMethod
-                    this.auditPerson = data.application.auditPerson
                     this.bankName = data.application.bankName
-                    this.auditFlg = data.application.auditFlg
                     this.payMoney = number.number(data.payMoney)
                     this.offsetAmount = number.number(data.offsetAmount)
                     //判断用户是否为出纳 1为出纳

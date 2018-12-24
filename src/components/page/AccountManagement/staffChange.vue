@@ -554,12 +554,7 @@
                         this.isLoading = false;
 //                        console.log(response);
                         if(response.data.status == 200){
-//                            this.axios()
-                            this.$router.go(-1);
-                            this.$message({
-                                type: 'success',
-                                message: '提交成功'
-                            });
+                            this.login()
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
                             this.$message.error(msg);
@@ -572,7 +567,7 @@
                         this.$message.error('提交失败，请重试！');
                     })
             },
-            axios(){
+            login(){
                 let url = addUrl.addUrl('login')
                 axios.post(url)
                     .then(response=> {
@@ -621,15 +616,16 @@
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
                             this.userName = name
-                            this.loading = false
+                            this.$router.go(-1);
+                            this.$message({
+                                type: 'success',
+                                message: '提交成功'
+                            });
                         }
                     })
                     .catch(error=> {
                         this.loading = false
-                        console.log('没有登录信息');
-                        alert('请您重新登录')
                         let url = addUrl.addUrl('logout')
-                        alert(url);
                         window.location.href = url
                     });
             },

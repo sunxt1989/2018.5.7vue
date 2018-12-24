@@ -53,7 +53,17 @@
                         <span class="tit">转入银行余额</span>
                         <input class="ipt" type="text" v-model="endAmount2" readonly>
                     </li>
-
+                    <li v-if="isShowTradeCompanyName" class="pt" style="position: relative;">
+                        <span class="tit"><span class="red">*</span>投资方</span>
+                        <el-select class='sel' v-model="tradeCompanyName">
+                            <el-option v-for="item in tradeCompanyList"
+                                       :key="item.value"
+                                       :label="item.stockHolderName"
+                                       :value="item.stockHolderName">
+                            </el-option>
+                        </el-select>
+                        <input class="opt" type="text" v-model="tradeCompanyName" maxlength="50" placeholder="请选择或输入">
+                    </li>
                     <li class="pt">
                         <span class="tit"><span class="red">*</span>{{moneyName}}</span>
                         <input class="ipt" type="text" v-model="money" @change="changeMoney">
@@ -100,6 +110,9 @@
                 type:'',//业务类别
                 moneyName:'',//金额名称
                 dateName:'',//日期名称
+                isShowTradeCompanyName:false,//是否显示投资方
+                tradeCompanyName:'',//投资方
+                tradeCompanyList:[],//投资方列表
 
                 isTurn:false,//是否为银行互转
                 remarkBankCode:'',//副银行账户卡号
@@ -174,6 +187,11 @@
                         this.loading = false;
                         return
                     }
+                    if(this.isShowTradeCompanyName && this.tradeCompanyName == ''){
+                        this.$message.error('请输入投资方');
+                        this.loading = false;
+                        return
+                    }
                     this.isLoading = true;
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
@@ -214,12 +232,13 @@
                 var url = addUrl.addUrl('newBankMoneySave');
                 var params = new URLSearchParams();
                 var money = unNumber.unNumber(this.money)
-
+//                console.log(this.tradeCompanyName);
                 params.append('bankCode',this.bankCode);
                 params.append('remarkBankCode',this.remarkBankCode);
                 params.append('money',money);
                 params.append('transferDate',this.transferDate);
                 params.append('discription',this.discription);
+                params.append('tradeCompanyName',this.tradeCompanyName);
                 params.append('type',this.type);
 
                 axios({
@@ -231,7 +250,7 @@
                     }
                 },params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -275,46 +294,52 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newBankMoney')
-//            console.log(this.name);
             let name = this.name
             params.append('bankId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     var data = response.data.value;
                     this.bankName = data.bankAccount.bankName
                     this.bankChildName = data.bankAccount.bankChildName
                     this.bankCode = data.bankAccount.bankCode
                     this.endAmount = number.number(data.bankAccount.endAmount)
-                    this.options = data.list
+                    this.options = data.list;
+                    this.tradeCompanyList = data.stockHolderList
 
                     if(name == '提取现金'){
                         this.isTurn = false
+                        this.isShowTradeCompanyName = false
                         this.type = 1
                         this.moneyName = '提现金额'
                         this.dateName = '提现日期'
                     }else if(name == '存入现金'){
                         this.isTurn = false
+                        this.isShowTradeCompanyName = false
                         this.type = 2
                         this.moneyName = '存现金额'
                         this.dateName = '存现日期'
                     }else if(name == '银行互转'){
                         this.isTurn = true
+                        this.isShowTradeCompanyName = false
                         this.type = 3
                         this.moneyName = '转账金额'
                         this.dateName = '转账日期'
                     }else if(name == '银行手续费'){
                         this.isTurn = false
+                        this.isShowTradeCompanyName = false
                         this.type = 4
                         this.moneyName = '手续费金额'
                         this.dateName = '支付日期'
                     }else if(name == '利息收入'){
                         this.isTurn = false
+                        this.isShowTradeCompanyName = false
                         this.type = 5
                         this.moneyName = '利息金额'
                         this.dateName = '收取日期'
                     }else if(name == '收到投资'){
                         this.isTurn = false
+                        this.isShowTradeCompanyName = true
                         this.type = 6
                         this.moneyName = '投资金额'
                         this.dateName = '收取日期'
@@ -432,9 +457,15 @@
         width:622px;
         height:36px;
     }
-
-
-
-
-
+    .opt{
+        width:580px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
+    }
 </style>

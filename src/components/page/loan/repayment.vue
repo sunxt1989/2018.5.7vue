@@ -140,12 +140,14 @@
                         this.loading = false;
                         return
                     }
+
                     //判断还款时间不能早于审核时间
                     if(Number(this.debitDateYMD.split('-').join('')) > Number(this.debitDate.split('-').join(''))){
                         this.$message.error('还款日期不得早于借款单确认日期');
                         this.loading = false;
                         return
                     }
+
                     this.$confirm('确定是否提交？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -170,7 +172,7 @@
                             }
                         }
                     }).then(() => {
-                        this.axios();
+                        this.repaymentSubmit();
                     }).catch(() => {
                         this.loading = false;
                         this.$message({
@@ -180,7 +182,7 @@
                     });
                 }
             },
-            axios(){
+            repaymentSubmit(){
                 var params = new URLSearchParams();
                 var money = unNumber.unNumber(this.money);
                 var url = addUrl.addUrl('repaymentSubmit')
@@ -190,19 +192,15 @@
                 params.append('money',money);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
-                        this.$router.go(-1);
-                        this.$message({
-                            type: 'success',
-                            message: '提交成功'
-                        });
+                        console.log(response);
+                        this.$router.push('/loan/loan');
                     })
                     .catch(error=> {
                         this.loading = false;
 //                        console.log(error);
                         alert('网络错误，不能访问');
                     })
-            },
+            }
         },
         computed:mapState(['current_book_ym']),
         mounted(){

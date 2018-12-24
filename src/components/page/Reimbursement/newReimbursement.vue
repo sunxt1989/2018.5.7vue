@@ -568,7 +568,7 @@
                             this.$router.push('/Reimbursement/ReimbursementList');
                             this.$message({
                                 type: 'success',
-                                message: '已成功'
+                                message: '提交成功'
                             });
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;

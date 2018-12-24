@@ -138,20 +138,12 @@
                             <input class="ipt" type="text" v-model="countStock" readonly>
                         </li>
                         <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
-                        </li>
-                        <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>单价</span>
-                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange(2)" maxlength="14">
-                        </li>
-                        <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" readonly>
+                            <span class="tit3"><span class="red">*</span>含税总价</span>
+                            <input class="ipt" type="text" v-model.lazy="newTotalMoney" @change="newTotalMoneyChange" maxlength="14">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="taxMoneyChange">
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -162,9 +154,20 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" readonly>
+                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
                         </li>
-
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                        </li>
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>数量</span>
+                            <input class="ipt" type="text" v-model.lazy="newNum" :disabled="isShowCount" maxlength="4">
+                        </li>
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>单价</span>
+                            <input class="ipt" type="text" v-model="newUnitPrice" disabled>
+                        </li>
                         <li class="pt cf">
                             <span class="tit3"><span class="red">*</span>明细</span>
                             <textarea class="tex" v-model="newDetailed" maxlength="50">
@@ -198,20 +201,12 @@
                             <input class="ipt" type="text" v-model="countStock" readonly>
                         </li>
                         <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model="newNum" @change="moneyChange(1)" :readonly="isShowCount" maxlength="4">
-                        </li>
-                        <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>单价</span>
-                            <input class="ipt" type="text" v-model="newUnitPrice" @change="moneyChange(2)" maxlength="14">
-                        </li>
-                        <li class="sm cf">
-                            <span class="tit3"><span class="red">*</span>金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" readonly>
+                            <span class="tit3"><span class="red">*</span>含税总价</span>
+                            <input class="ipt" type="text" v-model.lazy="newTotalMoney" @change="newTotalMoneyChange" maxlength="14">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="taxMoneyChange">
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -222,12 +217,23 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" readonly>
+                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
                         </li>
-
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                        </li>
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>数量</span>
+                            <input class="ipt" type="text" v-model.lazy="newNum" :readonly="isShowCount" maxlength="4">
+                        </li>
+                        <li class="sm cf">
+                            <span class="tit3"><span class="red">*</span>单价</span>
+                            <input class="ipt" type="text" v-model="newUnitPrice" disabled>
+                        </li>
                         <li class="pt cf">
                             <span class="tit3"><span class="red">*</span>明细</span>
-                            <textarea class="tex" v-model="newDetailed" maxlength="50" >
+                            <textarea class="tex" v-model="newDetailed" maxlength="50">
                             </textarea>
                         </li>
                     </ul>
@@ -238,7 +244,8 @@
                 <el-table :data="newList1" class="grayList" v-show="isShowLow">
                     <el-table-column property="className" label="库存商品" align="center" ></el-table-column>
                     <el-table-column property="commodityName" label="明细" align="center"></el-table-column>
-                    <el-table-column property="unit" label="单位"  align="center"></el-table-column>
+                    <el-table-column property="unit" label="单位"  align="center" width="80px"></el-table-column>
+                    <el-table-column property="newTotalMoney" label="含税总价"  align="center"></el-table-column>
                     <el-table-column property="count" label="数量" align="center"></el-table-column>
                     <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
                     <el-table-column property="money" label="金额" align="center"></el-table-column>
@@ -261,7 +268,8 @@
                 </el-table>
                 <el-table :data="newList2" class="grayList" v-show="!isShowLow">
                     <el-table-column property="commodityName" label="明细" align="center"></el-table-column>
-                    <el-table-column property="unit" label="单位"  align="center"></el-table-column>
+                    <el-table-column property="unit" label="单位"  align="center" width="80px"></el-table-column>
+                    <el-table-column property="newTotalMoney" label="含税总价"  align="center"></el-table-column>
                     <el-table-column property="count" label="数量" align="center"></el-table-column>
                     <el-table-column property="perPrice" label="单价" align="center"></el-table-column>
                     <el-table-column property="money" label="金额" align="center"></el-table-column>
@@ -400,9 +408,8 @@
                 newUnit:'',//单位(明细列表)
                 newNum:1,//数量(明细列表)
                 countStock:1,//库存数量(明细列表)
-                newUnitPrice:'0.00',//单价(明细列表)
-                newMoney:'0.00',//金额(明细列表)
                 newTaxRate:0,//税率(明细列表)
+                newTotalMoney:'0.00',//含税总价(明细列表)
                 options3:[//发票类别列表
                     {value:0,label:'免税'},
                     {value:3,label:'3%'},
@@ -413,7 +420,6 @@
                     {value:16,label:'16%'},
                     {value:17,label:'17%'}
                 ],
-                newTaxAmount:'0',//税额(明细列表)
                 newDetailed:'',//明细(明细列表)
                 newId:1,//明细列表id
                 SeeId:0,//查看明细列表id
@@ -526,9 +532,40 @@
                         }
                     }
                 }
+            },
+            //数量
+            newNum:function(val){
+                var str = /^\d+$/;//判断只允许输入正整数
+                if(!str.test(val)){
+                    this.$message.error('请正确输入数量');
+                    this.newNum = 1;
+                }
             }
         },
-        computed:mapState(['current_book_ym','current_company_scale','isMonthlyKnots','isAnnualKnots']),
+        computed:{
+            ...mapState({
+                current_book_ym:state => state.current_book_ym,
+                isMonthlyKnots:state => state.isMonthlyKnots,
+                isAnnualKnots:state => state.isAnnualKnots,
+            }),
+            //税额（明细列表）
+            newTaxAmount:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
+                let newTaxRate = this.newTaxRate / 100;
+                return number.number((newTotalMoney / (1 + newTaxRate) *  newTaxRate).toFixed(2))
+            },
+            //金额（明细列表）
+            newMoney:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
+                let newTaxAmount =  unNumber.unNumber(this.newTaxAmount) ;
+                return number.number((newTotalMoney - newTaxAmount).toFixed(2))
+            },
+            //单价（明细列表）
+            newUnitPrice:function(){
+                let newMoney = unNumber.unNumber(this.newMoney);
+                return (newMoney / this.newNum).toFixed(9)
+            }
+        },
         methods: {
             //销售类别change事件，当选择设备时明细列表进行修改
             typeChange(){
@@ -571,12 +608,10 @@
                         this.newDetailed ='';
                         this.newNum =1;
                         this.countStock =1;
-                        this.newUnitPrice = '0.00';
                         this.newNum = 1;
                         this.countStock = 1;
                         this.newTaxRate = 0;
-                        this.newMoney = '0.00';
-                        this.newTaxAmount = 0;
+                        this.newTotalMoney = '0.00';
                         this.newUnit ='';
                         done();
                     })
@@ -593,6 +628,7 @@
                     inventoryId:'',
                     className:'',
                     commodityName:'',
+                    newTotalMoney:'0.00',
                     perPrice:'',
                     count:'',
                     countStock:'',
@@ -612,8 +648,8 @@
                         this.$message.error('请正确输入数量');
                         this.loading = false;
                         return
-                    }else if (this.newUnitPrice == '0.00') {
-                        this.$message.error('请正确输入单价');
+                    }else if (this.newTotalMoney == '0.00') {
+                        this.$message.error('请正确输入价税合计');
                         this.loading = false;
                         return
                     }else if (this.newDetailed == '') {
@@ -646,6 +682,7 @@
                             obj.inventoryId = this.inventoryId;//库存商品的编号
                             obj.className = this.className;//库存名称
                             obj.commodityName = this.newDetailed;//库存明细
+                            obj.newTotalMoney = this.newTotalMoney;//含税总价
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.countStock = this.countStock;//库存数量
                             obj.count = this.newNum;//数量
@@ -662,12 +699,10 @@
                             this.inventoryId ='';
                             this.className ='';
                             this.newDetailed ='';
-                            this.newUnitPrice = '0.00';
                             this.newNum = 1;
                             this.countStock = 1;
                             this.newTaxRate = 0;
-                            this.newMoney = '0.00';
-                            this.newTaxAmount = 0;
+                            this.newTotalMoney = '0.00';
                             this.newUnit ='';
                             if(n == 0){
                                 this.dialogTableVisible = false;
@@ -675,8 +710,8 @@
                         })
                         .catch(() => { });
                 }else{
-                    if (this.newUnitPrice == '0.00') {
-                        this.$message.error('请正确输入单价');
+                    if (this.newTotalMoney == '0.00') {
+                        this.$message.error('请正确输入含税总价');
                         this.loading = false;
                         return
                     }else if (this.newDetailed == '') {
@@ -694,6 +729,7 @@
                             };
 
                             obj.commodityName = this.newDetailed;//明细
+                            obj.newTotalMoney = this.newTotalMoney;//含税总价
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.taxRate = this.newTaxRate;//税率
                             obj.count = this.newNum;//数量
@@ -708,12 +744,10 @@
                             this.inventoryId ='';
                             this.className ='';
                             this.newDetailed ='';
-                            this.newUnitPrice = '0.00';
                             this.countStock = 1;
                             this.newNum = 1;
                             this.newTaxRate = 0;
-                            this.newMoney = '0.00';
-                            this.newTaxAmount = 0;
+                            this.newTotalMoney = '0.00';
                             this.newUnit ='';
                             if(n == 0){
                                 this.dialogTableVisible = false;
@@ -730,12 +764,10 @@
                         this.inventoryId ='';
                         this.className ='';
                         this.newDetailed ='';
-                        this.newUnitPrice = '0.00';
                         this.newNum = 1;
                         this.countStock = 1;
                         this.newTaxRate = 0;
-                        this.newMoney = '0.00';
-                        this.newTaxAmount = 0;
+                        this.newTotalMoney = '0.00';
                         this.newUnit ='';
                         this.dialogTableVisible = false;
                     })
@@ -752,12 +784,10 @@
                         this.inventoryId = newList1[i].inventoryId
                         this.className = newList1[i].className
                         this.newDetailed = newList1[i].discription
-                        this.newUnitPrice = newList1[i].perPrice
                         this.newNum = newList1[i].count
                         this.countStock = newList1[i].countStock
                         this.newTaxRate = newList1[i].taxRate
-                        this.newMoney = newList1[i].money
-                        this.newTaxAmount = newList1[i].taxMoney
+                        this.newTotalMoney = newList1[i].newTotalMoney
                         this.newUnit = newList1[i].unit
                         this.isI = i;
                     }
@@ -777,11 +807,9 @@
                 for(var i =0; i < newList2.length; i++){
                     if(id == newList2[i].id){
                         this.newDetailed = newList2[i].commodityName;
-                        this.newUnitPrice = newList2[i].perPrice;
                         this.newTaxRate = newList2[i].taxRate;
                         this.newNum = newList2[i].count
-                        this.newMoney = newList2[i].money;
-                        this.newTaxAmount = newList2[i].taxMoney;
+                        this.newTotalMoney = newList2[i].newTotalMoney;
                         this.newUnit = newList2[i].unit;
                         this.isI = i;
                     }
@@ -796,12 +824,10 @@
                         this.inventoryId ='';
                         this.className ='';
                         this.newDetailed ='';
-                        this.newUnitPrice = '0.00';
                         this.newNum = 1;
                         this.countStock = 1;
                         this.newTaxRate = 0;
-                        this.newMoney = '0.00';
-                        this.newTaxAmount = 0;
+                        this.newTotalMoney = '0.00';
                         this.newUnit ='';
                         this.dialogSseTableVisible = false;
                     })
@@ -819,6 +845,7 @@
                     inventoryId:'',
                     className:'',
                     commodityName:'',
+                    newTotalMoney:'0.00',
                     perPrice:'',
                     count:'',
                     countStock:'',
@@ -838,8 +865,8 @@
                         this.$message.error('请正确输入数量');
                         this.loading = false;
                         return
-                    } else if (this.newUnitPrice == '0.00') {
-                        this.$message.error('请正确输入单价');
+                    } else if (this.newTotalMoney == '0.00') {
+                        this.$message.error('请正确输入价税合计');
                         this.loading = false;
                         return
                     }else if (this.newDetailed == '') {
@@ -872,6 +899,7 @@
                             obj.inventoryId = this.inventoryId;//库存商品的编号
                             obj.className = this.className;//商品名称
                             obj.commodityName = this.newDetailed;//设备明细
+                            obj.newTotalMoney = this.newTotalMoney;//含税总价
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.countStock = this.countStock;//库存数量
                             obj.count = this.newNum;//数量
@@ -887,19 +915,17 @@
                             this.inventoryId ='';
                             this.className ='';
                             this.newDetailed ='';
-                            this.newUnitPrice = '0.00';
                             this.newNum = 1;
                             this.countStock = 1;
                             this.newTaxRate = 0;
-                            this.newMoney = '0.00';
-                            this.newTaxAmount = 0;
+                            this.newTotalMoney = '0.00';
                             this.newUnit ='';
                             this.dialogSseTableVisible = false;
                         })
                         .catch(() => { });
                 }else{
-                    if (this.newUnitPrice == '0.00') {
-                        this.$message.error('请正确输入单价');
+                    if (this.newTotalMoney == '0.00') {
+                        this.$message.error('请正确输入含税总价');
                         this.loading = false;
                         return
                     }else if (this.newDetailed == '') {
@@ -917,7 +943,8 @@
                             };
 
                             obj.commodityName = this.newDetailed;//明细
-                            obj.count = this.newNum;//明细
+                            obj.newTotalMoney = this.newTotalMoney;//含税总价
+                            obj.count = this.newNum;//数量
                             obj.perPrice = this.newUnitPrice;//不含税单价
                             obj.taxRate = this.newTaxRate;//税率
                             obj.money = this.newMoney;//不含税金额
@@ -929,12 +956,10 @@
                             this.inventoryId ='';
                             this.className ='';
                             this.newDetailed ='';
-                            this.newUnitPrice = '0.00';
                             this.newNum = 1;
                             this.countStock = 1;
                             this.newTaxRate = 0;
-                            this.newMoney = '0.00';
-                            this.newTaxAmount = 0;
+                            this.newTotalMoney = '0.00';
                             this.newUnit ='';
                             this.dialogSseTableVisible = false;
                         })
@@ -1036,53 +1061,15 @@
                     }
                 }
             },
-            //改变金额的change事件
-            moneyChange(n){
-                var str = /^\d+$/;//判断只允许输入正整数
-                var str2 = /^[0-9]+(\.[0-9]{0,2})?$/;//判断只允许输入有0-2位小数的正实数
-                var newNum = this.newNum
-                var newUnitPrice = unNumber.unNumber(this.newUnitPrice);
-                if(n == 1){
-                    if(!this.isShowCount){
-                        if(!str.test(newNum)){
-                            this.$message.error('请正确输入数量');
-                            this.newNum = 1;
-                        }
-                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
-                        this.newMoney = number.number((newNum * newUnitPrice).toFixed(2));
-                        this.taxMoneyChange()
-                    }else{
-                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
-                        this.newMoney = number.number(newUnitPrice.toFixed(2));
-                        this.taxMoneyChange()
-                    }
-                }else if(n == 2){
-                    if(!this.isShowCount){
-                        if(!str2.test(this.newUnitPrice)){
-                            this.$message.error('请正确输入单价');
-                            this.newUnitPrice = '0.00';
-                            return
-                        }
-                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
-                        this.newMoney = number.number((newNum * newUnitPrice).toFixed(2));
-                        this.taxMoneyChange()
-                    }else{
-                        if(!str2.test(this.newUnitPrice)){
-                            this.$message.error('请正确输入单价');
-                            this.newUnitPrice = '0.00';
-                            return
-                        }
-                        this.newUnitPrice  = number.number(newUnitPrice.toFixed(2));
-                        this.newMoney = number.number(newUnitPrice.toFixed(2));
-                        this.taxMoneyChange()
-                    }
+            //含税总价change事件
+            newTotalMoneyChange(){
+                let val = unNumber.unNumber(this.newTotalMoney)
+                if(val <= 0){
+                    this.$message.error('请正确输入含税总价')
+                    this.newTotalMoney = '0.00'
+                }else{
+                    this.newTotalMoney = number.number(this.newTotalMoney)
                 }
-            },
-            //改变税额的change事件
-            taxMoneyChange(){
-                var newMoney = unNumber.unNumber(this.newMoney);
-                var newTaxRate = unNumber.unNumber(this.newTaxRate);
-                this.newTaxAmount = number.number(Math.round(newMoney * newTaxRate) / 100)
             },
             //after模态框事件
 
@@ -1226,8 +1213,6 @@
                         }
                     }).then(() => {
                         let index = this.punch + this.punch2;
-//                        console.log(this.punch);
-//                        console.log(this.punch2);
                         if(index != 0){
                             this.punch3 = this.punch
                             this.submitUpload(n);
@@ -1439,11 +1424,9 @@
                 let saveUrl = addUrl.addUrl('newSaleSave')
                 let submitUrl = addUrl.addUrl('newSaleSubmit')
                 if(n == 1){
-//                    url = saveUrl
-                    url = 'http://192.168.2.192:8080/web/vue/sale/save.html'
+                    url = saveUrl
                 }else if(n == 2){
-//                    url = submitUrl
-                    url = 'http://192.168.2.192:8080/web/vue/sale/submit.html'
+                    url = submitUrl
                 }
 
                 axios({
@@ -1509,7 +1492,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     //设置部门
                     this.options4 = data.departmentList;
@@ -1536,6 +1519,7 @@
                     var saleItemList = sale.saleItemList
 
                     for(let i = 0; i < saleItemList.length; i++){
+                        saleItemList[i].newTotalMoney = number.number(saleItemList[i].noTaxMoney + saleItemList[i].taxMoney)
                         saleItemList[i].money = number.number(saleItemList[i].noTaxMoney)
                         saleItemList[i].perPrice = number.number(saleItemList[i].perPrice)
                         saleItemList[i].taxMoney = number.number(saleItemList[i].taxMoney)

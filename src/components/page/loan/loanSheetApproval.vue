@@ -316,7 +316,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-//                console.log(response);
+                console.log(response);
                     var data = response.data.value;
 //            console.log(data);
                     this.options = data.departmentList;

@@ -183,8 +183,6 @@
                 }else{
                     this.url3 +='&printType=' + this.printType
                 }
-                console.log(this.url3);
-                window.open(this.url3)
                 this.dialogGrant = false;
                 this.grantLoading = false;
                 this.loading = false
@@ -214,20 +212,12 @@
             //年change事件
             changeYear(){
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.axios()
             },
             //月change事件
             ymClick() {
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.axios()
             },
 
             axios(){
@@ -277,7 +267,7 @@
                     })
             }
         },
-        computed:mapState(['current_book_ym','start_ym']),
+        computed:mapState(['current_book_ym','start_ym','isMonthlyKnots','isAnnualKnots']),
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
             // 首先在Virtual DOM渲染数据时，设置下背景图的高度．

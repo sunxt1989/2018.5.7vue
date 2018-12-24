@@ -5,9 +5,10 @@
              element-loading-spinner="el-icon-loading"
              element-loading-background="rgba(0, 0, 0, 0.8)">
             <div class="top">
-                <h2>月结</h2>
+                <h2>结转</h2>
                 <router-link to="/" class="back">返回</router-link>
-                <el-button @click="model" size="small" type="primary" class="sub" >月结</el-button>
+                <el-button @click="model(0)" size="small" type="primary" class="sub" :loading="isLoading">月结</el-button>
+                <el-button v-if="isMonthlyKnots && !isAnnualKnots" @click="model(1)" size="small" type="primary" class="sub2" :loading="isLoading">年结</el-button>
                 <h3 class="currentYM">当前账期：{{currentYM}}</h3>
             </div>
             <div class="w">
@@ -86,7 +87,7 @@
                             </transition>
                         </li>
                         <li>
-                            <span class="name">账期变更（{{month}}月-->{{month + 1}}月）</span>
+                            <span class="name">账期变更（{{month}}月-->{{nextMonth}}月）</span>
                             <span v-if='process_2_2 == 0' class="result">未处理</span>
                             <transition name="text-fade10">
                                 <span v-if='process_2_2 == 1' class="result2">成功</span>
@@ -94,7 +95,7 @@
                             </transition>
                         </li>
                         <li>
-                            <span class="name">{{month + 1}}月固定资产折旧</span>
+                            <span class="name">{{nextMonth}}月固定资产折旧</span>
                             <span v-if='process_3_1 == 0' class="result">未处理</span>
                             <transition name="text-fade11">
                                 <span v-if='process_3_1 == 1' class="result2">成功</span>
@@ -102,7 +103,7 @@
                             </transition>
                         </li>
                         <li>
-                            <span class="name">{{month + 1}}月无形资产折旧</span>
+                            <span class="name">{{nextMonth}}月无形资产折旧</span>
                             <span v-if='process_3_2 == 0' class="result">未处理</span>
                             <transition name="text-fade12">
                                 <span v-if='process_3_2 == 1' class="result2">成功</span>
@@ -110,7 +111,7 @@
                             </transition>
                         </li>
                         <li>
-                            <span class="name">{{month + 1}}月工资单生成</span>
+                            <span class="name">{{nextMonth}}月工资单生成</span>
                             <span v-if='process_3_3 == 0' class="result">未处理</span>
                             <transition name="text-fade13">
                                 <span v-if='process_3_3 == 1' class="result2">成功</span>
@@ -136,6 +137,7 @@
             return {
                 currentYM:0,//当前账期
                 month:0,//当前月份
+                nextMonth:0,//下个月份
                 process_1_1:0,//固定资产折旧
                 process_1_2:0,//无形资产折旧
                 process_1_3:0,//工资计提
@@ -150,12 +152,16 @@
                 process_3_2:0,//无形资产折旧
                 process_3_3:0,//工资单生成
                 loading:false,
-                loading2:false
+                loading2:false,
+                isLoading:false,
             }
         },
         methods: {
-            model(){
-                this.$confirm('您确定要对当前账期进行结转？', '提示', {
+            model(n){
+                this.isLoading = true
+                let msg = n == 0 ? '您确定要对当前账期进行月结?' :
+                    '年结后，上一年度账将封存，不能再进行操作，您是否确认年结？'
+                this.$confirm(msg, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     showClose: false,
@@ -179,13 +185,41 @@
                         }
                     }
                 }).then(() => {
-                   this.axios()
+                    if(n){
+                        this.annualKnots()
+                    }else{
+                        this.axios()
+                    }
                 }).catch(() => {
                     this.$message({
                         type: 'info',
                         message: '已取消'
                     });
+                    this.isLoading = false
                 });
+            },
+            annualKnots(){
+                this.loading = true
+                let url = addUrl.addUrl('annualKnots');
+                axios.post(url)
+                    .then(response=> {
+                        let msg = response.data.value.msg
+                        let result = response.data.value.result
+                        if(result == 1){
+                            this.$message.success(msg)
+                            this.login()
+                            this.isLoading = false
+                        }else{
+                            this.$message.error(msg)
+                            this.loading = false
+                            this.isLoading = false
+                        }
+                    })
+                    .catch((error)=>{
+                        this.$message.error('系统繁忙，请重试')
+                        this.loading = false
+                        this.isLoading = false
+                    })
             },
             axios(){
                 this.loading = true
@@ -218,11 +252,18 @@
                             setTimeout(function(){
                                 if(data.value.process_2_2 == 1){
                                     _this.$message.success('月结成功，当前账期已转入下月')
+                                    _this.login()
                                     _this.currentYM = nextYearMonth.substring(0,4) + '年' + nextYearMonth.substring(4,6) + '月'
                                     if(nextYearMonth.substring(4,5) == 0){
                                         _this.month = Number(nextYearMonth.substring(5,6))
+                                        _this.nextMonth = _this.month + 1
                                     }else{
                                         _this.month = Number(nextYearMonth.substring(4,6))
+                                        if(_this.month == 12){
+                                            _this.nextMonth = '次年1'
+                                        }else{
+                                            _this.nextMonth = _this.month + 1
+                                        }
                                     }
                                     _this.process_1_1 = 0
                                     _this.process_1_2 = 0
@@ -240,29 +281,108 @@
                                     obj.current_book_ym = nextYearMonth
                                     _this.$store.commit('add',obj)
                                     _this.loading2 = false;
+                                    _this.isLoading = false;
                                 }else{
                                     _this.$message.error('月结失败，请重试')
+                                    _this.loading2 = false;
+                                    _this.isLoading = false;
                                 }
                             },5000)
                         }else if(status == 400){
                             this.loading = false;
-                            this.loading2 = true;
+                            this.loading2 = false;
+                            this.isLoading = false
                             this.$message.error(msg)
                         }
 
                     })
                     .catch(()=>{
+                        this.$message.error('系统繁忙，请重试')
                         this.loading = false
+                        this.loading2 = false;
+                        this.isLoading = false;
                     })
-            }
+            },
+            login(){
+                let url = addUrl.addUrl('login')
+                axios.post(url)
+                    .then(response=> {
+                        console.log(response);
+                        let data = response.data.value
+                        if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
+                            let url2 = addUrl.addUrl('initialize')
+                            window.location.href = url2;
+                            return
+                        }else{
+                            this.accounts = data.accounts
+                            this.bookId = data.current_book_id;
+                            this.faceUri = data.faceUri ? data.faceUri : 'static/images/gongjuxiang.png';
+                            let obj = {}
+                            let start_ym = data.current_start_date.substring(0,7)//账套开账时间
+                            let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
+                            let auth_json = data.book_user.auth_json;//判断身份列表
+                            let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
+                            let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
+                            let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
+                            let menu_json = (data.book_user.menu_json == '') ? ['#loan','#bookkeeping'] : (data.book_user.menu_json).split(',');//默认配置桌面功能显示借款单，记账
+
+                            let current_account_standard = data.current_account_standard //会计准则判定 1：小企业 2：企业
+                            let current_company_scale = data.current_company_scale //当前账套纳税人性质 1 小规模纳税人 2 一般纳税人
+                            let current_book_level = data.current_book_level//用户类型 0 普通用户 1：代记账会计 2：代记账管理人员
+                            let user_type = data.user_type//账套等级 0 演示帐套 1 一般帐套 3 代记账帐套
+                            let isAccountBookkeeping = (user_type > 0 && current_book_level == 3)? true : false//是否为代记账，true 为是代记账账套 false 为普通账套
+                            let account_type = data.account_type//代记账会计身份，1为普通会计 >1会计
+                            let name = data.name;
+                            let isMonthlyKnots = data.carry_prev_month12_flg ? true : false;
+                            let isAnnualKnots = data.carry_prev_year_flg ? true : false;
+
+                            obj.start_ym = start_ym.split('-').join('');
+                            obj.current_book_ym = current_book_ym;
+                            obj.isBossFlg = isBossFlg;
+                            obj.isFinanceFlg = isFinanceFlg;
+                            obj.isCashierFlg = isCashierFlg;
+                            obj.menuArr = menu_json;
+                            obj.auth_json = auth_json;
+                            obj.current_account_standard = current_account_standard;
+                            obj.current_company_scale = current_company_scale;
+                            obj.user_type = user_type;
+                            obj.current_book_level = current_book_level;
+                            obj.isAccountBookkeeping = isAccountBookkeeping
+                            obj.account_type = account_type
+                            obj.name = name
+                            obj.isMonthlyKnots = isMonthlyKnots
+                            obj.isAnnualKnots = isAnnualKnots
+                            console.log(isMonthlyKnots);
+                            console.log(obj);
+                            this.$store.commit('add',obj);
+                            this.$message({
+                                type: 'success',
+                                message: '年结成功'
+                            });
+                            this.$router.push('/');
+                        }
+                    })
+                    .catch(error=> {
+                        this.loading = false
+                        let url = addUrl.addUrl('logout')
+                        window.location.href = url
+                    });
+            },
         },
-        computed:mapState(['current_book_ym']),
+        computed:mapState(['current_book_ym','isMonthlyKnots','isAnnualKnots']),
         created(){
             this.currentYM = this.current_book_ym.substring(0,4) + '年' + this.current_book_ym.substring(4,6) + '月'
             if(this.current_book_ym.substring(4,5) == 0){
                 this.month = Number(this.current_book_ym.substring(5,6))
+                this.nextMonth = this.month + 1
             }else{
                 this.month = Number(this.current_book_ym.substring(4,6))
+                console.log(this.month);
+                if(this.month == 12){
+                    this.nextMonth = '次年1'
+                }else{
+                    this.nextMonth = this.month + 1
+                }
             }
         }
     }
@@ -304,9 +424,13 @@
         position: absolute;
         right: 20px;
     }
-    .sub{
+    .top .sub{
         position: absolute;
         right: 100px;
+    }
+    .top .sub2{
+        position: absolute;
+        right: 180px;
     }
     .currentYM{
         position: absolute;

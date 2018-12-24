@@ -15,6 +15,7 @@
                             <span>库存商品</span>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="model" label="型号" sortable align="center"></el-table-column>
                     <el-table-column prop="count" label="数量" sortable align="center"></el-table-column>
                     <el-table-column prop="totalMoney" label="总金额" sortable align="center">
                         <template slot-scope="scope">
@@ -66,10 +67,11 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;//列表数据
                     this.tableData = data.list
                     for(let i in this.tableData){
+                        this.tableData[i].model = this.tableData[i].model == 'null' || this.tableData[i].model == 'undefined' || !this.tableData[i].model ? '' : this.tableData[i].model
                         this.tableData[i].showMoney = number.number(this.tableData[i].totalMoney)
                     }
                 })

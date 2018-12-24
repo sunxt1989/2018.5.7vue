@@ -23,11 +23,11 @@
                     </li>
 
                     <li class="sm">
-                        <span class="tit">加：特定业务计算的应纳税所得额</span>
+                        <span class="tit">加：特定业务计算的应纳所得税额</span>
                         <input class="ipt" type="text" v-model="B2" @change="changeInput(B2,'B2')">
                     </li>
                     <li class="sm">
-                        <span class="tit">应纳税所得额</span>
+                        <span class="tit">应纳所得税额</span>
                         <input class="ipt" type="text" v-model="B8" maxlength="18" disabled>
                     </li>
 

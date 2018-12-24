@@ -246,20 +246,23 @@
                         this.loading = false;
                         return
                     }
-                    let receiptDate = Number(this.receiptDate.split('-').join('').substring(0,6));//选择的日期
                     let receiptDateYear = Number(this.receiptDate.substring(0,4));//选择的日期的年份
-                    let current_book_ym = Number(this.current_book_ym);//当前账期日期
                     let lastYear = Number(this.current_book_ym.substring(0,4)-1);//去年年份
+                    let thisYear = Number(this.current_book_ym.substring(0,4));//今年年份
+//                    console.log(this.isMonthlyKnots);
+//                    console.log(this.isAnnualKnots);
 
-                    if(this.isMonthlyKnots && !this.isAnnualKnots){//判断是否12月月结且未年结
-                        if((receiptDateYear != lastYear) && receiptDate < current_book_ym){
-                            this.$message.error('请正确输入日期');
+                    if(this.isAnnualKnots){//判断去年是否年结
+//                        console.log('年结');
+                        if(receiptDateYear < thisYear){
+                            this.$message.error('该账套已年结，不能录入上年度数据。');
                             this.loading = false;
                             return
                         }
                     }else{
-                        if(receiptDate < current_book_ym ) {
-                            this.$message.error('费用日期不得早于当前账期');
+//                        console.log('未年结');
+                        if(receiptDateYear < lastYear) {
+                            this.$message.error('该账套已年结，不能录入上年度数据。');
                             this.loading = false
                             return
                         }

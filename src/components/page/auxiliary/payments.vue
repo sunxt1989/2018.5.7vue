@@ -41,7 +41,7 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">{{name}}款方式</span>
+                        <span class="tit">结算方式</span>
                         <el-select class="sel" v-model="payType" placeholder="请选择" @change="payTypeChange">
                             <el-option
                                 v-for="item in options2"

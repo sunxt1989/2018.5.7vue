@@ -6,7 +6,14 @@
                 <router-link to="/" class="back">返回</router-link>
                 <a :href=url1 target="_blank" class="sub1">导出Excel</a>
                 <a :href=url2 target="_blank" class="sub2">导出PDF</a>
-
+                <el-select v-model="choice" class='choice' placeholder="请选择" @change="axios">
+                    <el-option
+                        v-for="item in choiceOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
             </div>
             <div class="w">
                 <div class="content cf">
@@ -20,7 +27,7 @@
                         @change="changeYear">
                     </el-date-picker>
 
-                    <el-tabs class="tabs"  v-model="ymName" @tab-click="ymClick">
+                    <el-tabs class="tabs" v-show="choice == '1'" v-model="ymName" @tab-click="ymClick">
                         <el-tab-pane name="01">
                             <span slot="label" class="mon">1月</span>
                         </el-tab-pane>
@@ -58,6 +65,11 @@
                             <span slot="label" class="mon">12月</span>
                         </el-tab-pane>
                     </el-tabs>
+                    <el-tabs class="tabs" v-show="choice == '12'">
+                        <el-tab-pane name="01">
+                            <span slot="label" class="mon mon-none">1月</span>
+                        </el-tab-pane>
+                    </el-tabs>
 
                     <el-table class="single" :data="tableData3">
                         <el-table-column align="center" prop="xiangmu_1" label="项目"></el-table-column>
@@ -81,12 +93,17 @@
     export default{
         data(){
             return {
+                choice:'1',
                 currentYM:'',//当前账期
                 indexYM:'',//显示账期
                 url1:'',//导出Excel
                 url2:'',//导出PDF
                 ymName: '',
                 year:'',
+                choiceOptions:[//1：月报表，12：季报表
+                    {value:'1',label:'月报表'},
+                    {value:'12',label:'年报表'},
+                ],
                 thisPeriod:'',//本期名称
                 lastPeriod:'',//上期名称
                 tableData3:[],
@@ -97,20 +114,12 @@
             //年change事件
             changeYear(){
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.axios()
             },
             //月change事件
             ymClick() {
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.axios()
             },
 
             axios(){
@@ -119,12 +128,13 @@
                 let url2 = addUrl.addUrl('LRBeportPDF');
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('LRBeportList');
+//                let url =  'http://192.168.2.191:8080/web/vue/report/incomeStatement/get/list.html'
                 params.append('ym', this.indexYM);
-                params.append('showType','1');
+                params.append('showType',this.choice);
                 params.append('currentQuarter', this.quarterName);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -200,7 +210,7 @@
         float: left;
         margin-left: 2%;
     }
-    .yearSelect{
+    .content .yearSelect{
         display: inline-block;
         width:12%;
         float: left;
@@ -210,6 +220,9 @@
     .mon{
         font-size:16px;
         font-weight: bold;
+    }
+    .mon-none{
+        display: none;
     }
     .back{
         display: inline-block;

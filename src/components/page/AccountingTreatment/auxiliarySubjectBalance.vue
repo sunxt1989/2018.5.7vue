@@ -70,7 +70,6 @@
                 tableData: [],//采购付款单审批列表数据
                 startTime:'',//会计区间起始月份
                 endTime:'',//会计区间终止月份
-                year: '',//表头展示年份
                 defaultProps: {
                     children: 'children',
                     label: 'name'
@@ -188,9 +187,8 @@
             };
         },
         created(){
-            this.startTime = this.start_ym.substring(0,4) + '-' +this.start_ym.substring(4,6)
+            this.startTime = this.current_book_ym.substring(0,4) + '-01'
             this.endTime = this.current_book_ym.substring(0,4) + '-' +this.current_book_ym.substring(4,6);
-            this.year = this.start_ym.substring(0,4) + '年'
             this.axios()
         },
     }

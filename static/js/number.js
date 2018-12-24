@@ -8,10 +8,9 @@ function number(value){
     if(value.includes(',')){
         value = value.split(',').join('')
     }
-
-    var intPart = value < 0 ? Math.ceil(value) : Math.floor(value); //获取整数部分 向下取整
-    var intPartFormat = (value < 0 && value > -1) ? '-0' : intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
-    var floatPart = ".00"; //预定义小数部分
+    let intPart = value < 0 ? Math.ceil(value) : Math.floor(value); //获取整数部分 向下取整
+    let intPartFormat = (value < 0 && value > -1) ? '-0' : intPart.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+    let floatPart = ".00"; //预定义小数部分
 
     if(value.includes('.')){
         var value2Array = value.split(".");
@@ -25,7 +24,6 @@ function number(value){
             floatPart = value2Array[1].substr(0,2);
         }
         return intPartFormat + "." + floatPart;
-
     }else{
         return intPartFormat + floatPart;
     }

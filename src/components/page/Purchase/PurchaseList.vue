@@ -217,7 +217,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-//                        console.log(response);
+                        console.log(response);
                         var data = response.data.value.list
                         this.count = response.data.value.count;//总条目数
 
@@ -356,7 +356,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value.list
                     this.count = response.data.value.count;//总条目数
 

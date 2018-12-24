@@ -147,6 +147,8 @@ import invoiceDeduction from '@/components/page/invoice/invoiceDeduction' //发�
 import newInvoice from '@/components/page/invoice/newInvoice' //新建发票
 import seeInvoice from '@/components/page/invoice/seeInvoice' //查看发票
 
+//查看功能
+import viewingList from '@/components/page/viewing/viewingList'//查看功能列表
 Vue.use(Router);
 
 
@@ -739,6 +741,11 @@ export default new Router({
             path:'/invoice/seeInvoice',
             name:'seeInvoice',
             component:seeInvoice
+        },
+        {
+            path:'/viewing/viewingList',
+            name:'viewingList',
+            component:viewingList
         },
 
     ]

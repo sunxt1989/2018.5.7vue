@@ -94,7 +94,7 @@
                             <span>确认日期</span>
                             <el-date-picker
                                 class="bankCode"
-                                v-model="debitDate"
+                                v-model="confirmDate"
                                 type="date"
                                 :picker-options="pickerOptions1"
                                 placeholder="选择日期"
@@ -301,7 +301,7 @@
                 ],//结算方式列表
                 bankCode:'',//银行账户
                 bankAccountList:[],//银行账户列表
-                debitDate:'',//确认日期
+                confirmDate:'',//确认日期
                 isCashier:false,//是否是出纳
                 isTrue:false,
 
@@ -410,17 +410,23 @@
                         msg = '确定是否驳回'
                     }else{
                         msg = '确定是否确认'
-                        if(this.debitDate == ''){
+                        if(this.confirmDate == ''){
                             this.$message.error('请选择确认日期')
                             this.loading = false
                             return
                         }
+                        if(Number(this.confirmDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym)){
+                            this.$message.error('确认日期不得早于当前账期');
+                            this.loading = false
+                            return
+                        }
                         //判断选择日期不能早于销售日期
-                        if(Number(this.debitDate.split('-').join('')) > Number(this.saleDate.split('-').join(''))){
+                        if(Number(this.confirmDate.split('-').join('')) < Number(this.saleDate.split('-').join(''))){
                             this.$message.error('确认日期不得早于销售单创建日期');
                             this.loading = false
                             return
                         }
+
                         if(this.payType == '2' && this.bankCode == ''){
                             this.$message.error('请选择银行账户')
                             this.loading = false
@@ -490,7 +496,7 @@
                 params.append('discription',this.discription2);
                 params.append('payType',this.payType);
                 params.append('bankCode',this.bankCode);
-                params.append('confirmDate',this.debitDate);
+                params.append('confirmDate',this.confirmDate);
 
 //                console.log(url);
                 axios({
@@ -644,15 +650,15 @@
                     let date = new Date()
 
                     if(date.getMonth()+1 < 10){
-                        this.debitDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
+                        this.confirmDate = date.getFullYear() + '-0' + (date.getMonth()+1) ;
                     }else{
-                        this.debitDate = date.getFullYear() + '-' + (date.getMonth()+1);
+                        this.confirmDate = date.getFullYear() + '-' + (date.getMonth()+1);
                     };
 
                     if(date.getDate() < 10){
-                        this.debitDate += '-0' + date.getDate()
+                        this.confirmDate += '-0' + date.getDate()
                     }else{
-                        this.debitDate += '-' + date.getDate()
+                        this.confirmDate += '-' + date.getDate()
                     }
                     this.loading = false
                 })

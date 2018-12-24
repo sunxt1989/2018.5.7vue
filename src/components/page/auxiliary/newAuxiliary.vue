@@ -175,7 +175,7 @@
                         return
                     }
                     if(Number(this.businessDate.split('-').join('').substring(0,6)) < Number(this.current_book_ym) ){
-                        this.$message.error('选择日期不得早于当前日期');
+                        this.$message.error('选择日期不得早于当前账期');
                         this.loading = false;
                         return
                     }

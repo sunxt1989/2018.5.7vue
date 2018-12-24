@@ -152,11 +152,11 @@
                         </el-select>
                     </li>
                     <li class="sm" v-show="isShow">
-                        <span class="tit" v-show="isShow">银行账号</span>
-                        <input class="ipt" type="text" v-model="bankCode" readonly>
+                        <span class="tit">银行账号</span>
+                        <input class="ipt" type="text" v-model="bankName" readonly>
                     </li>
                     <li class="sm" v-show="isShow">
-                        <span class="tit" v-show="isShow">付款日期</span>
+                        <span class="tit">付款日期</span>
                         <input class="ipt" type="text" v-model="simpleConfirmDate" readonly>
                     </li>
                     <li class="pt cf">
@@ -266,7 +266,6 @@
                 receiptCount: '',//票据张数
                 payType: '',//结算方式
                 discription: '',//事由
-                settlementMethod: '',//结算方式
                 bankCode: '',//银行账号
                 bankName: '',//银行名称
                 type: '',
@@ -294,8 +293,12 @@
 
                 options: [],//报销部门列表
                 payTypeList: [//结算方式列表
-                    {value: 1, payTypeItem: '现金支付'},
-                    {value: 2, payTypeItem: '银行支付'}
+                    {value:'1',payTypeItem:'现金支付'},
+                    {value:'2',payTypeItem:'银行支付'},
+                    {value:'3',payTypeItem:'未收付'},
+                    {value:'5',payTypeItem:'企业微信'},
+                    {value:'6',payTypeItem:'企业支付宝'},
+                    {value:'7',payTypeItem:'企业借贷宝'},
                 ],
                 receiptList: [],//消费明细列表
                 nowReceiptList: [],//消费明细列表(临时)
@@ -323,6 +326,7 @@
                 },
                 choice:this.$route.params.choice,
                 currentPage:this.$route.params.currentPage,
+                isRedFlush:this.$route.params.isRedFlush,
                 loading: true,
                 isLoading: false,
                 screenHeight: '' //页面初始化高度
@@ -361,7 +365,6 @@
                 //找出费用单列表中时间最早的那一个，之后再和报销时间做对比
                 let receiptList = this.receiptList;
                 let simpleReceiptDate = []//费用单中时间数组
-
                 for(let i in receiptList){//获取所有费用单中时间数组
                     simpleReceiptDate.push(Number((receiptList[i].simpleReceiptDate).split('-').join('')));
                 }
@@ -372,6 +375,7 @@
                 });
 
                 if (n == 0) {
+                    if(this.isRedFlush) this.$router.go(-1);
                     if (this.isShowShare) {
                         this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                             confirmButtonText: '确定',
@@ -413,7 +417,7 @@
                         this.loading = false;
                         return
                     }
-                    if (this.debitDate == '') {
+                    if (this.applicationDate == '') {
                         this.$message.error('请正确输入报销日期');
                         this.loading = false
                         return
@@ -421,7 +425,7 @@
                         this.$message.error('请正确输入费用类别');
                         this.loading = false
                         return
-                    } else if (simpleReceiptDate[0] > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
+                    } else if (simpleReceiptDate[0] > Number(this.applicationDate.split('-').join(''))) { //判断选择日期不能早于报销日期
                         this.$message.error('报销日期不得早于费用发生日期');
                         this.loading = false
                         return
@@ -498,7 +502,7 @@
                         this.loading = false
                         return
                     }
-                    if (simpleReceiptDate[0] > Number(this.debitDate.split('-').join(''))) { //判断选择日期不能早于报销日期
+                    if (simpleReceiptDate[0] > Number(this.applicationDate.split('-').join(''))) { //判断选择日期不能早于报销日期
                         this.$message.error('报销日期不得早于费用发生日期');
                         this.loading = false
                         return
@@ -962,12 +966,11 @@
                     this.simpleConfirmDate = data.application.simpleConfirmDate
                     this.simpleReceiptDate = data.application.simpleReceiptDate
                     this.applicationDate = this.simpleReceiptDate
-                    this.payType = data.application.payType
+                    this.payType = String(data.application.payType)
                     this.receiptCount = data.application.receiptCount
                     this.discription = data.application.discription
                     this.originalType = data.application.originalType
                     this.reimbursementDepartment = data.application.departmentIdString
-                    this.settlementMethod = data.application.settlementMethod
                     this.auditPerson = data.application.auditPerson
                     this.bankCode = data.application.bankCode
                     this.bankName = data.application.bankName

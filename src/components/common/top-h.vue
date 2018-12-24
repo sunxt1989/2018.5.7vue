@@ -105,7 +105,7 @@
 //                let url = 'http://192.168.2.190:8881/web/vue/user/get/info/all.html'
                 axios.post(url)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let data = response.data.value;
                         if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
                             let url2 = addUrl.addUrl('initialize')

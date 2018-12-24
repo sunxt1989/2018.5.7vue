@@ -6,7 +6,7 @@
                 <router-link to="/" class="back">返回</router-link>
                 <a :href=url1 target="_blank" class="sub1">导出Excel</a>
                 <a :href=url2 target="_blank" class="sub2">导出PDF</a>
-                <el-select v-model="choice" class='choice' placeholder="请选择">
+                <el-select v-model="choice" class='choice' placeholder="请选择" @change="axios">
                     <el-option
                         v-for="item in choiceOptions"
                         :key="item.value"
@@ -79,6 +79,11 @@
                             <span slot="label" class="mon">第四季度</span>
                         </el-tab-pane>
                     </el-tabs>
+                    <el-tabs class="tabs" v-show="choice == '12'">
+                        <el-tab-pane name="01">
+                            <span slot="label" class="mon mon-none">1月</span>
+                        </el-tab-pane>
+                    </el-tabs>
 
                     <el-table class="single" :data="tableData3">
                         <el-table-column align="center" prop="xiangmu_1" label="项目"></el-table-column>
@@ -109,6 +114,7 @@
                 choiceOptions:[//1：月报表，3：季报表
                     {value:'1',label:'月报表'},
                     {value:'3',label:'季报表'},
+                    {value:'12',label:'年报表'},
                 ],
                 url1:'',//导出Excel
                 url2:'',//导出PDF
@@ -122,39 +128,32 @@
             }
         },
         methods: {
+
             //年change事件
             changeYear(){
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.thisPeriod = '本期金额';
+                this.lastPeriod = '上期金额';
+                this.axios()
             },
             //月change事件
             ymClick() {
                 this.indexYM = String(this.year) + String(this.ymName)
-                if(Number(this.currentYM) < Number(this.indexYM) || Number(this.indexYM) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.thisPeriod = (this.current_account_standard == 1) ? '本年累计金额' : '本期金额';
+                this.lastPeriod = (this.current_account_standard == 1) ? '本月金额' : '上期金额';
+                this.axios()
             },
             //季度change事件
             quarterClick(){
-                let quarterName = this.quarterName
+                let quarterName = this.quarterName;
                 if(quarterName < 4){
                     var maxYm = String(this.year) + '0'+String(this.quarterName * 3);
-                    var mixYm = String(this.year) + '0'+String((this.quarterName * 3) - 2)
                 }else{
                     var maxYm = String(this.year) + String(this.quarterName * 3);
-                    var mixYm = String(this.year) + String((this.quarterName * 3) - 2)
                 }
-                if(Number(this.currentYM) < Number(mixYm) || Number(maxYm) < Number(this.start_ym)){
-                    this.$message.error('对不起，当前日期没有数据')
-                }else{
-                    this.axios()
-                }
+                this.thisPeriod = (this.current_account_standard == 1) ? '本年累计金额' : '本期金额';
+                this.lastPeriod = (this.current_account_standard == 1) ? '本月金额' : '上期金额';
+                this.axios()
             },
             axios(){
                 this.loading = true
@@ -167,7 +166,7 @@
                 params.append('currentQuarter', this.quarterName);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -244,7 +243,7 @@
         float: left;
         margin-left: 2%;
     }
-    .yearSelect{
+    .content .yearSelect{
         display: inline-block;
         width:12%;
         float: left;
@@ -254,6 +253,9 @@
     .mon{
         font-size:16px;
         font-weight: bold;
+    }
+    .mon-none{
+        display: none;
     }
     .back{
         display: inline-block;

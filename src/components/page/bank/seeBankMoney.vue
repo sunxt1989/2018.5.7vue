@@ -45,7 +45,16 @@
                         <span class="tit">转入银行余额</span>
                         <input class="ipt" type="text" v-model="initialAmount2" readonly>
                     </li>
-
+                    <li v-if="isShowTradeCompanyName" class="pt" style="position: relative;">
+                        <span class="tit"><span class="red">*</span>投资方</span>
+                        <el-select class='sel' v-model="tradeCompanyName" disabled>
+                            <el-option v-for="item in tradeCompanyList"
+                                       :key="item.value"
+                                       :label="item.stockHolderName"
+                                       :value="item.stockHolderName">
+                            </el-option>
+                        </el-select>
+                    </li>
                     <li class="pt">
                         <span class="tit"><span class="red">*</span>{{moneyName}}</span>
                         <input class="ipt" type="text" v-model="money" readonly>
@@ -111,6 +120,9 @@
                 moneyName:'',//金额名称
                 dateName:'',//日期名称
                 name:'',//名称
+                isShowTradeCompanyName:false,//是否显示投资方
+                tradeCompanyName:'',//投资方
+                tradeCompanyList:[],//投资方列表
 
                 isTurn:false,//是否为银行互转
                 remarkBankCode:'',//副银行账户卡号
@@ -169,7 +181,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     let bankTransfer = data.bankTransfer
                     this.bankName =bankTransfer.bankName
@@ -185,6 +197,8 @@
                     this.bankChildName2 = bankTransfer.remarkBankName
                     this.initialAmount2 = number.number(bankTransfer.remarkEndAmount)
                     this.bankCode2 = bankTransfer.bankCodeRemark
+                    this.tradeCompanyName = bankTransfer.relationName
+                    this.tradeCompanyList = data.stockHolderList
 
                     let auditRecordList = data.auditRecordList
 
@@ -194,31 +208,37 @@
 
                     if(type == 1){
                         this.isTurn = false
+                         this.isShowTradeCompanyName = false
                         this.name = '提取现金'
                         this.moneyName = '提现金额'
                         this.dateName = '提现日期'
                     }else if(type == 2){
                         this.isTurn = false
+                         this.isShowTradeCompanyName = false
                         this.name = '存入现金'
                         this.moneyName = '存现金额'
                         this.dateName = '存现日期'
                     }else if(type == 3){
                         this.isTurn = true
+                         this.isShowTradeCompanyName = false
                         this.name = '银行互转'
                         this.moneyName = '转账金额'
                         this.dateName = '转账日期'
                     }else if(type == 4){
                         this.isTurn = false
+                         this.isShowTradeCompanyName = false
                         this.name = '银行手续费'
                         this.moneyName = '手续费金额'
                         this.dateName = '支付日期'
                     }else if(type == 5){
                         this.isTurn = false
+                         this.isShowTradeCompanyName = false
                         this.name = '利息收入'
                         this.moneyName = '利息金额'
                         this.dateName = '收取日期'
                     }else if(type == 6){
                         this.isTurn = false
+                         this.isShowTradeCompanyName = true
                         this.name = '收到投资'
                         this.moneyName = '投资金额'
                         this.dateName = '收取日期'
@@ -386,8 +406,15 @@
         height:50px;
         overflow: hidden;
     }
-
-
-
-
+    .opt{
+        width:580px;
+        height:28px;
+        border: none;
+        font-size:14px;
+        position: absolute;
+        top:5px;
+        left:185px;
+        outline:none;
+        color: #333;
+    }
 </style>

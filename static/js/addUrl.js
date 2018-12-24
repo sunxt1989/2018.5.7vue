@@ -3,8 +3,8 @@
  */
 function addUrl(name){
     //var url = 'http://192.168.2.105:8881/web';
-    //var url = 'http://192.168.2.190:8881/web';
-    var url = 'http://192.168.2.190:8080/web';
+    var url = 'http://192.168.2.190:8881/web';
+    //var url = 'http://192.168.2.190:8080/web';
     //var url = 'http://192.168.2.191:8080/web';
     //var url = 'http://192.168.2.192:8080/web';
     //var url = 'http://www.cloudaccounting.cn'
@@ -682,6 +682,10 @@ function addUrl(name){
     if(name == 'monthlyKnot'){
         return url + '/vue/carrydown/submit.html'
     }
+    //年结
+    if(name == 'annualKnots'){
+        return url + '/vue/carrydown/year/end/submit.html'
+    }
     //总账
     if(name == 'generalLedger'){
         return url + '/vue/report/general/ledger/get/list.html'
@@ -766,6 +770,14 @@ function addUrl(name){
     if(name == 'salePaymentRedFlush'){
         return url + '/vue/hedging/sale/receive/list.html'
     }
+    //红冲-收容业务列表
+    if(name == 'businessRedFlush'){
+        return url + '/vue/accept/business/list.html'
+    }
+    //红冲-代记账业务-票据列表
+    if(name == 'invoiceRedFlush'){
+        return url + '/vue/invoice/list.html'
+    }
 
 
     //红冲-红冲还款单
@@ -796,6 +808,15 @@ function addUrl(name){
     if(name == 'salePaymentRedFlushSubmit'){
         return url + '/vue/hedging/sale/receive.html'
     }
+    //红冲-红冲收容业务
+    if(name == 'businessRedFlushSubmit'){
+        return url + '/vue/accept/business/hedging.html'
+    }
+    //红冲-红冲票据流水
+    if(name == 'invoiceRedFlushSubmit'){
+        return url + '/vue/invoice/hedging.html'
+    }
+
     //交易方列表
     if(name == 'SupplierList'){
         return url + '/vue/tradeCompany/list.html'
