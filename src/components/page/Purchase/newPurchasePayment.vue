@@ -49,27 +49,6 @@
                         </div>
                     </li>
                 </ul>
-                <div class="line">
-                    <span>付款明细</span>
-                </div>
-                <el-table :data="List" class="grayList">
-                    <el-table-column property="sendDate" label="日期" align="center"></el-table-column>
-                    <el-table-column property="childTypeName" label="付款记录" align="center">
-                        <template slot-scope="scope">
-                            <span>付给{{scope.row.supplierName}}一笔款项</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column property="showMoney" label="金额"  align="center"></el-table-column>
-                    <el-table-column property="attachCount" label="附件" align="center">
-                        <template slot-scope="scope">
-                            <router-link :to="{name:'seePurchasePayment',params:{debitId:scope.row.sendId,advanceId:advanceId}}" class="see">
-                                {{scope.row.attachCount}}
-                            </router-link>
-                        </template>
-                    </el-table-column>
-                    <el-table-column property="auditFlg" label="状态" align="center"></el-table-column>
-                </el-table>
-
             </div>
         </div>
     </div>
@@ -86,7 +65,6 @@
             return{
                 unPayMoney:'',//待付款
                 money:'',//本次付款
-                List:[],//付款明细
                 dialogImageUrl: '',//展示图片URL
                 dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
@@ -110,8 +88,11 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                debitId:this.$route.params.debitId,//采购单id
+                choice:this.$route.params.choice,
+                purchaseId:this.$route.params.purchaseId,//采购单id
                 advanceId:this.$route.params.advanceId,//关联的辅助业务id
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
                 loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
@@ -141,7 +122,7 @@
                         if(this.advanceId){
                             this.$router.push('/auxiliary/auxiliaryList')
                         }else{
-                            this.$router.push('/Purchase/PurchaseList')
+                            this.$router.push({name:'purchasePaymentList',params:{purchaseId:this.purchaseId,choice:this.choice,activeName:this.activeName,currentPage:this.currentPage}})
                         }
                     }).catch(() => {
                         this.loading = false
@@ -279,7 +260,7 @@
                 this.imgName2 = this.allName[1] ? this.allName[1] : '';
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
-                params.append('purchase_id',this.debitId);
+                params.append('purchase_id',this.purchaseId);
                 params.append('advance_id',this.advanceId);
                 params.append('pay_money',money);
 
@@ -306,7 +287,7 @@
                             if(this.advanceId){
                                 this.$router.push('/auxiliary/auxiliaryList')
                             }else{
-                                this.$router.push('/Purchase/PurchaseList')
+                                this.$router.push({name:'purchasePaymentList',params:{purchaseId:this.purchaseId,choice:this.choice,activeName:this.activeName,currentPage:this.currentPage}})
                             }
                             this.$message({
                                 type: 'success',
@@ -326,7 +307,6 @@
                         this.$message.error('提交失败，请重试！');
                     })
             },
-
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -349,19 +329,13 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newPurchasePayment')
-            params.append('purchaseId',this.debitId);
+            params.append('purchaseId',this.purchaseId);
             params.append('advanceId',this.advanceId);
             axios.post(url,params)
                 .then(response=> {
 //                    console.log(response);
                     var data = response.data.value;
                     this.unPayMoney = number.number(data.unPayMoney)
-                    var list = data.list
-                    for(let i = 0; i < list.length; i++){
-                        list[i].showMoney =number.number(list[i].sendMoney)
-                    }
-                    this.List = list
-//                    console.log(this.List);
                     this.loading = false
                 })
                 .catch(error=> {

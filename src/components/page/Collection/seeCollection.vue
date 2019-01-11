@@ -234,7 +234,7 @@
                 params.append('id',val);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -495,7 +495,7 @@
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '保存成功'
+                                message: '记账成功'
                             });
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
@@ -534,7 +534,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     let item = data.item
                     this.bankCodeList = data.bankList
@@ -562,9 +562,11 @@
                     let auditFlg = item.auditFlg;
                     if(auditFlg == 0){
                         this.isChange = true;
-                    }else if(auditFlg == 4){
+                    }else{
                         this.isChange = false
                     }
+
+                    if(this.isRedFlush) this.isChange = false
 
                     this.loading = false
                 })

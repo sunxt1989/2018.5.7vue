@@ -67,7 +67,7 @@
             axios.post(url)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;//列表数据
                     this.tableData = data.list
                     for(let i in this.tableData){

@@ -285,7 +285,7 @@
             let url = addUrl.addUrl('auxiliaryShow')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     this.bankList = data.bankList
                     this.tradeList = data.tradeList

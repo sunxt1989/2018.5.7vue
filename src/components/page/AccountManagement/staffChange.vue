@@ -25,7 +25,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td rowspan="6" class="hd">用户角色</td>
+                            <td rowspan="7" class="hd">用户角色</td>
                             <td>
                                 <el-checkbox class="check" v-model="bossFlg" size="medium" :disabled="isBossFlg">
                                     企业负责人 勾选会替换原来的管理员</el-checkbox>
@@ -47,6 +47,12 @@
                             <td>
                                 <el-checkbox class="check" v-model="hrFlg" size="medium">
                                     综合负责人</el-checkbox>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <el-checkbox class="check" v-model="accounterFlg" size="medium">
+                                    会计</el-checkbox>
                             </td>
                         </tr>
                         <tr>
@@ -105,43 +111,43 @@
                                 </li>
                                 <li>
                                     <span class="tit">采购：</span>
-                                    <el-checkbox v-model="chakanPurchase">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoPurchase">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanPurchase"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoPurchase"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">销售：</span>
-                                    <el-checkbox v-model="chakanSale">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoSale">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanSale"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoSale"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">工资：</span>
-                                    <el-checkbox v-model="chakanSalary">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoSalary">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanSalary"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoSalary"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">资产：</span>
-                                    <el-checkbox v-model="chakanAssets">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoAssets">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanAssets"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoAssets"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">账务处理：</span>
-                                    <el-checkbox v-model="chakanAccounting">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoAccounting">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanAccounting"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoAccounting"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">银行业务：</span>
-                                    <el-checkbox v-model="chakanBank">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoBank">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanBank"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoBank"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">报表：</span>
-                                    <el-checkbox v-model="chakanReport">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoReport">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanReport"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoReport"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">收付款：</span>
-                                    <el-checkbox v-model="chakanPayment">查看</el-checkbox>
-                                    <el-checkbox v-model="caozuoPayment">操作</el-checkbox>
+                                    <el-checkbox v-model="chakanPayment"disabled>查看</el-checkbox>
+                                    <el-checkbox v-model="caozuoPayment"disabled>操作</el-checkbox>
                                 </li>
                                 <li>
                                     <span class="tit">账套管理：</span>
@@ -182,6 +188,8 @@
 
                 cashierFlg:false,//出纳标记
                 isCashierFlg:false,//出纳标记
+
+                accounterFlg:false,//会计标记
 
                 hrFlg:false,//综合管理员标记
 
@@ -257,29 +265,29 @@
                     this.chakanSale = false;
                     this.caozuoSale = false;
                 }
-                //工资、资产状态判断
+                //工资状态判断
                 if(val || this.financeFlg || this.hrFlg){
                     this.chakanSalary = true;
                     this.caozuoSalary = true;
-                    this.chakanAssets = true;
-                    this.caozuoAssets = true;
                 }else{
                     this.chakanSalary = false;
                     this.caozuoSalary = false;
-                    this.chakanAssets = false;
-                    this.caozuoAssets = false;
                 }
-                //账务处理状态判断
-                if(val || this.financeFlg){
+                //账务处理、资产、报表状态判断
+                if(val || this.financeFlg || this.accounterFlg){
                     this.chakanAccounting = true;
                     this.caozuoAccounting = true;
                     this.chakanReport = true;
                     this.caozuoReport = true;
+                    this.chakanAssets = true;
+                    this.caozuoAssets = true;
                 }else{
                     this.chakanAccounting = false;
                     this.caozuoAccounting = false;
                     this.chakanReport = false;
                     this.caozuoReport = false;
+                    this.chakanAssets = false;
+                    this.caozuoAssets = false;
                 }
                 //银行业务、收付款状态判断
                 if(val || this.financeFlg || this.cashierFlg){
@@ -312,29 +320,29 @@
                     this.chakanSale = false;
                     this.caozuoSale = false;
                 }
-                //工资、资产状态判断
+                //工资状态判断
                 if(val || this.bossFlg || this.hrFlg){
                     this.chakanSalary = true;
                     this.caozuoSalary = true;
-                    this.chakanAssets = true;
-                    this.caozuoAssets = true;
                 }else{
                     this.chakanSalary = false;
                     this.caozuoSalary = false;
-                    this.chakanAssets = false;
-                    this.caozuoAssets = false;
                 }
-                //账务处理状态判断
-                if(val || this.bossFlg){
+                //账务处理、资产、报表状态判断
+                if(val || this.bossFlg || this.accounterFlg){
                     this.chakanAccounting = true;
                     this.caozuoAccounting = true;
                     this.chakanReport = true;
                     this.caozuoReport = true;
+                    this.chakanAssets = true;
+                    this.caozuoAssets = true;
                 }else{
                     this.chakanAccounting = false;
                     this.caozuoAccounting = false;
                     this.chakanReport = false;
                     this.caozuoReport = false;
+                    this.chakanAssets = false;
+                    this.caozuoAssets = false;
                 }
                 //银行业务、收付款状态判断
                 if(val || this.bossFlg || this.cashierFlg){
@@ -347,6 +355,14 @@
                     this.caozuoBank = false;
                     this.chakanPayment = false;
                     this.caozuoPayment = false;
+                }
+                //资产状态判断
+                if(val || this.bossFlg || this.accounterFlg){
+                    this.chakanAssets = true;
+                    this.caozuoAssets = true;
+                }else{
+                    this.chakanAssets = false;
+                    this.caozuoAssets = false;
                 }
             },
             //出纳change事件（控制报销、借款、银行业务、收付款）
@@ -366,17 +382,13 @@
             },
             //综合负责人change事件（控制报销、借款、工资、资产）
             hrFlg:function(val){
-                //工资、资产状态判断
+                //工资状态判断
                 if(val || this.bossFlg || this.financeFlg){
                     this.chakanSalary = true;
                     this.caozuoSalary = true;
-                    this.chakanAssets = true;
-                    this.caozuoAssets = true;
                 }else{
                     this.chakanSalary = false;
                     this.caozuoSalary = false;
-                    this.chakanAssets = false;
-                    this.caozuoAssets = false;
                 }
             },
             //采购专员change事件（控制报销、借款、采购）
@@ -400,6 +412,33 @@
                 }else{
                     this.chakanSale = false;
                     this.caozuoSale = false;
+                }
+            },
+            //会计专员change事件（控制资产、账务处理、报表）
+            accounterFlg:function(val){
+                //工资、资产状态判断
+                if(val || this.bossFlg || this.financeFlg){
+                    this.chakanAssets = true;
+                    this.caozuoAssets = true;
+                }else{
+                    this.chakanAssets = false;
+                    this.caozuoAssets = false;
+                }
+                //账务处理、资产、报表状态判断
+                if(val || this.bossFlg || this.financeFlg){
+                    this.chakanAccounting = true;
+                    this.caozuoAccounting = true;
+                    this.chakanReport = true;
+                    this.caozuoReport = true;
+                    this.chakanAssets = true;
+                    this.caozuoAssets = true;
+                }else{
+                    this.chakanAccounting = false;
+                    this.caozuoAccounting = false;
+                    this.chakanReport = false;
+                    this.caozuoReport = false;
+                    this.chakanAssets = false;
+                    this.caozuoAssets = false;
                 }
             }
         },
@@ -538,6 +577,7 @@
                 params.append('hrFlg',this.hrFlg);
                 params.append('purchaseFlg',this.purchaseFlg);
                 params.append('saleFlg',this.saleFlg);
+                params.append('accounterFlg',this.accounterFlg);
                 params.append('departments',departmentsArr.join(';'));
                 params.append('menus',menus);
 
@@ -585,6 +625,7 @@
                             let start_ym = data.current_start_date.substring(0,7)//账套开账时间
                             let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
                             let auth_json = data.book_user.auth_json;//判断身份列表
+                            let accounter_flg = data.book_user.accounter_flg;//是否是会计
                             let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
@@ -612,6 +653,7 @@
                             obj.isAccountBookkeeping = isAccountBookkeeping
                             obj.account_type = account_type
                             obj.name = name
+                            obj.accounter_flg = accounter_flg
 //                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
@@ -655,7 +697,7 @@
 //            console.log(this.debitId);
             axios.post(url,params)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     this.loading = false
                     let data = response.data.value;
                     //bookUser 部分
@@ -670,6 +712,7 @@
                     let hrFlg = bookUser.hrFlg //综合管理员标记
                     let purchaseFlg = bookUser.purchaseFlg //采购专员标记
                     let saleFlg = bookUser.saleFlg //销售专员标记
+                    let accounterFlg = bookUser.accounterFlg //销售专员标记
 
                     if(managerFlg == 1){
                         this.managerFlg = true;
@@ -695,6 +738,9 @@
                     }
                     if(saleFlg == 1){
                         this.saleFlg = true;
+                    }
+                    if(accounterFlg == 1){
+                        this.accounterFlg = true;
                     }
                     //departmentList 部分
                     this.departmentOption = data.departmentList

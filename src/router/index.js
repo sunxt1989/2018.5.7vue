@@ -6,6 +6,7 @@ import homePage from '@/components/page/homePage'
 import loan from '@/components/page/loan/loan'//借款单列表
 import newLoan from '@/components/page/loan/newLoan'//新建借款单
 import seeLoan from '@/components/page/loan/seeLoan'//查看借款单
+import repaymentList from '@/components/page/loan/repaymentList'//还款单列表
 import repayment from '@/components/page/loan/repayment'//还款单
 import seeRepayment from '@/components/page/loan/seeRepayment'//还款单详情
 import loanApprovalList from '@/components/page/loan/loanApprovalList'//借款单审批列表
@@ -30,6 +31,7 @@ import ReimbursementConfirmation from '@/components/page/Reimbursement/Reimburse
 import PurchaseList from '@/components/page/Purchase/PurchaseList'//采购单列表
 import newPurchase from '@/components/page/Purchase/newPurchase'//新建采购单
 import seePurchase from '@/components/page/Purchase/seePurchase'//查看采购单
+import purchasePaymentList from '@/components/page/Purchase/purchasePaymentList'//采购付款单列表
 import newPurchasePayment from '@/components/page/Purchase/newPurchasePayment'//新建采购付款单
 import seePurchasePayment from '@/components/page/Purchase/seePurchasePayment'//采购付款单查看
 import approvalPurchaseList from '@/components/page/Purchase/approvalPurchaseList'//采购单审批列表
@@ -45,6 +47,7 @@ import newSale from '@/components/page/Sale/newSale'//新建销售单
 import seeSale from '@/components/page/Sale/seeSale'//查看销售单
 import approvalSaleList from '@/components/page/Sale/approvalSaleList'//销售单审批列表
 import approvalSale from '@/components/page/Sale/approvalSale'//销售单审批
+import salePaymentList from '@/components/page/Sale/salePaymentList'//销售付款单列表
 import newSalePayment from '@/components/page/Sale/newSalePayment'//新建销售付款单
 import seeSalePayment from '@/components/page/Sale/seeSalePayment'//销售收款单查看
 import approvalSalePayList from '@/components/page/Sale/approvalSalePayList'//销售单收款审批列表
@@ -86,7 +89,7 @@ import AccountManagement from '@/components/page/AccountManagement/AccountManage
 import newAccountManagement from '@/components/page/AccountManagement/newAccountManagement'//新建账套管理
 import changeAccountManagement from '@/components/page/AccountManagement/changeAccountManagement'//修改账套管理
 import seeAccountManagement from '@/components/page/AccountManagement/seeAccountManagement'//查看账套管理
-import changePassword from '@/components/page/AccountManagement/changePassword'//查看账套管理
+import changePassword from '@/components/page/AccountManagement/changePassword'//修改密码
 import staffList from '@/components/page/AccountManagement/staffList'//员工列表
 import staffChange from '@/components/page/AccountManagement/staffChange'//员工权限详情
 import departmentList from '@/components/page/AccountManagement/departmentList'//部门列表
@@ -173,6 +176,11 @@ export default new Router({
             path:'/loan/seeLoan/',
             name:'seeLoan',
             component:seeLoan
+        },
+        {
+            path:'/loan/repaymentList',
+            name:'repaymentList',
+            component:repaymentList
         },
         {
             path:'/loan/repayment',
@@ -287,6 +295,11 @@ export default new Router({
             component:seePurchase
         },
         {
+            path:'/Purchase/purchasePaymentList',
+            name:'purchasePaymentList',
+            component:purchasePaymentList
+        },
+        {
             path:'/Purchase/newPurchasePayment',
             name:'newPurchasePayment',
             component:newPurchasePayment
@@ -372,6 +385,11 @@ export default new Router({
             path:'/Sale/approvalSale',
             name:'approvalSale',
             component:approvalSale
+        },
+        {
+            path:'/Sale/salePaymentList',
+            name:'salePaymentList',
+            component:salePaymentList
         },
         {
             path:'/Sale/newSalePayment',
@@ -745,7 +763,7 @@ export default new Router({
         {
             path:'/viewing/viewingList',
             name:'viewingList',
-            component:viewingList
+            component:viewingList,
         },
 
     ]

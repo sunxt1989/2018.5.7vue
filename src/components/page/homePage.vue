@@ -816,7 +816,7 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="user_type > 0 && current_book_level == 3">
+                        <div class="items cf" v-if="items2.isShowRecordSheet || items2.isShowBookkeeping">
                             <span class="items-tit">记账</span>
                             <!--录单-->
                             <div class="checkbox" v-if="items2.isShowRecordSheet">
@@ -834,7 +834,7 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="user_type > 0 && current_book_level == 3">
+                        <div class="items cf" v-if="accounter_flg == 1 && owner_flg == 1">
                             <span class="items-tit">进销存</span>
                             <!--交易方-->
                             <div class="checkbox">
@@ -852,7 +852,7 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="user_type >= 10">
+                        <div class="items cf" v-if="items2.isShowBookkeepingVoucher">
                             <span class="items-tit">记账凭证</span>
                             <!--记账凭证-->
                             <div class="checkbox">
@@ -863,9 +863,9 @@
                             </div>
                         </div>
 
-                        <div class="items cf" v-if="isBossFlg">
+                        <div class="items cf" v-if="items2.isShowViewingList">
                             <span class="items-tit">查看功能</span>
-                            <!--记账凭证-->
+                            <!--查看功能-->
                             <div class="checkbox">
                                 <el-checkbox v-model="items1.viewingList" class="homePage-checkbox" @change="checkboxChange">
                                     <img :src=items[40].src alt="" class="itemImg">
@@ -1238,7 +1238,7 @@
                 }
             }
         },
-        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type','isBossFlg']),
+        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type','isBossFlg','owner_flg','accounter_flg','isFinanceFlg']),
         methods:{
             //选择菜单配置的时候的change事件
             checkboxChange(e){
@@ -1399,7 +1399,7 @@
                     this.$router.push({name:'approvalPurchase',params:{debitId:relationId}})
                 }else if(type == '14'){
                     //采购单通知提交人
-                    this.$router.push({name:'seePurchase',params:{debitId:relationId}})
+                    this.$router.push({name:'seePurchase',params:{purchaseId:relationId}})
                 }else if(type == '15'){
                     //采购付款单财务负责人审核
                     this.$router.push({name:'approvalPurchasePay',params:{debitId:relationId}})
@@ -1408,13 +1408,13 @@
                     this.$router.push({name:'approvalPurchaseConfirm',params:{debitId:relationId}})
                 }else if(type == '18'){
                     //采购付款单通知提交人
-                    this.$router.push({name:'seePurchasePayment',params:{debitId:relationId,isRedFlush:true}})
+                    this.$router.push({name:'seePurchasePayment',params:{purchaseId:relationId,isRedFlush:true}})
                 }else if(type == '19'){
                     //销售单审核
                     this.$router.push({name:'approvalSale',params:{debitId:relationId}})
                 }else if(type == '20'){
                     //销售单通知提交人
-                    this.$router.push({name:'seeSale',params:{debitId:relationId}})
+                    this.$router.push({name:'seeSale',params:{saleId:relationId}})
                 }else if(type == '21'){
                     //销售收款单财务负责人审核
                     this.$router.push({name:'approvalSalePay',params:{debitId:relationId}})
@@ -1423,7 +1423,7 @@
                     this.$router.push({name:'approvalSaleConfirm',params:{debitId:relationId}})
                 }else if(type == '24'){
                     //销售收款单通知提交人
-                    this.$router.push({name:'seeSalePayment',params:{debitId:relationId,isRedFlush:true}})
+                    this.$router.push({name:'seeSalePayment',params:{saleId:relationId,isRedFlush:true}})
                 }else if(type == '25'|| type == '30'||type == '32'||type == '34'||type == '36'||type == '38'){
                     //银行业务审核
                     this.$router.push({name:'approvalBank',params:{debitId:relationId}})
@@ -1555,25 +1555,25 @@
                 let newMenuArr = [];
                 //根据功能权限判断列表中存在的项目而功能权限中却没有时，将不显示在功能中
                 for (let i in menuArr) {
-                    if (menuArr[i] == '#costSheet' && auth_json.application_chakan == 1 && this.current_book_level != 3) {//费用单
+                    if (menuArr[i] == '#costSheet' && this.owner_flg == 0) {//费用单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#ReimbursementList' && auth_json.application_chakan == 1 && this.current_book_level != 3) {//报销单
+                    if (menuArr[i] == '#ReimbursementList' && this.owner_flg == 0) {//报销单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#loan' && auth_json.debit_chakan == 1 && this.current_book_level != 3) {//借款单
+                    if (menuArr[i] == '#loan' && this.owner_flg == 0) {//借款单
                         newMenuArr.push(menuArr[i]);
                     }
-                    if (menuArr[i] == '#PurchaseList' && auth_json.purchase_chakan == 1 && this.current_book_level != 3) {//采购单
+                    if (menuArr[i] == '#PurchaseList' && auth_json.purchase_chakan == 1) {//采购单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#saleList' && auth_json.sale_chakan == 1 && this.current_book_level != 3) {//销售单
+                    if (menuArr[i] == '#saleList' && auth_json.sale_chakan == 1) {//销售单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#SupplierList' && ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) || this.current_book_level == 3)) {//交易方
+                    if (menuArr[i] == '#SupplierList' && ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) || (this.accounter_flg == 1 && this.owner_flg == 1))) {//交易方
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#stockList' && ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) || this.current_book_level == 3)) {//库存商品
+                    if (menuArr[i] == '#stockList' && ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) || (this.accounter_flg == 1 && this.owner_flg == 1))) {//库存商品
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#payroll' && auth_json.salary_chakan == 1) {//工资单
@@ -1585,7 +1585,7 @@
                     if (menuArr[i] == '#bankMoneyList' && auth_json.bank_chakan == 1) {//银行现金业务
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#TaxationList' && auth_json.payment_chakan == 1) {//税费缴纳
+                    if (menuArr[i] == '#TaxationList' && auth_json.accounting_chakan == 1) {//税费缴纳
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#fixedAssetsList' && auth_json.assets_chakan == 1) {//固定资产
@@ -1594,19 +1594,19 @@
                     if (menuArr[i] == '#intangibleAssetsList' && auth_json.assets_chakan == 1) {//无形资产
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#projectList' && auth_json.manage_chakan == 1) {//项目
+                    if (menuArr[i] == '#projectList' && auth_json.salary_chakan == 1) {//项目
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#develop' && auth_json.accounting_chakan == 1) {//自主研发辅助账
+                    if (menuArr[i] == '#develop' && auth_json.report_chakan == 1) {//自主研发辅助账
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#summary' && auth_json.accounting_chakan == 1) {//辅助账汇总表
+                    if (menuArr[i] == '#summary' && auth_json.report_chakan == 1) {//辅助账汇总表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#costCollection' && auth_json.accounting_chakan == 1) {//费用情况归集表
+                    if (menuArr[i] == '#costCollection' && auth_json.report_chakan == 1) {//费用情况归集表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#Entrust' && auth_json.accounting_chakan == 1) {//委托研发辅助账
+                    if (menuArr[i] == '#Entrust' && auth_json.report_chakan == 1) {//委托研发辅助账
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#Initialization' && auth_json.accounting_chakan == 1) {//账务处理
@@ -1636,7 +1636,7 @@
                     if (menuArr[i] == '#bankJournal' && auth_json.bank_chakan == 1) {//银行存款日记账
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#auxiliaryList' && auth_json.bank_chakan == 1  && this.current_book_level != 3) {//辅助业务
+                    if (menuArr[i] == '#auxiliaryList' && auth_json.accounting_chakan == 1) {//辅助业务
                         newMenuArr.push(menuArr[i])
                     }
                     if (menuArr[i] == '#ZCFZReport' && auth_json.report_chakan == 1) {//资产负债表
@@ -1648,98 +1648,84 @@
                     if (menuArr[i] == '#XJLLeport' && auth_json.report_chakan == 1) {//现金流量表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#RedFlush' && auth_json.bank_chakan == 1) {//红冲
+                    if (menuArr[i] == '#RedFlush' && auth_json.accounting_chakan == 1) {//红冲
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#staffList' && auth_json.manage_chakan == 1 && this.current_book_level != 3) {//员工列表
+                    if (menuArr[i] == '#staffList' && auth_json.manage_chakan == 1) {//员工列表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#departmentList' && auth_json.manage_chakan == 1 &&  this.current_book_level != 3) {//部门列表
+                    if (menuArr[i] == '#departmentList' && auth_json.manage_chakan == 1) {//部门列表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#collectionList' && auth_json.payment_chakan == 1) {//收容业务列表
+                    if (menuArr[i] == '#collectionList' && this.accounter_flg == 1) {//收容业务列表
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#addBoss' && this.user_type > 0 && this.current_book_level == 3) {//添加老板
+                    if (menuArr[i] == '#addBoss' && this.accounter_flg == 1 && this.owner_flg == 1) {//添加老板
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#invoiceDeduction' && this.user_type > 0 && this.current_book_level == 3) {//发票抵扣
+                    if (menuArr[i] == '#invoiceDeduction' && this.accounter_flg==1) {//发票抵扣
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#recordSheet' && this.user_type > 0 && this.current_book_level == 3) {//录单
+                    if (menuArr[i] == '#recordSheet' && this.accounter_flg==1) {//录单
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#bookkeeping' && this.user_type > 0 && this.current_book_level == 3 && this.account_type > 1) {//记账
+                    if (menuArr[i] == '#bookkeeping' && this.accounter_flg==1) {//记账
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#bookkeepingVoucher' && this.user_type >= 10 ) {//记账凭证
+                    if (menuArr[i] == '#bookkeepingVoucher' && this.accounter_flg==1) {//记账凭证
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#viewingList' && this.isBossFlg ) {//记账凭证
+                    if (menuArr[i] == '#viewingList' && (this.isBossFlg == 1 || this.isFinanceFlg==1) ) {//查看功能
                         newMenuArr.push(menuArr[i])
                     }
-                }
-                //判断功能权限,将无权限的项目隐藏不显示
-                if (auth_json.application_chakan == 1 && this.current_book_level != 3) {//费用单
-                    this.items2.isShowCostSheet = true;
-                } else {
-                    this.items2.isShowCostSheet = false;
-                }
-                if (auth_json.application_chakan == 1 && this.current_book_level != 3) {//报销单
-                    this.items2.isShowReimbursementList = true;
-                } else {
-                    this.items2.isShowReimbursementList = false;
-                }
-                if (auth_json.debit_chakan == 1 && this.current_book_level != 3) {//借款单
-                    this.items2.isShowLoan = true;
-                } else {
-                    this.items2.isShowLoan = false;
-                }
-                if ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1 || auth_json.payment_chakan == 1) && this.current_book_level != 3) {//交易方
-                    this.items2.isShowSupplierList = true;
-                } else {
-                    this.items2.isShowSupplierList = false;
-                }
-                if ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) && this.current_book_level != 3) {//库存商品
-                    this.items2.isShowStockList = true;
-                } else {
-                    this.items2.isShowStockList = false;
                 }
 
-                if (auth_json.purchase_chakan == 1 && this.current_book_level != 3) {//采购单
+                //判断功能权限,将无权限的项目隐藏不显示
+                if (this.owner_flg == 0) {//费用单,报销单,借款单
+                    this.items2.isShowCostSheet = true;
+                    this.items2.isShowReimbursementList = true;
+                    this.items2.isShowLoan = true;
+                } else {
+                    this.items2.isShowCostSheet = false;
+                    this.items2.isShowReimbursementList = false;
+                    this.items2.isShowLoan = false;
+                }
+                if ((auth_json.purchase_chakan == 1 || auth_json.sale_chakan == 1) || (this.accounter_flg == 1 && this.owner_flg == 1)) {//交易方,库存商品
+                    this.items2.isShowSupplierList = true;
+                    this.items2.isShowStockList = true;
+                } else {
+                    this.items2.isShowSupplierList = false;
+                    this.items2.isShowStockList = false;
+                }
+                if (auth_json.purchase_chakan == 1) {//采购单
                     this.items2.isShowPurchaseList = true;
                 } else {
                     this.items2.isShowPurchaseList = false;
                 }
-                if (auth_json.sale_chakan == 1 && this.current_book_level != 3) {//销售单
+                if (auth_json.sale_chakan == 1) {//销售单
                     this.items2.isShowSaleList = true;
                 } else {
                     this.items2.isShowSaleList = false;
                 }
-                if (auth_json.salary_chakan == 1) {//工资单
+                if (auth_json.salary_chakan == 1) {//工资单、项目
                     this.items2.isShowPayroll = true;
+                    this.items2.isShowProjectList = true;
                 } else {
                     this.items2.isShowPayroll = false;
+                    this.items2.isShowProjectList = false;
                 }
-                if (auth_json.bank_chakan == 1) {//银行账户、银行现金业务、红冲
+                if (auth_json.bank_chakan == 1) {//银行账户、银行现金业务、现金日记账、银行存款日记账
                     this.items2.isShowBankList = true;
                     this.items2.isShowBankMoneyList = true;
                     this.items2.isShowCashDayAccount = true;
                     this.items2.isShowBankJournal = true;
-                    this.items2.isShowRedFlush = true;
                 } else {
                     this.items2.isShowBankList = false;
                     this.items2.isShowBankMoneyList = false;
                     this.items2.isShowCashDayAccount = false;
                     this.items2.isShowBankJournal = false;
-                    this.items2.isShowRedFlush = false;
                 }
 
-                if (auth_json.bank_chakan == 1 && this.current_book_level != 3) {//辅助业务
-                    this.items2.isShowAuxiliaryList = true;
-                } else {
-                    this.items2.isShowAuxiliaryList = false;
-                }
                 if (auth_json.assets_chakan == 1) {//固定资产、无形资产
                     this.items2.isShowFixedAssetsList = true;
                     this.items2.isShowIntangibleAssetsList = true;
@@ -1747,30 +1733,26 @@
                     this.items2.isShowFixedAssetsList = false;
                     this.items2.isShowIntangibleAssetsList = false;
                 }
-                if (auth_json.manage_chakan == 1) {//项目
-                    this.items2.isShowProjectList = true;
-                } else {
-                    this.items2.isShowProjectList = false;
-                }
 
-                if (auth_json.report_chakan == 1) {//资产负债表、现金流量表、利润表
+                if (auth_json.report_chakan == 1) {//资产负债表、现金流量表、利润表、自主研发辅助账、辅助账汇总表、费用情况归集表、委托研发辅助账
                     this.items2.isShowZCFZReport = true;
                     this.items2.isShowXJLLeport = true;
                     this.items2.isShowLRBeport = true;
+                    this.items2.isShowEntrust = true
+                    this.items2.isShowDevelop = true;
+                    this.items2.isShowCostCollection = true;
+                    this.items2.isShowSummary = true;
                 } else {
                     this.items2.isShowZCFZReport = false;
                     this.items2.isShowXJLLeport = false;
                     this.items2.isShowLRBeport = false;
+                    this.items2.isShowEntrust = false;
+                    this.items2.isShowDevelop = false;
+                    this.items2.isShowCostCollection = false;
+                    this.items2.isShowSummary = false;
                 }
-                if (auth_json.payment_chakan == 1) {
+                if (auth_json.accounting_chakan == 1) {//税费缴纳、账务处理、凭证、月结、总账、明细账、科目余额、辅助科目余额、辅助业务、红冲
                     this.items2.isShowTaxationList = true;
-                    this.items2.isShowCollection = true;
-                } else {
-                    this.items2.isShowTaxationList = false;
-                    this.items2.isShowCollection = false;
-                }
-
-                if (auth_json.accounting_chakan == 1) {
                     this.items2.isShowInitialization = true;
                     this.items2.isShowVoucherList = true;
                     this.items2.isShowMonthlyKnot = true;
@@ -1778,10 +1760,8 @@
                     this.items2.isShowDetailAccount = true;
                     this.items2.isShowSubjectBalance = true;
                     this.items2.isShowAuxiliarySubjectBalance = true;
-                    this.items2.isShowDevelop = true;
-                    this.items2.isShowCostCollection = true;
-                    this.items2.isShowSummary = true;
-                    this.items2.isShowEntrust = true;
+                    this.items2.isShowAuxiliaryList = true;
+                    this.items2.isShowRedFlush = true;
                 } else {
                     this.items2.isShowInitialization = false;
                     this.items2.isShowVoucherList = false;
@@ -1790,12 +1770,12 @@
                     this.items2.isShowDetailAccount = false;
                     this.items2.isShowSubjectBalance = false;
                     this.items2.isShowAuxiliarySubjectBalance = false;
-                    this.items2.isShowDevelop = false;
-                    this.items2.isShowCostCollection = false;
-                    this.items2.isShowSummary = false;
-                    this.items2.isShowEntrust = false;
+                    this.items2.isShowTaxationList = false;
+                    this.items2.isShowAuxiliaryList = false;
+                    this.items2.isShowRedFlush = false;
                 }
-                if (auth_json.manage_chakan == 1 && this.current_book_level != 3) {
+
+                if (auth_json.manage_chakan == 1) {//员工列表、//部门列表
                     this.items2.isShowStaffList = true;
                     this.items2.isShowDepartmentList = true;
                 } else {
@@ -1803,35 +1783,33 @@
                     this.items2.isShowDepartmentList = false;
                 }
 
-                if (this.user_type > 0 && this.current_book_level == 3) {//是否是代记账判定
+                if (this.accounter_flg == 1 && this.owner_flg == 1) {//添加老板
                     this.items2.isShowAddBoss = true;
-                    this.items2.isShowInvoiceDeduction = true;
-                    this.items2.isShowRecordSheet = true;
-
-                    if(this.account_type > 1){//是否显示记账功能
-                        this.items2.isShowBookkeeping = true;
-                    }else{
-                        this.items2.isShowBookkeeping = false;
-                    }
-
                 } else {
                     this.items2.isShowAddBoss = false;
+                }
+
+                if(this.accounter_flg == 1){//发票抵扣、录单、记账、记账凭证、收容项业务
+                    this.items2.isShowInvoiceDeduction = true;
+                    this.items2.isShowRecordSheet = true;
+                    this.items2.isShowBookkeeping = true;
+                    this.items2.isShowBookkeepingVoucher = true;
+                    this.items2.isShowCollection = true;
+                }else{
                     this.items2.isShowInvoiceDeduction = false;
                     this.items2.isShowRecordSheet = false;
                     this.items2.isShowBookkeeping = false;
-                }
-                if (this.user_type >= 10) {//记账凭证
-                    this.items2.isShowBookkeepingVoucher = true;
-                }else{
                     this.items2.isShowBookkeepingVoucher = false;
+                    this.items2.isShowCollection = false;
                 }
-                if (this.isBossFlg) {//记账凭证
+
+                if (this.isBossFlg || this.isFinanceFlg==1) {//查看功能
                     this.items2.isShowViewingList = true;
                 }else{
                     this.items2.isShowViewingList = false;
                 }
 
-//                console.log(newMenuArr,'newMenuArr');
+
                 let newArr = this.changeElement(newMenuArr);
                 this.grid = new Muuri(element,{
                     dragEnabled: true,//模块是否可以拖动
@@ -1893,7 +1871,7 @@
             let url = addUrl.addUrl('newsList');
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let list = data.list
                     for(let i in list){

@@ -49,27 +49,6 @@
                         </div>
                     </li>
                 </ul>
-                <div class="line">
-                    <span>收款明细</span>
-                </div>
-                <el-table :data="List" class="grayList">
-                    <el-table-column property="receiveDate" label="日期" align="center"></el-table-column>
-                    <el-table-column property="childTypeName" label="收款记录" align="center">
-                        <template slot-scope="scope">
-                            <span>收到{{scope.row.customName}}一笔款项</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column property="showMoney" label="金额"  align="center"></el-table-column>
-                    <el-table-column property="attachCount" label="附件" align="center">
-                        <template slot-scope="scope">
-                            <router-link :to="{name:'seeSalePayment',params:{debitId:scope.row.receiveId,advanceId:advanceId}}" class="see">
-                                {{scope.row.attachCount}}
-                            </router-link>
-                        </template>
-                    </el-table-column>
-                    <el-table-column property="auditFlg" label="状态" align="center"></el-table-column>
-                </el-table>
-
             </div>
         </div>
     </div>
@@ -86,7 +65,6 @@
             return{
                 unReceiveMoney:'',//待收款
                 money:'',//本次收款
-                List:[],//收款明细
                 dialogImageUrl: '',//展示图片URL
                 dialogImageName: '',//展示图片名称
                 dialogVisible: false,//dialog是否打开状态
@@ -110,8 +88,12 @@
                         return time.getTime() > Date.now();
                     },
                 },
-                debitId:this.$route.params.debitId,//销售单id
+                saleId:this.$route.params.saleId,//销售单id
                 advanceId:this.$route.params.advanceId,//关联的辅助业务id
+                choice:this.$route.params.choice,
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,
                 loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
@@ -141,7 +123,7 @@
                         if(this.advanceId){
                             this.$router.push('/auxiliary/auxiliaryList')
                         }else{
-                            this.$router.push('/')
+                            this.$router.push({name:'salePaymentList',params:{saleId:this.saleId,isBossSee:this.isBossSee,choice:this.choice,activeName:this.activeName,currentPage:this.currentPage}})
                         }
                     }).catch(() => {
                         this.loading = false
@@ -278,7 +260,7 @@
                 this.imgName2 = this.allName[1] ? this.allName[1] : '';
                 this.imgName3 = this.allName[2] ? this.allName[2] : '';
                 this.imgName4 = this.allName[3] ? this.allName[3] : '';
-                params.append('sale_id',this.debitId);
+                params.append('sale_id',this.saleId);
                 params.append('advance_id',this.advanceId);
                 params.append('receive_money',money);
 
@@ -305,7 +287,7 @@
                             if(this.advanceId){
                                 this.$router.push('/auxiliary/auxiliaryList')
                             }else{
-                                this.$router.push('/')
+                                this.$router.push({name:'salePaymentList',params:{saleId:this.saleId,isBossSee:this.isBossSee,choice:this.choice,activeName:this.activeName,currentPage:this.currentPage}})
                             }
                             this.$message({
                                 type: 'success',
@@ -348,19 +330,13 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('newSalePayment')
-            params.append('saleId',this.debitId);
+            params.append('saleId',this.saleId);
             params.append('advanceId',this.advanceId);
             axios.post(url,params)
                 .then(response=> {
 //                    console.log(response);
                     var data = response.data.value;
                     this.unReceiveMoney = number.number(data.unReceiveMoney)
-                    var list = data.list
-                    for(let i = 0; i < list.length; i++){
-                        list[i].showMoney =number.number(list[i].receiveMoney)
-                    }
-                    this.List = list
-//                    console.log(this.List);
                     this.loading = false
                 })
                 .catch(error=> {

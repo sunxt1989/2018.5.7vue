@@ -8,7 +8,7 @@
             <div class="w">
                 <div class="content cf">
                     <el-tabs v-model="activeName" type="card" @tab-click="handleClick" >
-                        <el-tab-pane label="还款红冲" name="1">
+                        <el-tab-pane v-if="current_book_level != 3" label="还款红冲" name="1">
                             <el-table class="single" :data="tableData1">
                                 <el-table-column align="center" prop="userName" label="还款人"></el-table-column>
                                 <el-table-column align="center" prop="debitDateYMD" label="日期"></el-table-column>
@@ -20,7 +20,7 @@
                                 <el-table-column align="center" prop="" label="查看">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'repayment',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
+                                            <router-link :to="{name:'seeRepayment',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
                                         </span>
@@ -35,7 +35,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="借款红冲" name="2">
+                        <el-tab-pane v-if="current_book_level != 3" label="借款红冲" name="2">
                             <el-table class="single" :data="tableData2">
                                 <el-table-column align="center" prop="userName" label="借款人"></el-table-column>
                                 <el-table-column align="center" prop="departmentName" label="借款部门"></el-table-column>
@@ -64,7 +64,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="报销红冲" name="3">
+                        <el-tab-pane v-if="current_book_level != 3" label="报销红冲" name="3">
                                <el-table class="single" :data="tableData3">
                                 <el-table-column align="center" prop="originalTypeName" label="类别"></el-table-column>
                                 <el-table-column align="center" prop="simpleAccountDate" label="日期"></el-table-column>
@@ -92,7 +92,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="采购红冲" name="4">
+                        <el-tab-pane v-if="current_book_level != 3" label="采购红冲" name="4">
                             <el-table class="single" :data="tableData4">
                                 <el-table-column align="center" prop="departmentName" label="部门"></el-table-column>
                                 <el-table-column align="center" prop="supplierName" label="供应商"></el-table-column>
@@ -128,7 +128,7 @@
                                 <el-table-column align="center" prop="" label="查看" width="80px">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'seePurchase',params:{debitId:scope.row.idString}}"
+                                            <router-link :to="{name:'seePurchase',params:{purchaseId:scope.row.idString}}"
                                                          class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
@@ -147,7 +147,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="采购付款红冲" name="5">
+                        <el-tab-pane v-if="current_book_level != 3" label="采购付款红冲" name="5">
                                <el-table class="single" :data="tableData5">
                                 <el-table-column align="center" prop="supplierName" label="供应商"></el-table-column>
                                 <el-table-column align="center" prop="simpleSendDate" label="付款日期"></el-table-column>
@@ -159,7 +159,7 @@
                                 <el-table-column align="center" prop="" label="查看">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'seePurchasePayment',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
+                                            <router-link :to="{name:'seePurchasePayment',params:{purchaseId:scope.row.idString,isRedFlush:true}}" class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
                                         </span>
@@ -174,7 +174,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="销售红冲" name="6">
+                        <el-tab-pane v-if="current_book_level != 3" label="销售红冲" name="6">
                             <el-table class="single" :data="tableData6">
                                 <el-table-column align="center" prop="departmentName" label="部门"></el-table-column>
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
@@ -208,7 +208,7 @@
                                 <el-table-column align="center" prop="" label="查看">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'seeSale',params:{debitId:scope.row.idString}}"
+                                            <router-link :to="{name:'seeSale',params:{saleId:scope.row.idString}}"
                                                          class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
@@ -227,7 +227,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="销售收款红冲" name="7">
+                        <el-tab-pane v-if="current_book_level != 3" label="销售收款红冲" name="7">
                                <el-table class="single" :data="tableData7">
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
                                 <el-table-column align="center" prop="simpleReceiveDate" label="收款日期"></el-table-column>
@@ -239,7 +239,7 @@
                                 <el-table-column align="center" prop="" label="查看">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <router-link :to="{name:'seeSalePayment',params:{debitId:scope.row.idString,isRedFlush:true}}" class="see">
+                                            <router-link :to="{name:'seeSalePayment',params:{saleId:scope.row.idString,isRedFlush:true}}" class="see">
                                                 <i class="icon iconfont icon-kanguo blue"></i>
                                             </router-link>
                                         </span>
@@ -254,7 +254,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane label="收容业务红冲" name="8">
+                        <el-tab-pane  label="收容业务红冲" name="8">
                                <el-table class="single" :data="tableData8">
                                 <el-table-column align="center" prop="sceneName" label="业务名称"></el-table-column>
                                 <el-table-column align="center" prop="businessDateYMD" label="业务日期"></el-table-column>
@@ -300,7 +300,7 @@
                                 <el-table-column align="center" prop="" label="红冲">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.idString)"></i>
+                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.receipt_id)"></i>
                                         </span>
                                     </template>
                                 </el-table-column>
@@ -314,7 +314,12 @@
                                         <span v-else>收</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column align="center" prop="receipt_type_name" label="项目"></el-table-column>
+                                <el-table-column align="center" prop="receipt_type_name" label="项目">
+                                    <template slot-scope="scope">
+                                        <p>{{scope.row.receipt_type_name}}</p>
+                                        <p>{{scope.row.receipt_type_extra_name}}</p>
+                                    </template>
+                                </el-table-column>
                                 <el-table-column align="center" prop="receipt_date" label="日期"></el-table-column>
                                 <el-table-column align="center" prop="receiveMoney" label="金额">
                                     <template slot-scope="scope">
@@ -325,7 +330,7 @@
                                 <el-table-column align="center" prop="" label="红冲">
                                     <template slot-scope="scope">
                                         <span class="operation">
-                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.idString)"></i>
+                                            <i class="icon iconfont icon-zhuanhuan1 green" @click="openModel(scope.row.receipt_id)"></i>
                                         </span>
                                     </template>
                                 </el-table-column>
@@ -422,8 +427,10 @@
                     url = addUrl.addUrl('businessRedFlushSubmit');
                 }else if(this.activeName == 9){
                     url = addUrl.addUrl('invoiceRedFlushSubmit');
+                    params.append('invoiceId',this.isId);
                 }else if(this.activeName == 10){
                     url = addUrl.addUrl('invoiceRedFlushSubmit');
+                    params.append('invoiceId',this.isId);
                 }
                 params.append('id',this.isId);
                 params.append('discription',this.discription);
@@ -527,7 +534,7 @@
                 }else if(this.activeName == 9){
                     let tableData = this.tableData9
                     for(let i in tableData){
-                        if(id == tableData[i].idString){
+                        if(id == tableData[i].receipt_id){
                             this.money = tableData[i].showMoney
                             this.day = tableData[i].receipt_date
                         }
@@ -536,7 +543,7 @@
                 }else if(this.activeName == 10){
                     let tableData = this.tableData10
                     for(let i in tableData){
-                        if(id == tableData[i].idString){
+                        if(id == tableData[i].receipt_id){
                             this.money = tableData[i].showMoney
                             this.day = tableData[i].receipt_date
                         }
@@ -580,7 +587,7 @@
                 }
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
@@ -627,7 +634,6 @@
                                 this.tableData7 = data;
                             }else if(this.activeName == 8){
                                 let list = data.list
-                                console.log(list);
                                 for (let i in list) {
                                     list[i].showMoney = number.number(list[i].money)
                                 }

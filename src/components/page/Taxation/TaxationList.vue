@@ -390,7 +390,7 @@
                     .then(response=> {
                         this.loading = false;
                         this.isLoading = false
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.value.result == '1'){
                             this.axios()
                             this.$message({

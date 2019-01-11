@@ -4,8 +4,8 @@
             <div class="top">
                 <h2>查看借款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button v-if="!isReject" @click="model(1)" size="small" type="danger" class="sub" :loading="isLoading">提交审批</el-button>
-                <el-button v-show="showBtn" @click="model(2)"  size="small" type="danger" class="sub1" :loading="isLoading">撤回</el-button>
+                <el-button v-if="!isReject && !isBossSee" @click="model(1)" size="small" type="danger" class="sub" :loading="isLoading">提交审批</el-button>
+                <el-button v-show="showBtn && !isBossSee" @click="model(2)"  size="small" type="danger" class="sub1" :loading="isLoading">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -16,7 +16,7 @@
                 <ul class="list">
                     <li class="sm">
                         <span class="tit">金额</span>
-                        <input class="ipt" type="text" v-model="money" :readonly="isReject" @blur="blur" maxlength="14">
+                        <input class="ipt" type="text" v-model="money" :readonly="isReject || isBossSee" @blur="blur" maxlength="14">
                     </li>
                     <li class="sm">
                         <span class="tit">已还金额</span>
@@ -35,7 +35,7 @@
                             placeholder="选择日期"
                             :picker-options="pickerOptions1"
                             value-format="yyyy-MM-dd"
-                            :disabled="isReject">
+                            :disabled="isReject || isBossSee">
                         </el-date-picker>
                     </li>
                     <li class="sm">
@@ -57,7 +57,7 @@
                     </li>
                     <li class="pt">
                         <span class="tit">借款部门</span>
-                        <el-select class="department" v-model="departmentId" placeholder="请选择" :disabled="isReject">
+                        <el-select class="department" v-model="departmentId" placeholder="请选择" :disabled="isReject || isBossSee">
                             <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -68,7 +68,7 @@
                     </li>
                     <li class="pt cf">
                         <span class="tit2">事由</span>
-                            <textarea class="tex" v-model="discription" maxlength="50" :readonly="isReject">
+                            <textarea class="tex" v-model="discription" maxlength="50" :readonly="isReject || isBossSee">
                             </textarea>
                     </li>
                     <li class="pt cf">
@@ -89,7 +89,7 @@
                                 :on-remove='onRemove'
                                 :file-list="attachUrlJson"
                                 :auto-upload="false"
-                                :disabled="isReject">
+                                :disabled="isReject || isBossSee">
                                 <i class="el-icon-plus"></i>
                             </el-upload>
                             <el-dialog :visible.sync="dialogVisible">
@@ -144,6 +144,7 @@
                 debitId:this.$route.params.debitId,
                 choice:this.$route.params.choice,
                 currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
 
@@ -152,6 +153,7 @@
                 dialogImageUrl:'',//展示图片URL
                 isReject:true,//是否是驳回状态 true为否 false为是
                 showBtn:false,//是否显示撤回按钮
+                isBossSee:this.$route.params.isBossSee,//是否为boss查看页面模式
 
                 limit:4,//上传图片最大张数
                 punch:0,//打点器,判断是否有图片上传
@@ -213,6 +215,10 @@
                 let debitDate = Number(this.debitDate.split('-').join('').substring(0,6));//当前选择日期
                 let current_book_ym = Number(this.current_book_ym);//当前账期日期
                 if(n == 0){
+                    if(this.isBossSee) {
+                        this.$router.push({name:'viewingList',params:{activeName:this.activeName,currentPage:this.currentPage}})
+                        return
+                    }
                     if(!this.isReject){
                         this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                             confirmButtonText: '确定',
@@ -499,8 +505,9 @@
             };
         },
         created(){
-            var params = new URLSearchParams();
-            var url = addUrl.addUrl('seeLoan')
+            let params = new URLSearchParams();
+            let url = addUrl.addUrl('seeLoan')
+//            let url = 'http://192.168.2.192:8080/web/vue/debit/item/debit/show.html.html'
             params.append('debitId',this.debitId);
             axios.post(url,params)
                 .then(response=> {

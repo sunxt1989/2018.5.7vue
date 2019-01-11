@@ -75,17 +75,18 @@
 
                     <el-table-column prop="" label="收款" sortable align="center">
                         <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unreceiveMoney == 0 || scope.row.auditFlg != 4">收款</span>
+                            <span class="black" v-if="scope.row.auditFlg < 4">收款</span>
                             <router-link v-else class="repayment red"
-                                         :to="{name:'newSalePayment',params:{debitId:scope.row.idString}}">收款
+                                         :to="{name:'salePaymentList',params:{saleId:scope.row.idString,auditFlg:scope.row.auditFlg}}">收款
                             </router-link>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seeSale',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
-                                        <i class="icon iconfont icon-bianji blue"></i></router-link>
+                                    <router-link :to="{name:'seeSale',params:{saleId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
+                                        <i class="icon iconfont icon-bianji blue"></i>
+                                    </router-link>
                                 </span>
                                 <span class="operation">
                                     <!--当状态为 0，1 时才能点击删除按钮-->

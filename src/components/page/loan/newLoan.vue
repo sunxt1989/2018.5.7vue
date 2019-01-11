@@ -264,8 +264,9 @@
                 fileReader.readAsDataURL(blob);
             },
             myUpload(content){
-//                console.log(content);
+                console.log(content);
                 var file = content.file;
+                console.log(file);
                 var _this = this;
                 this.readBlobAsDataURL(file,function (dataurl){
                     _this.allBase.push(dataurl);

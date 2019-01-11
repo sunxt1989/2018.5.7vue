@@ -3,7 +3,9 @@
         <div class="w">
             <div class="top">
                 <h2>采购付款单详情</h2>
-                <router-link v-if="!isRedFlush" :to="{name:'newPurchasePayment',params:{debitId:purchase_id,advanceId:this.advanceId}}" class="back">
+                <router-link v-if="!isRedFlush" class="back"
+                             :to="{name:'purchasePaymentList',
+                             params:{purchaseId:purchase_id,choice:choice,isBossSee:isBossSee,activeName:activeName,currentPage:currentPage,auditFlg:auditFlg}}" >
                     返回
                 </router-link>
                 <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
@@ -90,9 +92,13 @@
                 unPayMoney:'',//待付款
                 money:'',//本次付款
                 purchase_id:'',//采购单ID
-                debitId:this.$route.params.debitId,
+                choice:this.$route.params.choice,
+                purchaseId:this.$route.params.purchaseId,
                 isRedFlush:this.$route.params.isRedFlush,
-                advanceId:this.$route.params.advanceId,
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,
+                auditFlg:this.$route.params.auditFlg,
 
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
@@ -141,7 +147,7 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('seePurchasePayment')
-            params.append('purchase_send_id',this.debitId);
+            params.append('purchase_send_id',this.purchaseId);
 
             axios.post(url,params)
                 .then(response=> {

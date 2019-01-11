@@ -4,9 +4,9 @@
             <div class="top">
                 <h2>查看采购单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson" :loading="isLoading">保存</el-button>
-                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson" :loading="isLoading">提交</el-button>
-                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn" :loading="isLoading">撤回</el-button>
+                <el-button @click="model(1)" size="small" type="primary" class="sub1" v-show="!isAuditPerson && !isBossSee" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" size="small" type="danger" class="sub2" v-show="!isAuditPerson && !isBossSee" :loading="isLoading">提交</el-button>
+                <el-button @click="model(3)"  size="small" type="danger" class="sub1" v-show="showBtn && !isBossSee" :loading="isLoading">撤回</el-button>
             </div>
         </div>
         <div class="w">
@@ -213,7 +213,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择">
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="newTaxRateChange">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -223,12 +223,12 @@
                             </el-select>
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
+                            <span class="tit3"><span class="red">*</span>税额</span>
+                            <input class="ipt" type="text" v-model="newTaxAmount" @blur="newTaxAmountBlur">
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" @blur="newMoneyBlur">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
@@ -272,7 +272,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择">
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="newTaxRateChange">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -282,12 +282,12 @@
                             </el-select>
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
+                            <span class="tit3"><span class="red">*</span>税额</span>
+                            <input class="ipt" type="text" v-model="newTaxAmount" @blur="newTaxAmountBlur">
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" @blur="newMoneyBlur">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
@@ -440,7 +440,7 @@
                 isShowShareItem4:true,
                 isShowShareItem5:true,
 
-                debitId:this.$route.params.debitId,
+                purchaseId:this.$route.params.purchaseId,
                 tradeName:'',//供应商
                 supplierList:[],//供应商列表
                 supplierIdNumber:'',//统一社会信用代码
@@ -493,6 +493,10 @@
                 newNum:1,//数量(明细列表)
                 newTotalMoney:'0.00',//含税总价(明细列表)
                 newTaxRate:0,//税率(明细列表)
+                newUnitPrice:0,//单价(明细列表)
+                newMoney:'0.00',//金额(明细列表)
+                newTaxAmount:'0.00',//税额(明细列表)
+
                 options3:[//发票类别列表
                     {value:0,label:'免税'},
                     {value:3,label:'3%'},
@@ -544,6 +548,8 @@
                 showBtn:false,//是否显示撤回按钮
                 choice:this.$route.params.choice,
                 currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,//是否为boss查看页面模式
                 loading:true,
                 isLoading:false,
                 screenHeight: '' //页面初始化高度
@@ -630,11 +636,14 @@
             },
             //数量
             newNum:function(val){
-                var str = /^\d+$/;//判断只允许输入正整数
+                let str = /^\d+$/;//判断只允许输入正整数
                 if(!str.test(val)){
                     this.$message.error('请正确输入数量');
                     this.newNum = 1;
                 }
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                this.newUnitPrice = (newTotalMoney / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
             }
         },
         computed:{
@@ -643,22 +652,17 @@
                 isMonthlyKnots:state => state.isMonthlyKnots,
                 isAnnualKnots:state => state.isAnnualKnots,
             }),
-            //税额（明细列表）
-            newTaxAmount:function(){
-                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
+            //计算出的金额(明细列表)
+            computerMoney:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
                 let newTaxRate = this.newTaxRate / 100;
-                return number.number((newTotalMoney / (1 + newTaxRate) *  newTaxRate).toFixed(2))
+                return newTotalMoney / (1 + newTaxRate)
             },
-            //金额（明细列表）
-            newMoney:function(){
-                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
-                let newTaxAmount =  unNumber.unNumber(this.newTaxAmount) ;
-                return number.number((newTotalMoney - newTaxAmount).toFixed(2))
-            },
-            //单价（明细列表）
-            newUnitPrice:function(){
-                let newMoney = unNumber.unNumber(this.newMoney);
-                return (newMoney / this.newNum).toFixed(9)
+            //计算出的税额(明细列表)
+            computerTaxAmount:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                return newTotalMoney / (1 + newTaxRate) * newTaxRate
             }
         },
         methods: {
@@ -747,6 +751,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         done();
                     })
                     .catch(() => { });
@@ -819,6 +826,9 @@
                             this.newTotalMoney = '0.00';
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             if(n == 0){
                                 this.dialogTableVisible = false;
                             }
@@ -863,6 +873,9 @@
                             this.newNum = 1;
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             if(n == 0){
                                 this.dialogTableVisible = false;
                             }
@@ -882,6 +895,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         this.dialogTableVisible = false;
                     })
                     .catch(() => { });
@@ -898,6 +914,9 @@
                         this.newTaxRate = newList1[i].taxRate
                         this.newTotalMoney = newList1[i].newTotalMoney
                         this.newUnit = newList1[i].unit
+                        this.newTaxAmount = newList1[i].taxMoney;
+                        this.newMoney = newList1[i].money;
+                        this.newUnitPrice = newList1[i].perPrice
                         this.isI = i;
                     }
                 }
@@ -914,6 +933,9 @@
                         this.newNum = newList2[i].count
                         this.newTotalMoney = newList2[i].newTotalMoney;
                         this.newUnit = newList2[i].unit;
+                        this.newTaxAmount = newList2[i].taxMoney;
+                        this.newMoney = newList2[i].money;
+                        this.newUnitPrice = newList2[i].perPrice
                         this.isI = i;
                     }
                 }
@@ -931,6 +953,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         this.dialogSseTableVisible = false;
                     })
                     .catch(() => { });
@@ -1003,6 +1028,9 @@
                             this.newTaxRate = 0;
                             this.newTotalMoney = '0.00';
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             this.dialogSseTableVisible = false;
                         })
                         .catch(() => { });
@@ -1043,6 +1071,9 @@
                             this.newTaxRate = 0;
                             this.newTotalMoney = '0.00';
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             this.dialogSseTableVisible = false;
                         })
                         .catch(() => {
@@ -1141,14 +1172,55 @@
                     }
                 }
             },
-            //含税总价change事件
+            //含税总价chenge事件
             newTotalMoneyChange(){
                 let val = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
                 if(val <= 0){
                     this.$message.error('请正确输入含税总价')
                     this.newTotalMoney = '0.00'
                 }else{
-                    this.newTotalMoney = number.number(this.newTotalMoney)
+                    this.newTotalMoney = number.number(val)
+                }
+                this.newTaxAmount = number.number((val / (1 + newTaxRate) *  newTaxRate).toFixed(2));//税额
+                this.newMoney = number.number((val / (1 + newTaxRate)).toFixed(2));//金额
+                this.newUnitPrice = (val / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
+            },
+            //税率chenge事件
+            newTaxRateChange(){
+                let val = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                this.newTaxAmount = number.number((val / (1 + newTaxRate) *  newTaxRate).toFixed(2))//税额
+                this.newMoney = number.number((val / (1 + newTaxRate)).toFixed(2));//金额
+                this.newUnitPrice = (val / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
+            },
+            //税额失去焦点事件
+            newTaxAmountBlur(){
+                let computerTaxAmount = Number(this.computerTaxAmount.toFixed(2))
+                let newTaxAmount = unNumber.unNumber(this.newTaxAmount)
+                let computerMoney = Number(this.computerMoney.toFixed(2))
+                if(newTaxAmount <= 0){
+                    this.$message.error('请正确输入税额')
+                    this.newTaxAmount = number.number(computerTaxAmount)
+                    return
+                }
+                if( (Math.abs(computerTaxAmount - newTaxAmount)).toFixed(2) > 0.02 && computerMoney){
+                    this.$message.error('您输入的税额与计算出的税额差距过大')
+                    this.newTaxAmount = number.number(computerTaxAmount)
+                }
+            },
+            //金额失去焦点事件
+            newMoneyBlur(){
+                let computerMoney = Number(this.computerMoney.toFixed(2))
+                let newMoney = unNumber.unNumber(this.newMoney)
+                if(newMoney <= 0){
+                    this.$message.error('请正确输入金额')
+                    this.newMoney = number.number(computerMoney)
+                    return
+                }
+                if( (Math.abs(computerMoney - newMoney)).toFixed(2) > 0.02 && computerMoney){
+                    this.$message.error('您输入的税额与计算出的税额差距过大')
+                    this.newMoney = number.number(computerMoney)
                 }
             },
             //after模态框事件
@@ -1157,6 +1229,11 @@
                 this.loading = true
                 this.n = n;
                 if(n == 0){
+                    if(this.isBossSee) {
+//                        console.log(this.isBossSee);
+                        this.$router.push({name:'viewingList',params:{activeName:this.activeName,currentPage:this.currentPage}})
+                        return
+                    }
                     if(this.isAuditPerson){
                         this.$router.push({name:'PurchaseList',params:{choice:this.choice,currentPage:this.currentPage}})
                     }else{
@@ -1418,7 +1495,7 @@
             back(){
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('seePurchaseBack')
-                params.append('id',this.debitId);
+                params.append('id',this.purchaseId);
                 axios.post(url,params)
                     .then(response=>{
                         if(response.data.status == 200){
@@ -1627,7 +1704,7 @@
                 params.append('type',type);
                 params.append('taxFlg',this.taxFlg);
                 params.append('totalMoney',this.totalMoney);
-                params.append('purchaseId',this.debitId);
+                params.append('purchaseId',this.purchaseId);
                 params.append('purchaseItems',purchaseItems);
                 params.append('purchaseDate',this.purchaseDate);
 //                console.log(this.imgUrl1);
@@ -1702,10 +1779,12 @@
         created(){
             var params = new URLSearchParams();
             var url = addUrl.addUrl('seePurchase');
-            params.append('id',this.debitId);
+//            console.log(url);
+            params.append('id',this.purchaseId);
             axios.post(url,params)
                 .then(response=> {
                     var data = response.data.value;
+//                    console.log(data);
                     //设置部门
                     this.options4 = data.departmentList;
                     this.supplierList = data.supplierList;
@@ -1731,11 +1810,11 @@
 
                     var type = purchase.type;
                     var purchaseItemList = purchase.purchaseItemList
-
+//                    console.log(purchaseItemList);
                     for(let i = 0; i < purchaseItemList.length; i++){
                         purchaseItemList[i].newTotalMoney = number.number(purchaseItemList[i].noTaxMoney + purchaseItemList[i].taxMoney)
                         purchaseItemList[i].money = number.number(purchaseItemList[i].noTaxMoney)
-                        purchaseItemList[i].perPrice = number.number(purchaseItemList[i].perPrice)
+//                        purchaseItemList[i].perPrice =
                         purchaseItemList[i].taxMoney = number.number(purchaseItemList[i].taxMoney)
                         purchaseItemList[i].id = purchaseItemList[i].idString
                     }
@@ -1783,7 +1862,7 @@
                         this.showBtn = true
                     }
 
-                    var divideFlg = data.purchase.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊
+                    let divideFlg = data.purchase.divideFlg;//判断是否为分摊 0 为未分摊 1为分摊
                     if(divideFlg ==0){
                         this.isShare = false
                         this.department = data.purchase.departmentIdString1
@@ -1800,6 +1879,12 @@
                         this.input3 = data.purchase.projectDivRate3 || 0
                         this.input4 = data.purchase.projectDivRate4 || 0
                         this.input5 = data.purchase.projectDivRate5 || 0
+                    }
+
+                    if(this.isBossSee){
+                        this.isAuditPerson = true
+                        this.isShowShare = false;
+                        this.isReadonly = true;
                     }
 //                    console.log(this.deviceList);
                     this.loading = false

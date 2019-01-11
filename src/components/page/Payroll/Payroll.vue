@@ -10,6 +10,8 @@
                 <el-button @click="dialogFormVisible = true" size="small" type="primary" class="sub4">工资发放时间：{{showProvideDay}}</el-button>
                 <router-link v-if="!isCalculation" :to="{name:'addPayroll',params:{ym:currentYM} }" class="sub5">新增临时员工</router-link>
                 <router-link v-if=" start_ym == current_book_ym " :to="{name:'record',params:{ym:currentYM} }" class="sub6">初始化工资补录</router-link>
+                <el-button @click="dialogImportPayroll = true" size="small" type="primary" class="sub7">导入</el-button>
+                <el-button v-show="!isCalculation" @click="batchDelete" size="small" type="primary" class="sub8">批量删除</el-button>
             </div>
             <div class="w">
                 <div class="content cf" :style="{height:screenHeight}">
@@ -61,7 +63,8 @@
                         </el-tab-pane>
                     </el-tabs>
 
-                    <el-table class="single" :data="tableData3" style="width: 100%" :height="tableHeight">
+                    <el-table class="single" :data="tableData3" style="width: 100%" :height="tableHeight" ref="multipleTable">
+                            <el-table-column align="center" type="selection" prop="id"></el-table-column>
                             <el-table-column fixed prop="userName" label="姓名">
                                 <template slot-scope="scope">
                                     <span v-if="scope.row.userId == 0"><span class="red">*</span>{{scope.row.userName}}</span>
@@ -178,6 +181,20 @@
                         <el-button @click="closeGrant" size="small">取 消</el-button>
                         <el-button type="primary" @click="grantAxios" size="small" :disabled="isComplete">确 定</el-button>
                     </el-dialog>
+                    <el-dialog title="导入" :visible.sync="dialogImportPayroll" width="400px">
+                        <el-upload
+                            ref="upload"
+                            action="#"
+                            :limit="1"
+                            :http-request="myUpload"
+                            :before-upload='beforeAvatarUpload'
+                            :auto-upload="false">
+                            <el-button size="small" type="primary">点击导入文件</el-button>
+                            <div slot="tip" class="el-upload__tip">上传文件只能是 xls/xlsx 格式!</div>
+                        </el-upload>
+                        <el-button @click="importPayroll" size="small" type="primary" class="importPayrollBtn" :loading="importPayrollLoading">导入</el-button>
+                        <a :href=url2 target="_blank" class="downloadPayroll" @keydown.enter.native.prevent>下载工资单xls模板</a>
+                    </el-dialog>
                 </div>
             </div>
         </div>
@@ -199,8 +216,12 @@
                 accruedYM:'',//末次计提年月
                 isCalculation:false,//是否已计提
                 url:'',
+                url2:'',//下载工资单xls模板
+                file:'',//导入文件地址
+                fileName:'',//导入文件地址
                 dialogFormVisible:false,
                 dialogGrant:false,//工资发放模态框
+                dialogImportPayroll:false,//导入模态框
                 wages:'2',//工资发放分类
                 socialSecurity:'2',//社保发放分类
                 AccumulationFund:'2',//公积金发放分类
@@ -243,6 +264,7 @@
                 loading:true,
                 isComplete:false,//工资发放模态框确认按钮loading状态
                 grantLoading:false,//工资发放按钮loading
+                importPayrollLoading:false,//导入按钮loading
                 calculationLoading:false,//工资计提按钮loading
                 screenHeight: '' ,//页面初始化高度
                 tableHeight: 460 //表格高度
@@ -250,6 +272,138 @@
         },
         computed:mapState(['start_ym','current_book_ym']),
         methods: {
+            //批量删除
+            batchDelete(){
+                let ids = '';//员工id参数
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('batchDelete')
+                let selection = this.$refs.multipleTable.selection
+
+                selection = selection.filter(x => x.userId == '0')
+                let length = selection.length
+                if(length == 0){
+                    this.$message.error('请选择可删除的员工再进行批量删除操作');
+                    return
+                }else{
+                    this.$confirm('确定是否批量删除所选员工, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        showClose: false,
+                        closeOnClickModal: false,
+                        closeOnPressEscape: false,
+                        type: 'warning',
+                        beforeClose: (action, instance, done) => {
+                            if (action === 'confirm') {
+                                instance.confirmButtonLoading = true;
+                                instance.cancelButtonLoading = true;
+                                instance.confirmButtonText = '执行中...';
+                                setTimeout(() => {
+                                    done();
+                                    setTimeout(() => {
+                                        instance.confirmButtonLoading = false;
+                                        instance.cancelButtonLoading = false;
+                                    }, 300);
+                                }, 300);
+                            } else {
+                                done();
+                            }
+                        }
+                    }).then(() => {
+                        for(let i in selection){
+                            if(i == 0){
+                                ids += selection[i].id
+                            }else{
+                                ids += ','+ selection[i].id
+                            }
+                        }
+                        params.append('ids',ids);
+                        axios.post(url,params)
+                            .then(response=> {
+                                let dataMsg = response.data.value.dataMsg
+                                let dataNew = response.data.value.dataNew
+                                if(dataNew == 1){
+                                    this.$message.success(dataMsg);
+                                    this.axios();
+                                    this.loading = false
+                                }else{
+                                    this.$message.error(dataMsg);
+                                    this.loading = false
+                                }
+                            })
+                            .catch(error=> {
+                                alert('网络错误，不能访问');
+                                this.loading = false;
+                            })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消'
+                        });
+                    });
+                }
+            },
+            //限制用户上传图片格式和大小
+            beforeAvatarUpload(file){
+                const isXLS = file.name.split('.')[1] === 'xls';
+                const isXLSX = file.name.split('.')[1] === 'xlsx';
+                if (!isXLS && !isXLSX) {
+                    this.importPayrollLoading = false;
+                    this.$message.error('上传文件只能是 xls/xlsx 格式');
+                }
+                return isXLS || isXLSX;//如果不符合要求的话是不走myUpload函数的
+            },
+            myUpload(content){
+                var file = content.file;
+                var _this = this;
+                this.readBlobAsDataURL(file,function (dataurl){
+                    _this.file = dataurl
+                    _this.fileName = file.name
+                    _this.upload()
+                });
+            },
+            //url转换base方法
+            readBlobAsDataURL(blob, callback) {
+//                console.log(blob);
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                    callback(e.target.result);
+                };
+                fileReader.readAsDataURL(blob);
+            },
+            //点击导入
+            importPayroll(){
+                if(this.$refs.upload.uploadFiles.length){
+                    this.importPayrollLoading = true
+                    this.$refs.upload.submit();
+                }else{
+                    this.$message.error('请选择上传的文件')
+                }
+            },
+            upload(){
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('upload');
+                params.append('fileName',this.fileName)
+                params.append('fileUrlData',this.file)
+                axios.post(url,params)
+                .then(response =>{
+//                    console.log(response);
+                    let status = response.data.status
+                    let msg = response.data.msg
+                    if(status == 200){
+                        this.$message.success(msg)
+                        this.axios()
+                    }else if(status == 400){
+                        this.$message.error(msg)
+                    }
+                    this.loading = false
+                    this.dialogImportPayroll = false
+                    this.importPayrollLoading = false;
+                }).catch(() => {
+                    this.loading = false
+                    this.dialogImportPayroll = false
+                    this.importPayrollLoading = false;
+                });
+            },
             handleClose(done){
                 this.grantLoading = false;
                 done();
@@ -442,10 +596,15 @@
                             if(dataNew == 1){
                                 this.axios();
                                 this.loading = false
+                                this.$message.success(dataMsg);
                             }else{
                                 this.$message.error(dataMsg);
                                 this.loading = false
                             }
+                        })
+                        .catch(error=> {
+                            alert('网络错误，不能访问');
+                            this.loading = false;
                         })
                 }).catch(() => {
                     this.loading = false
@@ -561,6 +720,7 @@
         },
         created(){
             var url = addUrl.addUrl('payroll');
+            this.url2 = addUrl.addUrl('download')
             axios.post(url)
                 .then(response=> {
 //                    console.log(response);
@@ -608,6 +768,7 @@
         height:100%;
     }
     .top {
+        height:60px;
         margin: 20px 0;
         text-align: center;
         position: relative;
@@ -659,22 +820,30 @@
         line-height: 32px;
         text-decoration: none;
         position: absolute;
-        right:60px;
+        right:70px;
+        font-size:12px;
+    }
+    .top .sub7{
+        position: absolute;
+        right:140px;
         font-size:12px;
     }
     .top .sub2{
         position: absolute;
-        right:120px;
+        top:38px;
+        right:0px;
         font-size:12px;
     }
     .top .sub3{
         position: absolute;
-        right:205px;
+        top:38px;
+        right:95px;
         font-size:12px;
     }
     .top .sub4{
         position: absolute;
-        right:290px;
+        top:38px;
+        right:190px;
         font-size:12px;
     }
     .top .sub5{
@@ -687,7 +856,7 @@
         line-height: 32px;
         text-decoration: none;
         position: absolute;
-        left:0px;
+        right:210px;
         font-size:12px;
     }
     .top .sub6{
@@ -703,7 +872,14 @@
         font-size:12px;
         text-decoration: none;
         position: absolute;
-        left:120px;
+        left:0px;
+    }
+    .top .sub8{
+        position: absolute;
+        top:38px;
+        left:0px;
+        font-size:12px;
+        margin:0;
     }
     .operation {
         cursor: pointer;
@@ -728,5 +904,25 @@
         display: inline-block;
         width:100px;
     }
-
+    .content .importPayroll{
+        display: block;
+    }
+    .content .downloadPayroll{
+        display: inline-block;
+        width:120px;
+        height:32px;
+        color: #fff;
+        text-align: center;
+        background-color: #409EFF;
+        border-radius: 3px;
+        line-height: 32px;
+        text-decoration: none;
+        font-size:12px;
+        margin-top: 20px;
+    }
+    .content .importPayrollBtn{
+        font-size:12px;
+        margin-top: 20px;
+        margin-right: 30px;
+    }
 </style>

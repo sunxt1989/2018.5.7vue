@@ -71,7 +71,7 @@
                     .then(response=> {
                         this.loading = false;
                         var data = response.data.value;//报销单审批列表数据
-                        console.log(data);
+//                        console.log(data);
                         this.count = data.count;//总条目数
                         this.tableData = this.addUrl(data.list)
                     })
@@ -114,7 +114,7 @@
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;//报销单审批列表数据
 //                    console.log(data);

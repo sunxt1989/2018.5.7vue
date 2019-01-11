@@ -463,7 +463,7 @@
                     .then(response=>{
                         this.loading = false;
                         this.isLoading = false;
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -484,7 +484,6 @@
             },
 
             addUrl(list){
-                console.log(list);
                 for(var i = 0; i < list.length; i++){
                     list[i].showMoney = number.number(list[i].money);
                     if(list[i].type <=3){

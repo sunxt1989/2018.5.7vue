@@ -188,7 +188,6 @@
                         </el-tabs>
                         <el-button @click="treeSave" class="treeSave" size="small" type="primary">保存</el-button>
                     </el-dialog>
-
                 </div>
                 <el-table :data="tableData" class="single" :height="tableDataHeight">
                     <el-table-column prop="subjectCode" label="科目编号" align="center" width="100px"></el-table-column>

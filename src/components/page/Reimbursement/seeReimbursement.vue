@@ -4,9 +4,9 @@
             <div class="top">
                 <h2>查看报销单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click="model(1)" v-show="showBtn1" size="small" type="danger" class="sub1" :loading="isLoading">保存</el-button>
-                <el-button @click="model(2)" v-show="showBtn2" size="small" type="primary" class="sub2" :loading="isLoading">提交</el-button>
-                <el-button @click="model(3)" v-show="showBtn3" size="small" type="danger" class="sub1" :loading="isLoading">撤回</el-button>
+                <el-button @click="model(1)" v-show="showBtn1 && !isBossSee" size="small" type="danger" class="sub1" :loading="isLoading">保存</el-button>
+                <el-button @click="model(2)" v-show="showBtn2 && !isBossSee" size="small" type="primary" class="sub2" :loading="isLoading">提交</el-button>
+                <el-button @click="model(3)" v-show="showBtn3 && !isBossSee" size="small" type="danger" class="sub1" :loading="isLoading">撤回</el-button>
                 <a :href=url1 target="_blank" class="sub3">下载报销单</a>
             </div>
         </div>
@@ -15,7 +15,7 @@
                 <div class="line">
                     <span>查看报销单</span>
                 </div>
-                <el-button type="danger" plain size="small" class="share" v-if="isShowShare" @click="shareClick">
+                <el-button type="danger" plain size="small" class="share" v-if="isShowShare " @click="shareClick">
                     <span v-show="!isShare">费用分摊</span>
                     <span v-show="isShare">取消费用分摊</span>
                 </el-button>
@@ -327,6 +327,8 @@
                 choice:this.$route.params.choice,
                 currentPage:this.$route.params.currentPage,
                 isRedFlush:this.$route.params.isRedFlush,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,//是否为boss查看页面模式
                 loading: true,
                 isLoading: false,
                 screenHeight: '' //页面初始化高度
@@ -375,7 +377,15 @@
                 });
 
                 if (n == 0) {
-                    if(this.isRedFlush) this.$router.go(-1);
+                    if(this.isRedFlush) {
+                        this.$router.go(-1);
+                        return
+                    }
+                    if(this.isBossSee) {
+//                        console.log(this.activeName);
+                        this.$router.push({name:'viewingList',params:{activeName:this.activeName,currentPage:this.currentPage}})
+                        return
+                    }
                     if (this.isShowShare) {
                         this.$confirm('填写的信息还未提交，是否返回？', '提示', {
                             confirmButtonText: '确定',
@@ -947,19 +957,21 @@
             };
         },
         created(){
+//            console.log(this.activeName);
             this.url1 = addUrl.addUrl('saveReimbursement')
             this.url1 = this.url1 + '?id=' + this.debitId
 
 //            console.log(this.debitId);
             var params = new URLSearchParams();
             var url = addUrl.addUrl('seeReimbursement')
+//            var url = 'http://192.168.2.192:8080/web/vue/application/check.html'
             params.append('id', this.debitId);
             axios.post(url, params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;
-                    console.log(data);
+//                    console.log(data);
                     this.originalTypeName = data.application.originalTypeName
                     this.type = data.application.type
                     this.money = number.number(data.application.money)
@@ -981,7 +993,7 @@
                     this.auditRecordList = auditRecordList;
 
                     var receiptList = data.receiptList
-                    console.log(receiptList);
+//                    console.log(receiptList);
                     this.options = data.departmentList
 //                    console.log(this.reimbursementDepartment);
                     var arr = [];
@@ -1054,6 +1066,13 @@
                     } else {
                         this.isReadonly = true;
                         this.isShowShare = false
+                    }
+                    //当为boss查看模式时
+                    if(this.isBossSee){
+                        this.isShow = true;
+                        this.isReadonly = true;
+                        this.isShowShare = false
+                        this.showGridDataAdd = false
                     }
                 })
                 .catch(error=> {

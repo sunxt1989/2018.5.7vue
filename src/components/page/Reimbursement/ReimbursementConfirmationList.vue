@@ -115,7 +115,7 @@
             params.append('pageNo', this.currentPage);
             axios.post(url, params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false;
                     var data = response.data.value;//报销单确认列表数据
 //                    console.log(data);

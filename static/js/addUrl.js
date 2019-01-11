@@ -6,7 +6,7 @@ function addUrl(name){
     var url = 'http://192.168.2.190:8881/web';
     //var url = 'http://192.168.2.190:8080/web';
     //var url = 'http://192.168.2.191:8080/web';
-    //var url = 'http://192.168.2.192:8080/web';
+    //var url = 'https://192.168.2.192:8443/web';
     //var url = 'http://www.cloudaccounting.cn'
 
     //借款单列表
@@ -491,6 +491,10 @@ function addUrl(name){
     if(name == 'payrollDelete'){
         return url + '/vue/salary/delete/employee.html'
     }
+    //工资表批量删除员工
+    if(name == 'batchDelete'){
+        return url + '/vue/salary/delete/temp/employee/batch.html'
+    }
     //修改工资发放时间
     if(name == 'provideTime'){
         return url + '/vue/salary/update/provideTime.html'
@@ -506,6 +510,14 @@ function addUrl(name){
     //工资表导出
     if(name == 'derive'){
         return url + '/vue/salary/download/list.html'
+    }
+    //工资-导入工资单xls
+    if(name == 'upload'){
+        return url + '/vue/salary/upload/items.html'
+    }
+    //工资-下载工资单xls模板
+    if(name == 'download'){
+        return url + '/vue/salary/download/excel/template.html'
     }
     //新增临时员工
     if(name == 'addPayroll'){
@@ -1041,6 +1053,22 @@ function addUrl(name){
     //发票业务-专票抵扣
     if(name == 'invoiceReduce'){
         return url + '/vue/bill/reduce.html'
+    }
+    //借款-查询我的借款列表
+    if(name == 'viewingLoanList'){
+        return url + '/vue/business/check/borrowing.html'
+    }
+    //查询我的销售单列表
+    if(name == 'viewingSaleList'){
+        return url + '/vue/business/check/sale.html'
+    }
+    //查询我的采购单列表
+    if(name == 'viewingPurchaseList'){
+        return url + '/vue/business/check/purchase.html'
+    }
+    //查询我的报销单列表
+    if(name == 'viewingReimbursementList'){
+        return url + '/vue/business/check/application.html'
     }
 }
 export default{

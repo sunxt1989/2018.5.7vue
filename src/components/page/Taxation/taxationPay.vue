@@ -132,6 +132,7 @@
                         }
                     })
                     .catch(error=> {
+//                        console.log(error);
                         this.loading = false;
                         this.isLoading = false;
 //                        console.log(error);

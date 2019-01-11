@@ -186,7 +186,7 @@
 
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     this.loading = false
                     var data = response.data.value;//费用列表
 //                    console.log(data);

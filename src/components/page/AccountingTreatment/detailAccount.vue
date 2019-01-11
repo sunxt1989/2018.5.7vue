@@ -142,7 +142,6 @@
                         this.$refs.Tree.setCheckedKeys([data.name]);
                     }
                 }
-
             },
 
             //获取tree结构的axios请求

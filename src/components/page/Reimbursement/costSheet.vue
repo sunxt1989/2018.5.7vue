@@ -255,7 +255,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value;//费用列表
                         for(var i = 0; i < data.length; i++){
                             data[i].showMoney = number.number(data[i].money);

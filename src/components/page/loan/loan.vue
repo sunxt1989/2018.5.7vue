@@ -32,7 +32,6 @@
                 </el-date-picker>
 
                 <el-button size="small" type="primary" @click="axios" class="query">查询</el-button>
-
                 <el-table :data="tableData" class="blueList" show-summary :summary-method="getTotal" >
                     <el-table-column prop="userName" label="借款人" sortable align="center"></el-table-column>
                     <el-table-column prop="departmentName" label="借款部门" sortable align="center"></el-table-column>
@@ -69,9 +68,9 @@
                     </el-table-column>
                     <el-table-column label="还款" width="80px" align="center">
                         <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unCreditMoney == '0.00' || scope.row.auditFlg != 4">还款</span>
+                            <span class="black" v-if="scope.row.auditFlg < 4">还款</span>
                             <router-link v-else class="repayment red"
-                                         :to="{name:'repayment',params:{debitId:scope.row.idString}}">还款
+                                         :to="{name:'repaymentList',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}">还款
                             </router-link>
                         </template>
                     </el-table-column>
@@ -92,7 +91,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-
                 <el-pagination
                     @current-change="changePage"
                     background
@@ -100,7 +98,6 @@
                     layout="prev, pager, next"
                     :total='count'>
                 </el-pagination>
-
             </div>
         </div>
     </div>

@@ -111,6 +111,7 @@
                             <span v-else-if="scope.row.payType == 5">企业微信</span>
                             <span v-else-if="scope.row.payType == 6">企业支付宝</span>
                             <span v-else-if="scope.row.payType == 7">企业借贷宝</span>
+                            <span v-else>请选择</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="money" label="金额" sortable>

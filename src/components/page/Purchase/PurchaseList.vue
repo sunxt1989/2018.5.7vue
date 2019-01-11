@@ -3,7 +3,7 @@
         <div class="w cf">
             <div class="top">
                 <h2>采购单列表</h2>
-                <el-select v-model="choice" class='choice' placeholder="未完成列表" @change="changeChoice">
+                <el-select v-model="choice" class="choice" placeholder="未完成列表" @change="changeChoice">
                     <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -93,16 +93,16 @@
 
                     <el-table-column prop="" label="付款" sortable align="center">
                         <template slot-scope="scope">
-                            <span class="black" v-if="scope.row.unsendMoney == 0 || scope.row.auditFlg != 4">付款</span>
-                            <router-link v-else class="repayment red"
-                                         :to="{name:'newPurchasePayment',params:{debitId:scope.row.idString}}">付款
+                            <span v-if="scope.row.auditFlg < 4" class="black">付款</span>
+                            <router-link v-else class="repayment red" :to="{name:'purchasePaymentList',params:{purchaseId:scope.row.idString,auditFlg:scope.row.auditFlg}}">
+                                付款
                             </router-link>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
                                 <span class="operation">
-                                    <router-link :to="{name:'seePurchase',params:{debitId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
+                                    <router-link :to="{name:'seePurchase',params:{purchaseId:scope.row.idString,choice:choice,currentPage:currentPage}}" class="see">
                                         <i class="icon iconfont icon-bianji blue"></i></router-link>
                                 </span>
                                 <span class="operation">
@@ -217,7 +217,7 @@
                 axios.post(url,params)
                     .then(response=> {
                         this.loading = false;
-                        console.log(response);
+//                        console.log(response);
                         var data = response.data.value.list
                         this.count = response.data.value.count;//总条目数
 
@@ -280,11 +280,11 @@
             },
             //删除列表信息
             deleteList(isId){
-                var debitId = isId;
+                var purchaseId = isId;
                 var params = new URLSearchParams();
                 var url = addUrl.addUrl('PurchaseListDelete')
-//                console.log(debitId);
-                params.append('id',debitId);
+//                console.log(purchaseId);
+                params.append('id',purchaseId);
 
                 axios.post(url,params)
                     .then(response=> {
@@ -356,7 +356,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value.list
                     this.count = response.data.value.count;//总条目数
 

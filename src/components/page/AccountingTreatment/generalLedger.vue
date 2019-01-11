@@ -231,7 +231,6 @@
                 tree4: [],//权益
                 tree5: [],//成本
                 tree6: [],//损益
-                currentAccountStandard: 1,
                 year: '',//表头展示年份
                 defaultProps: {
                     children: 'children',
@@ -416,6 +415,7 @@
                 this.loading = true
                 this.treeAxios(1)
             },
+
             objectSpanMethod({ row, column, rowIndex, columnIndex }) {
                 if(columnIndex < 2){
                     if(row.rowspan){

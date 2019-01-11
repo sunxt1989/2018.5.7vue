@@ -3,7 +3,9 @@
         <div class="w">
             <div class="top">
                 <h2>销售收款单详情</h2>
-                <router-link v-if="!isRedFlush" :to="{name:'newSalePayment',params:{debitId:sale_id,advanceId:advanceId}}" class="back">
+                <router-link v-if="!isRedFlush" class="back"
+                             :to="{name:'salePaymentList',
+                             params:{saleId:sale_id,isBossSee:isBossSee,choice:choice,activeName:activeName,currentPage:currentPage,auditFlg:auditFlg}}" >
                     返回
                 </router-link>
                 <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
@@ -89,9 +91,13 @@
                 unreceiveMoney:'',//待收款
                 money:'',//本次收款
                 sale_id:'',//销售单ID
-                debitId:this.$route.params.debitId,
+                saleId:this.$route.params.saleId,
+                choice:this.$route.params.choice,
                 isRedFlush:this.$route.params.isRedFlush,
-                advanceId:this.$route.params.advanceId,
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,
+                auditFlg:this.$route.params.auditFlg,
 
                 userDebitAuditRecordList:[],
                 attachUrlJson:[],//上传图片展示
@@ -138,9 +144,10 @@
             };
         },
         created(){
+//            console.log(this.saleId);
             var params = new URLSearchParams();
             var url = addUrl.addUrl('seeSalePayment')
-            params.append('sale_receive_id',this.debitId);
+            params.append('sale_receive_id',this.saleId);
 
             axios.post(url,params)
                 .then(response=> {

@@ -79,7 +79,7 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">注册资本</span>
+                        <span class="tit">注册资金（元）</span>
                         <input class="ipt" type="text" v-model="registeredCapital" maxlength="50" @change="changeMoney" :readonly="isReadonly">
                     </li>
                     <li class="ptx">

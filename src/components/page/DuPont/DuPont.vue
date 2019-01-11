@@ -309,8 +309,7 @@
             let url = addUrl.addUrl('DuPont')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
-                    console.log(response.data);
+//                    console.log(response);
                     let data = response.data
                     let dataMap = data.dataMap
                     let dbMap = data.dataMap

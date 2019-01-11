@@ -250,7 +250,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         if(response.data.status == 200){
                             this.$router.go(-1);
                             this.$message({
@@ -298,7 +298,7 @@
             params.append('bankId',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.bankName = data.bankAccount.bankName
                     this.bankChildName = data.bankAccount.bankChildName

@@ -356,7 +356,7 @@
             axios.post(url,params)
                 .then(response=> {
                     this.loading = false;
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     let userDebitAuditRecordList = data.userDebitAuditRecordList

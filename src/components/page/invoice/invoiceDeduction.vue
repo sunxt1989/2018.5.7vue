@@ -10,16 +10,9 @@
         </div>
         <div class="w">
             <div class="left" :style="{height:screenHeight}">
-                <el-table :data="tableData" class="blueList">
-                    <el-table-column prop="" label="选择"  align="center" width="80px">
-                        <template slot-scope="scope">
-                            <span class="checkbox" v-if="scope.row.receipt_reduce_flg == 0">
-                                <input name=checked type="checkbox" :value=scope.row.receipt_id class="inputcheckbox listInput">
-                                <i class="iconfont icon-31xuanze"></i>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="编号" align="center" width="80px">
+                <el-table :data="tableData" class="blueList" ref="multipleTable">
+                    <el-table-column align="center" type="selection" prop="receipt_id"></el-table-column>
+                    <el-table-column label="编号" align="center" width="60px">
                         <template slot-scope="scope">
                             <span>{{scope.row.index}}</span>
                         </template>
@@ -42,18 +35,27 @@
                             <span>进项专票</span>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="" label="状态" sortable align="center" width="100px">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.receipt_reduce_flg == 1">已抵扣</span>
+                            <span v-else>未抵扣</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="80px" align="center">
                         <template slot-scope="scope">
-                                <span class="operation">
-                                    <router-link :to="{name:'seeInvoice',params:{receiptId:scope.row.receipt_id,currentPage:currentPage}}" class="see">
-                                        <i class="icon iconfont icon-kanguo blue"></i>
-                                    </router-link>
-                                </span>
-                                <span class="operation">
-                                    <i v-if='scope.row.receipt_source_flg == 0 || scope.row.receipt_reduce_flg == 1' class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
-                                    <i v-else @click='deleteModel(scope.row.receipt_id)' class="icon iconfont icon-shanchu red"></i>
-
-                                </span>
+                            <span class="operation">
+                                <router-link
+                                    :to="{name:'seeInvoice',params:{receiptId:scope.row.receipt_id,currentPage:currentPage}}"
+                                    class="see">
+                                    <i class="icon iconfont icon-kanguo blue"></i>
+                                </router-link>
+                            </span>
+                            <span class="operation">
+                                <i v-if='scope.row.receipt_source_flg == 0 || scope.row.receipt_reduce_flg == 1'
+                                   class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
+                                <i v-else @click='deleteModel(scope.row.receipt_id)'
+                                   class="icon iconfont icon-shanchu red"></i>
+                            </span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -89,16 +91,15 @@
             changeChoice(){
                 this.axios()
             },
-            //执行ajax重新获取借款单列表数据
             axios(){
                 var params = new URLSearchParams();
-            var url = addUrl.addUrl('invoiceList')
+                var url = addUrl.addUrl('invoiceList')
 //                var url = 'http://192.168.2.190:8080/web/vue/bill/list.html'
                 params.append('page_no',this.currentPage);
                 axios.post(url,params)
                     .then(response=> {
 //                        console.log(response);
-                        var data = response.data.value.list;//借款单列表数据
+                        var data = response.data.value.list;
                         this.count = response.data.value.page_count;//
                         this.currentPage = response.data.value.page_no;//
 
@@ -188,15 +189,14 @@
             },
             //认证抵扣事件
             invoiceReduce(){
-                let checked = $("input[name=checked]:checked")//找出符合name的input标签中已选中的标签
-                let length = checked.length;
                 let ids = '';//发票id参数
-                var params = new URLSearchParams();
-                var url = addUrl.addUrl('invoiceReduce')
-//                var url = 'http://192.168.2.190:8080/web/vue/bill/reduce.html'
-
+                let params = new URLSearchParams();
+                let url = addUrl.addUrl('invoiceReduce')
+                let selection = this.$refs.multipleTable.selection
+                selection = selection.filter(x => x.receipt_reduce_flg == 0)
+                let length = selection.length
                 if(length == 0){
-                    this.$message.error('请选择需要抵扣的发票');
+                    this.$message.error('请选择至少一条未抵扣的发票');
                     return
                 }else{
                     this.$confirm('确定是否抵扣所选发票, 是否继续?', '提示', {
@@ -223,13 +223,13 @@
                             }
                         }
                     }).then(() => {
-                        checked.each(function(i){
+                        for(let i in selection){
                             if(i == 0){
-                                ids += checked[i].value
+                                ids += selection[i].receipt_id
                             }else{
-                                ids += ','+ checked[i].value
+                                ids += ','+ selection[i].receipt_id
                             }
-                        })
+                        }
                         params.append('receipt_ids',ids);
                         axios.post(url,params)
                             .then(response=> {

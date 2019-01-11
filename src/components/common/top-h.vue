@@ -116,10 +116,12 @@
                             this.bookId = data.current_book_id;
                             this.faceUri = data.faceUri ? data.faceUri : 'static/images/gongjuxiang.png';
                             let obj = {}
-                            console.log(data);
+//                            console.log(data);
                             let start_ym = data.current_start_date.substring(0,7)//账套开账时间
                             let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
                             let auth_json = data.book_user.auth_json;//判断身份列表
+                            let owner_flg = data.book_user.owner_flg;//代记账会计以外所有人
+                            let accounter_flg = data.book_user.accounter_flg;//是否是会计
                             let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
@@ -151,6 +153,8 @@
                             obj.name = name
                             obj.isMonthlyKnots = isMonthlyKnots
                             obj.isAnnualKnots = isAnnualKnots
+                            obj.owner_flg = owner_flg
+                            obj.accounter_flg = accounter_flg
 //                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
@@ -164,11 +168,11 @@
                         }
                     })
                     .catch(error=> {
+//                        console.log(error);
                         this.loading = false
-                        console.log('没有登录信息');
                         alert('请您重新登录')
                         let url = addUrl.addUrl('logout')
-//                        alert(url);
+                        alert(url);
                         window.location.href = url
                     });
             },

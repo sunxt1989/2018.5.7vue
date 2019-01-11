@@ -4,7 +4,7 @@
             <div class="top">
                 <h2>还款单</h2>
                 <el-button @click="model(0)" size="small" class="back">返回</el-button>
-                <el-button @click.native="model(1)" v-if="!isRedFlush" size="small" type="danger" class="sub" >提交</el-button>
+                <el-button @click.native="model(1)" size="small" type="danger" class="sub" >提交</el-button>
             </div>
         </div>
         <div class="w cf">
@@ -25,7 +25,7 @@
                             <input type="text" class="dhk" name="dhk" id="dhk" v-model="unCreditMoney" readonly>
                         </li>
                         <li>
-                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur" maxlength="14" :readonly="isRedFlush">
+                            <input type="text" class="hk" name="hk" id="hk" v-model="money" @blur="blur" maxlength="14">
                         </li>
                         <li>
                             <el-date-picker
@@ -34,49 +34,11 @@
                                 type="date"
                                 :picker-options="pickerOptions1"
                                 value-format="yyyy-MM-dd"
-                                placeholder="选择日期"
-                                :disabled="isRedFlush">
+                                placeholder="选择日期">
                             </el-date-picker>
                         </li>
                     </ul>
                 </div>
-                <div class="line">
-                    <span>还款明细</span>
-                </div>
-                <el-table class="hkTable grayList" :data="tableData" style="width: 60%">
-                    <el-table-column prop="debitDateYMD" label="日期" sortable width="180"></el-table-column>
-                    <el-table-column prop="payType" label="还款方式" sortable width="180">
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.paymentMethod == 1">
-                                <span v-if="scope.row.payType == 1">现金支付</span>
-                                <span v-else-if="scope.row.payType == 2">银行支付</span>
-                            </span>
-                            <span v-if="scope.row.paymentMethod == 2">
-                                <span>报销冲抵</span>
-                            </span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="money" label="还款金额" sortable></el-table-column>
-                    <el-table-column prop="auditFlg" label="还款状态" sortable>
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.auditFlg == 0">未提交</span>
-                            <span v-if="scope.row.auditFlg == 1">驳回</span>
-                            <span v-if="scope.row.auditFlg == 2">待审核</span>
-                            <span v-if="scope.row.auditFlg == 3">待出纳确认</span>
-                            <span v-if="scope.row.auditFlg == 4">通过</span>
-                            <span v-if="scope.row.auditFlg == 5">待审核</span>
-                            <span v-if="scope.row.auditFlg == 6">待审核</span>
-                            <span v-if="scope.row.auditFlg == 7">已红冲</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="" label="查看详情" >
-                        <template slot-scope="scope">
-                            <router-link :to="{name:'seeRepayment',params:{debitId:scope.row.idString}}" class="see">
-                                <i class="icon iconfont icon-kanguo blue"></i>
-                            </router-link>
-                        </template>
-                    </el-table-column>
-                </el-table>
             </div>
         </div>
     </div>
@@ -92,10 +54,11 @@
             return{
                 debitId:this.$route.params.debitId,//单据ID
                 isRedFlush:this.$route.params.isRedFlush,//是否为红冲
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
                 unCreditMoney:'',//待还款
                 money:'',//本次还款
                 debitDate:'',//还款时间
-                tableData: [],//还款明细
                 debitDateYMD: [],//借款单确认日期
                 pickerOptions1:{
                     disabledDate(time) {
@@ -113,19 +76,15 @@
             model(n){
                 this.loading = true;
                 if (n == 0) {
-                    if(this.isRedFlush){
-                        this.$router.go(-1)
-                    }else {
-                        this.$confirm('填写的信息还未提交，是否返回？', '提示', {
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            type: 'warning'
-                        }).then(() => {
-                            this.$router.push('/')
-                        }).catch(() => {
-                            this.loading = false;
-                        });
-                    }
+                    this.$confirm('填写的信息还未提交，是否返回？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$router.push({name:'repaymentList',params:{debitId:this.debitId,activeName:this.activeName,currentPage:this.currentPage}})
+                    }).catch(() => {
+                        this.loading = false;
+                    });
                 } else {
                     if(unNumber.unNumber(this.money) <= 0){
                         this.$message.error('请正确输入金额');
@@ -192,8 +151,8 @@
                 params.append('money',money);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
-                        this.$router.push('/loan/loan');
+//                        console.log(response);
+                        this.$router.push({name:'repaymentList',params:{debitId:this.debitId,activeName:this.activeName,currentPage:this.currentPage}});
                     })
                     .catch(error=> {
                         this.loading = false;
@@ -229,7 +188,6 @@
                 .then(response=> {
 //                    console.log(response);
                     var data = response.data.value
-                    this.tableData = data.userDebitItemList;
                     this.unCreditMoney = number.number(data.userDebitItem.unCreditMoney);
                     this.debitDateYMD = data.userDebitItem.debitDateYMD
                     let date = new Date()

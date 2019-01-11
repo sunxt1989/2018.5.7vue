@@ -322,11 +322,11 @@
         },
         computed:mapState(['current_book_ym','current_account_standard']),
         created(){
-            console.log(this.current_account_standard);
+//            console.log(this.current_account_standard);
             let url = addUrl.addUrl('Initialization');
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value
                     let currentYM = this.current_book_ym;
 

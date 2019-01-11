@@ -212,7 +212,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" >
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="newTaxRateChange">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -222,16 +222,16 @@
                             </el-select>
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
+                            <span class="tit3"><span class="red">*</span>税额</span>
+                            <input class="ipt" type="text" v-model="newTaxAmount" @blur="newTaxAmountBlur">
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" @blur="newMoneyBlur">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
-                            <input class="ipt" type="text" v-model.lazy="newNum" :disabled="isShowCount" maxlength="4">
+                            <input class="ipt" type="text" v-model.lazy="newNum" :disabled="isShowCount" maxlength="4" >
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>单价</span>
@@ -271,7 +271,7 @@
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>税率</span>
-                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择">
+                            <el-select class="sel" v-model="newTaxRate" placeholder="请选择" @change="newTaxRateChange">
                                 <el-option
                                     v-for="item in options3"
                                     :key="item.value"
@@ -282,12 +282,12 @@
                         </li>
 
                         <li class="sm cf">
-                            <span class="tit3">税额</span>
-                            <input class="ipt" type="text" v-model="newTaxAmount" disabled>
+                            <span class="tit3"><span class="red">*</span>税额</span>
+                            <input class="ipt" type="text" v-model="newTaxAmount" @blur="newTaxAmountBlur">
                         </li>
                         <li class="sm cf">
-                            <span class="tit3">金额</span>
-                            <input class="ipt" type="text" v-model="newMoney" disabled>
+                            <span class="tit3"><span class="red">*</span>金额</span>
+                            <input class="ipt" type="text" v-model="newMoney" @blur="newMoneyBlur">
                         </li>
                         <li class="sm cf">
                             <span class="tit3"><span class="red">*</span>数量</span>
@@ -447,7 +447,6 @@
 
                 newList1:[],//新建明细列表（设备）
                 newList2:[],//新建明细列表（其他）
-
                 totalMoney1:'',//含税总价1
                 unTotalMoney1:'',//不含税总价1
 
@@ -463,6 +462,10 @@
                 newNum:1,//数量(明细列表)
                 newTotalMoney:'0.00',//含税总价(明细列表)
                 newTaxRate:0,//税率(明细列表)
+                newUnitPrice:0,//单价(明细列表)
+                newMoney:'0.00',//金额(明细列表)
+                newTaxAmount:'0.00',//税额(明细列表)
+
                 options3:[//发票类别列表
                     {value:0,label:'免税'},
                     {value:3,label:'3%'},
@@ -579,12 +582,15 @@
             },
             //数量
             newNum:function(val){
-                var str = /^\d+$/;//判断只允许输入正整数
+                let str = /^\d+$/;//判断只允许输入正整数
                 if(!str.test(val)){
                     this.$message.error('请正确输入数量');
                     this.newNum = 1;
                 }
-            }
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                this.newUnitPrice = (newTotalMoney / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
+            },
         },
         computed:{
             ...mapState({
@@ -592,22 +598,17 @@
                 isMonthlyKnots:state => state.isMonthlyKnots,
                 isAnnualKnots:state => state.isAnnualKnots,
             }),
-            //税额（明细列表）
-            newTaxAmount:function(){
-                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
+            //计算出的金额(明细列表)
+            computerMoney:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
                 let newTaxRate = this.newTaxRate / 100;
-                return number.number((newTotalMoney / (1 + newTaxRate) *  newTaxRate).toFixed(2))
+                return newTotalMoney / (1 + newTaxRate)
             },
-            //金额（明细列表）
-            newMoney:function(){
-                let newTotalMoney = unNumber.unNumber(this.newTotalMoney);
-                let newTaxAmount =  unNumber.unNumber(this.newTaxAmount) ;
-                return number.number((newTotalMoney - newTaxAmount).toFixed(2))
-            },
-            //单价（明细列表）
-            newUnitPrice:function(){
-                let newMoney = unNumber.unNumber(this.newMoney);
-                return (newMoney / this.newNum).toFixed(9)
+            //计算出的税额(明细列表)
+            computerTaxAmount:function(){
+                let newTotalMoney = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                return newTotalMoney / (1 + newTaxRate) * newTaxRate
             }
         },
         methods: {
@@ -684,6 +685,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         done();
                     })
                     .catch(() => { });
@@ -754,6 +758,9 @@
                             this.newTotalMoney = '0.00';
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             if(n == 0){
                                 this.dialogTableVisible = false;
                             }
@@ -798,6 +805,9 @@
                             this.newNum = 1;
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             if(n == 0){
                                 this.dialogTableVisible = false;
                             }
@@ -817,6 +827,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         this.dialogTableVisible = false;
                     })
                     .catch(() => { });
@@ -833,6 +846,9 @@
                         this.newTotalMoney = newList1[i].newTotalMoney
                         this.newTaxRate = newList1[i].taxRate
                         this.newUnit = newList1[i].unit
+                        this.newTaxAmount = newList1[i].taxMoney;
+                        this.newMoney = newList1[i].money;
+                        this.newUnitPrice = newList2[i].perPrice
                         this.isI = i;
                     }
                 }
@@ -849,6 +865,9 @@
                         this.newNum = newList2[i].count
                         this.newTotalMoney = newList2[i].newTotalMoney
                         this.newUnit = newList2[i].unit;
+                        this.newTaxAmount = newList2[i].taxMoney;
+                        this.newMoney = newList2[i].money;
+                        this.newUnitPrice = newList2[i].perPrice
                         this.isI = i;
                     }
                 }
@@ -866,6 +885,9 @@
                         this.newTaxRate = 0;
                         this.newTotalMoney = '0.00';
                         this.newUnit ='';
+                        this.newTaxAmount ='0.00';
+                        this.newMoney ='0.00';
+                        this.newUnitPrice = '0.00';
                         this.dialogSseTableVisible = false;
                     })
                     .catch(() => { });
@@ -939,6 +961,9 @@
                             this.newTotalMoney = '0.00';
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             this.dialogSseTableVisible = false;
                         })
                         .catch(() => { });
@@ -979,6 +1004,9 @@
                             this.newNum = 1;
                             this.newTaxRate = 0;
                             this.newUnit ='';
+                            this.newTaxAmount ='0.00';
+                            this.newMoney ='0.00';
+                            this.newUnitPrice = '0.00';
                             this.dialogSseTableVisible = false;
                         })
                         .catch(() => {
@@ -1080,11 +1108,53 @@
             //含税总价chenge事件
             newTotalMoneyChange(){
                 let val = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
                 if(val <= 0){
                     this.$message.error('请正确输入含税总价')
                     this.newTotalMoney = '0.00'
                 }else{
-                    this.newTotalMoney = number.number(this.newTotalMoney)
+                    this.newTotalMoney = number.number(val)
+                }
+                this.newTaxAmount = number.number((val / (1 + newTaxRate) *  newTaxRate).toFixed(2));//税额
+                this.newMoney = number.number((val / (1 + newTaxRate)).toFixed(2));//金额
+                this.newUnitPrice = (val / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
+            },
+            //税率chenge事件
+            newTaxRateChange(){
+                let val = unNumber.unNumber(this.newTotalMoney)
+                let newTaxRate = this.newTaxRate / 100;
+                this.newTaxAmount = number.number((val / (1 + newTaxRate) *  newTaxRate).toFixed(2))//税额
+                this.newMoney = number.number((val / (1 + newTaxRate)).toFixed(2));//金额
+                this.newUnitPrice = (val / (1 + newTaxRate) / this.newNum).toFixed(9);//单价
+            },
+            //税额失去焦点事件
+            newTaxAmountBlur(){
+//                console.log(computerTaxAmount);
+                let computerTaxAmount = Number(this.computerTaxAmount.toFixed(2))
+                let newTaxAmount = unNumber.unNumber(this.newTaxAmount)
+                let computerMoney = Number(this.computerMoney.toFixed(2))
+                if(newTaxAmount <= 0){
+                    this.$message.error('请正确输入税额')
+                    this.newTaxAmount = number.number(computerTaxAmount)
+                    return
+                }
+                if( (Math.abs(computerTaxAmount - newTaxAmount)).toFixed(2) > 0.02 && computerMoney){
+                    this.$message.error('您输入的税额与计算出的税额差距过大')
+                    this.newTaxAmount = number.number(computerTaxAmount)
+                }
+            },
+            //金额失去焦点事件
+            newMoneyBlur(){
+                let computerMoney = Number(this.computerMoney.toFixed(2))
+                let newMoney = unNumber.unNumber(this.newMoney)
+                if(newMoney <= 0){
+                    this.$message.error('请正确输入金额')
+                    this.newMoney = number.number(computerMoney)
+                    return
+                }
+                if( (Math.abs(computerMoney - newMoney)).toFixed(2) > 0.02 && computerMoney){
+                    this.$message.error('您输入的税额与计算出的税额差距过大')
+                    this.newMoney = number.number(computerMoney)
                 }
             },
             //after模态框事件
@@ -1428,7 +1498,7 @@
                 this.dialogVisible = true;
             },
             submit(n){
-                console.log(n);
+//                console.log(n);
                 this.loading = true;
                 var params = new URLSearchParams();
                 var type = this.type;

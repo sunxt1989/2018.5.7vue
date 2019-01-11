@@ -263,7 +263,7 @@
                 params.append('id',this.scene);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value.setting;
                         this.bankCodeName = data.bankCodeName
                         this.bankCodeFlg = data.bankCodeFlg
@@ -450,7 +450,7 @@
                             this.$router.go(-1);
                             this.$message({
                                 type: 'success',
-                                message: '保存成功'
+                                message: '记账成功'
                             });
                         }else if(response.data.status == 400){
                             var msg = response.data.msg;
@@ -487,7 +487,7 @@
             var url = addUrl.addUrl('collection')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     this.bankCodeList = data.bankList
                     this.departmentAndProjectList = data.departmentList

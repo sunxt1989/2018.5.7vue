@@ -3,10 +3,7 @@
         <div class="w">
             <div class="top">
                 <h2>还款单详情</h2>
-                <router-link v-if="!isRedFlush" :to="{name:'repayment',params:{debitId:debit_id}}" class="back">
-                    返回
-                </router-link>
-                <el-button v-if="isRedFlush" @click="model" size="small" class="back2">返回</el-button>
+                <el-button @click="model" size="small" class="back2">返回</el-button>
             </div>
         </div>
         <div class="w">
@@ -71,6 +68,9 @@
                 debit_id:'',//借款单ID
                 debitId:this.$route.params.debitId,
                 isRedFlush:this.$route.params.isRedFlush,
+                isBossSee:this.$route.params.isBossSee,//是否为boss查看
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
 
                 isShow:false,//是否显示结算方式等
                 payType:'',//结算方式
@@ -83,7 +83,11 @@
         },
         methods:{
             model(){
-                this.$router.go(-1)
+                if(this.isRedFlush){
+                    this.$router.go(-1);
+                }else{
+                    this.$router.push({name:'repaymentList',params:{debitId:this.debit_id,activeName:this.activeName,currentPage:this.currentPage,isBossSee:this.isBossSee}})
+                }
             },
         },
         mounted(){

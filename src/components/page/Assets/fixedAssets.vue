@@ -796,7 +796,7 @@
 //            var url = 'http://192.168.2.190:8080/web/vue/assets/fixed/item.html'
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value;
                     this.options = data.departmentList;
                     this.bankList = data.bankList
@@ -856,7 +856,7 @@
                 })
                 .catch(error=> {
                     this.loading = false
-                    console.log(error);
+//                    console.log(error);
                     alert('网络错误，不能访问');
                 });
         }

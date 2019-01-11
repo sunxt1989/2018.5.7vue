@@ -68,9 +68,9 @@
                         <el-tab-pane name="12">
                             <span slot="label" class="mon">12月</span>
                         </el-tab-pane>
-                        <el-tab-pane name="13">
-                            <span slot="label" class="mon">13月</span>
-                        </el-tab-pane>
+                        <!--<el-tab-pane name="13">-->
+                            <!--<span slot="label" class="mon">13月</span>-->
+                        <!--</el-tab-pane>-->
                     </el-tabs>
 
                     <el-table class="single voucherList" :data="tableData"  @selection-change="handleSelectionChange" :default-expand-all="true"  >
@@ -179,10 +179,11 @@
                     let arr = this.url3.split('printType=')
                     arr[1] = this.printType
                     this.url3 = arr.join('=')
-                    console.log(this.url3);
+//                    console.log(this.url3);
                 }else{
                     this.url3 +='&printType=' + this.printType
                 }
+                window.location.href = this.url3;
                 this.dialogGrant = false;
                 this.grantLoading = false;
                 this.loading = false

@@ -2,35 +2,35 @@
     <div v-loading.fullscreen.lock="loading">
         <div class="w cf">
             <div class="top">
-                <h2>收容业务列表</h2>
-                <router-link to="/Collection/newCollection" class="addLink">新增</router-link>
-                <router-link to="/" class="back">返回</router-link>
+                <h2>销售收款单列表</h2>
+                <router-link v-if="!isBossSee && isShowButton && auditFlg != 7" :to="{name:'newSalePayment',params:{saleId:saleId,activeName:activeName,currentPage:currentPage}}" class="addLink">新增销售收款单</router-link>
+                <el-button @click="back" size="small" class="back">返回</el-button>
             </div>
         </div>
         <div class="w">
             <div class="left" :style="{height:screenHeight}">
                 <el-table :data="tableData" class="blueList">
-                    <el-table-column prop="sceneName" label="业务名称" sortable align="center"></el-table-column>
-                    <el-table-column prop="businessDateYMD" label="业务日期" sortable align="center"></el-table-column>
-                    <el-table-column prop="money" label="价税合计" sortable align="center">
+                    <el-table-column property="receiveDate" label="日期" sortable align="center"></el-table-column>
+                    <el-table-column property="childTypeName" label="收款记录" sortable align="center">
                         <template slot-scope="scope">
-                            <span>{{ scope.row.showMoney }}</span>
+                            <span>收到{{scope.row.customName}}一笔款项</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="auditFlg" label="业务状态" sortable align="center">
+                    <el-table-column property="receiveMoney" label="金额" sortable align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.auditFlg == 0">仅保存</span>
-                            <span v-if="scope.row.auditFlg == 4">已记账</span>
-                            <span v-if="scope.row.auditFlg == 7">已红冲</span>
+                            <span>{{scope.row.showMoney}}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="80px" align="center">
+                    <el-table-column property="attachCount" label="附件" sortable align="center">
+                        <template slot-scope="scope">
+                            <span>{{scope.row.attachCount}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column property="auditFlg" label="状态" sortable align="center"></el-table-column>
+                    <el-table-column label="查看" align="center">
                         <template slot-scope="scope">
                             <span class="operation">
-                                 <router-link v-if="scope.row.auditFlg == 0" :to="{name:'seeCollection',params:{debitId:scope.row.idString}}" class="see">
-                                     <i class="icon iconfont icon-shuru blue"></i>
-                                 </router-link>
-                                <router-link v-if="scope.row.auditFlg == 4 || scope.row.auditFlg == 7" :to="{name:'seeCollection',params:{debitId:scope.row.idString}}" class="see">
+                                <router-link :to="{name:'seeSalePayment',params:{saleId:scope.row.receiveId,isBossSee:isBossSee,choice:choice,currentPage:currentPage,auditFlg:auditFlg}}" class="see">
                                     <i class="icon iconfont icon-kanguo blue"></i>
                                 </router-link>
                             </span>
@@ -47,14 +47,29 @@
     import number from '../../../../static/js/number'
     import unNumber from '../../../../static/js/unNumber'
     import addUrl from '../../../../static/js/addUrl'
-
     export default {
         data() {
             return {
-                tableData: [],//销售单审批列表数据
+                choice:this.$route.params.choice,
+                saleId:this.$route.params.saleId,//采购单id
+                currentPage:this.$route.params.currentPage,
+                activeName:this.$route.params.activeName,
+                isBossSee:this.$route.params.isBossSee,//是否为boss查看页面模式
+                auditFlg:this.$route.params.auditFlg,//判断该条是否为已红冲状态，如果为'7'时则不显示新建按钮
+                tableData: [],//销售单列表数据
+                isShowButton:false,//是否显示新建按钮
                 loading:true,
                 screenHeight: '' //页面初始化高度
             }
+        },
+        methods:{
+            back(){
+                if(this.isBossSee){
+                    this.$router.push({name:'viewingList',params:{activeName:this.activeName,currentPage:this.currentPage}})
+                } else{
+                    this.$router.push({name:'saleList',params:{choice:this.choice,currentPage:this.currentPage}})
+                }
+            },
         },
         mounted(){
             // 动态设置背景图的高度为浏览器可视区域高度
@@ -75,22 +90,29 @@
             };
         },
         created(){
-            var url = addUrl.addUrl('collectionList');
-            axios.post(url)
+            var params = new URLSearchParams();
+            var url = addUrl.addUrl('newSalePayment')
+            params.append('saleId',this.saleId);
+            axios.post(url,params)
                 .then(response=> {
-                    this.loading = false;
 //                    console.log(response);
-                    let data = response.data.value.list;
-                    for(let i in data){
-                        data[i].showMoney =number.number(data[i].money)
+                    var data = response.data.value;
+                    var list = data.list
+                    let unReceiveMoney = data.unReceiveMoney
+                    this.isShowButton = unReceiveMoney ? true : false
+                    for(let i = 0; i < list.length; i++){
+                        list[i].showMoney =number.number(list[i].receiveMoney)
+                        list[i].receiveMoney = unNumber.unNumber(list[i].receiveMoney)
                     }
-                    this.tableData = data
+                    this.tableData = list
+//                    console.log(this.List);
+                    this.loading = false
                 })
                 .catch(error=> {
-                    this.loading = false;
+                    this.loading = false
 //                    console.log(error);
                     alert('网络错误，不能访问');
-                })
+                });
         },
     }
 </script>
@@ -109,25 +131,10 @@
     h2 {
         display: inline-block;
     }
-    .back{
-        display: inline-block;
-        width:56px;
-        height:30px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        line-height: 32px;
-        text-align: center;
-        font-size:14px;
-        text-decoration: none;
-        color: #333;
-        position: absolute;
-        right: 30px;
-    }
     .addLink{
         display: inline-block;
-        width: 56px;
-        height:30px;
+        width: 120px;
+        height:32px;
         color: #fff;
         background-color: #409EFF;
         border-radius: 3px;
@@ -136,28 +143,18 @@
         right:120px;
         text-decoration: none;
     }
-    .choice {
-        width:120px;
-        display: inline-block;
+    .back{
         position: absolute;
-        left:20px;
-        text-decoration: none;
-    }
-    .query{
-        margin-left: 30px;
+        right:20px;
+        font-size:12px;
     }
     .left {
-        width: 1120px;
+        width: 1160px;
         background-color: #fff;
-        padding: 20px 40px;
+        padding: 20px;
         text-align: left;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
-    }
-    .record {
-        font-size: 18px;
-        color: #333;
-        margin-right: 20px;
     }
     .repayment {
         text-decoration: none;
@@ -167,9 +164,6 @@
     }
     .el-table {
         margin: 30px 0;
-    }
-    .el-select {
-        margin: 0 20px;
     }
     .see{
         text-decoration: none;

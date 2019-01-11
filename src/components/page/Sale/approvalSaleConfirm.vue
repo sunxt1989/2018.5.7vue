@@ -589,7 +589,7 @@
             params.append('sale_receive_id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     var data = response.data.value
                     var sale = data.sale
 

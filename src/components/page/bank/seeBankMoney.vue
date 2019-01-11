@@ -181,7 +181,7 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let bankTransfer = data.bankTransfer
                     this.bankName =bankTransfer.bankName

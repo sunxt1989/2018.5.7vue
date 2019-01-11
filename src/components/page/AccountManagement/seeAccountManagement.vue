@@ -79,7 +79,7 @@
                         </el-date-picker>
                     </li>
                     <li class="pt">
-                        <span class="tit">注册资金</span>
+                        <span class="tit">注册资金（元）</span>
                         <input class="ipt" type="text" v-model="registeredCapital" readonly>
                     </li>
                     <li class="pt" v-if="inviteCode">
@@ -159,6 +159,11 @@
                         <el-radio class="radio" v-model="techScaleType" label="1">一般科技企业</el-radio>
                         <el-radio class="radio" v-model="techScaleType" label="2">科技型中小企业</el-radio>
                         <el-checkbox v-model="highTechFlg">高新技术企业</el-checkbox>
+                    </li>
+                    <li class="pt">
+                        <span class="tit">是否自动结转</span>
+                        <el-radio class="radio" v-model="carry" label="0">是</el-radio>
+                        <el-radio class="radio" v-model="carry" label="1">否</el-radio>
                     </li>
                     <li class="ptx">
                         <span class="tit">营业执照</span>
@@ -280,6 +285,7 @@
                 addedTaxPeroidType:'',//增值税缴税周期
                 techScaleType:'',//科技企业规模标记 1：一般科技企业 2：科技中小企业
                 highTechFlg:'',//是否科技型企业
+                carry:'0',//是否自动结转
 
                 initialStatus:'',//是否可以修改
 
@@ -319,7 +325,6 @@
                         this.loading = false
                     });
                 }else{
-
                     this.$confirm('确定是否保存？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -350,6 +355,7 @@
                             type: 'info',
                             message: '已取消'
                         });
+                        this.loading = false
                     });
                 }
             },
@@ -357,7 +363,6 @@
                 var url = addUrl.addUrl('AccountManagementUpdate');
                 var params = new URLSearchParams();
                 let highTechFlg = this.highTechFlg ? '1' : '0'
-                console.log(this.incomeTaxPeroidType);
                 params.append('accountStandard',this.accountStandard);
                 params.append('fixedDeprecitionType',this.fixedDeprecitionType);
                 params.append('intangibleDeprecitionType',this.intangibleDeprecitionType);
@@ -366,6 +371,7 @@
                 params.append('addedTaxPeroidType',this.addedTaxPeroidType);
                 params.append('techScaleType',this.techScaleType);
                 params.append('highTechFlg',highTechFlg);
+                params.append('carrydownFlg',this.carry);
 
                 axios({
                     method:'post',
@@ -376,7 +382,7 @@
                     }
                 },params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         var msg = response.data.msg;
                         if(response.data.status == 200){
                             this.$message({
@@ -441,7 +447,7 @@
             let url = addUrl.addUrl('seeAccountManagement')
             axios.post(url)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value.item
 
                     this.companyName = data.companyName
@@ -457,15 +463,15 @@
                     this.areaCode = data.district;
                     this.attachUrlJson = [{name: '', url: data.idNumberUri}];
                     this.accountStandard = data.accountStandard;
-                    this.fixedDeprecitionType = data.fixedDeprecitionType;
-                    this.intangibleDeprecitionType = data.intangibleDeprecitionType;
-                    this.inventoryCostType = data.inventoryCostType;
-                    this.incomeTaxPeroidType = data.incomeTaxPeroidType;
-                    this.addedTaxPeroidType = data.addedTaxPeroidType;
+                    this.fixedDeprecitionType = data.fixedDeprecitionType ? data.fixedDeprecitionType : '';
+                    this.intangibleDeprecitionType = data.intangibleDeprecitionType ? data.intangibleDeprecitionType : '';
+                    this.inventoryCostType = data.inventoryCostType ? data.inventoryCostType : '';
+                    this.incomeTaxPeroidType = data.incomeTaxPeroidType ? data.incomeTaxPeroidType : '';
+                    this.addedTaxPeroidType = data.addedTaxPeroidType ? data.addedTaxPeroidType : '';
                     this.highTechFlg = data.highTechFlg ? true : false;
                     this.techScaleType = String(data.techScaleType);
                     this.initialStatus = data.initialStatus
-
+                    this.carry = String(data.carrydownFlg)
 
                     this.loading = false
                 })

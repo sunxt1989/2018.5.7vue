@@ -134,7 +134,7 @@
                 params.append('currentQuarter', this.quarterName);
                 axios.post(url,params)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
