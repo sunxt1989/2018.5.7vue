@@ -78,8 +78,8 @@
                 if(n == 0){
                     this.$router.go(-1)
                 }else {
-                    let debitId = $(".inputcheckbox[name='radio']:checked").val()
-                    if(!debitId){
+                    let saleId = $(".inputcheckbox[name='radio']:checked").val()
+                    if(!saleId){
                         this.$message.error('请选择关联条目');
                         this.loading = false;
                         return
@@ -110,7 +110,7 @@
                         }
                     }).then(() => {
                         this.$router.push({ name: 'newSalePayment',
-                            params:{debitId:debitId,advanceId:this.advanceId}})
+                            params:{saleId:saleId,advanceId:this.advanceId}})
                     }).catch(() => {
                         this.$message({
                             type: 'info',

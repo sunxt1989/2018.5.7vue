@@ -2,12 +2,12 @@
  * Created by who on 2018/7/4.
  */
 function addUrl(name){
-    //var url = 'http://192.168.2.105:8881/web';
-    var url = 'http://192.168.2.190:8881/web';
-    //var url = 'http://192.168.2.190:8080/web';
-    //var url = 'http://192.168.2.191:8080/web';
+    // var url = 'http://192.168.2.105:8881/web';
+    // var url = 'http://192.168.2.190:8881/web';
+    // var url = 'http://192.168.2.190:8080/web';
+    // var url = 'http://192.168.2.191:8080/web';
     //var url = 'https://192.168.2.192:8443/web';
-    //var url = 'http://www.cloudaccounting.cn'
+    var url = 'http://www.cloudaccounting.cn';//外网
 
     //借款单列表
     if(name == 'loan'){

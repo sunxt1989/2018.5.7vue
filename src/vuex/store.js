@@ -20,6 +20,7 @@ const state ={
     account_type:'',//代记账会计身份，1为普通会计 >1会计
     owner_flg:'',//代记账会计以外所有人，1为是 0为否
     accounter_flg:'',//是否是会计，1为是 0为否
+    stock_flg:'',//是否是股东，1为是 0为否
     name:'',//用户名称
     isMonthlyKnots:false,//是否12月月结
     isAnnualKnots:false,//是否去年年结
@@ -44,6 +45,7 @@ const mutations={
         state.isAnnualKnots = obj.isAnnualKnots ? obj.isAnnualKnots : state.isAnnualKnots;
         state.owner_flg = obj.owner_flg ? obj.owner_flg : state.owner_flg;
         state.accounter_flg = obj.accounter_flg ? obj.accounter_flg : state.accounter_flg;
+        state.stock_flg = obj.stock_flg ? obj.stock_flg : state.stock_flg;
     },
 }
 

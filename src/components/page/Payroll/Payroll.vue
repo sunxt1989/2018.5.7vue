@@ -64,63 +64,132 @@
                     </el-tabs>
 
                     <el-table class="single" :data="tableData3" style="width: 100%" :height="tableHeight" ref="multipleTable">
-                            <el-table-column align="center" type="selection" prop="id"></el-table-column>
-                            <el-table-column fixed prop="userName" label="姓名">
-                                <template slot-scope="scope">
-                                    <span v-if="scope.row.userId == 0"><span class="red">*</span>{{scope.row.userName}}</span>
-                                    <span v-else-if="scope.row.userName == ''">合计</span>
-                                    <span v-else>{{scope.row.userName}}</span>
-                                </template>
+                        <el-table-column align="center" type="selection" prop="id"></el-table-column>
+                        <el-table-column fixed type="index" label="序号" align="center"></el-table-column>
+                        <el-table-column fixed prop="userName" label="姓名">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.userId == 0"><span class="red">*</span>{{scope.row.userName}}</span>
+                                <span v-else-if="scope.row.userName == ''">合计</span>
+                                <span v-else>{{scope.row.userName}}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column fixed label="部门">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.departmentName">{{scope.row.departmentName}}</span>
+                                <span v-else-if="scope.row.projectName">{{scope.row.projectName}}</span>
+                                <span v-if="scope.row.divideFlg == 1">(分摊)</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column fixed prop="" label="操作">
+                            <template slot-scope="scope">
+                                <span class="operation" v-if="scope.row.userName != ''">
+                                    <router-link :to="{name:'seePayroll',params:{id:scope.row.id,
+                                       userName:scope.row.userName,
+                                       userId:scope.row.userId,
+                                       ym:currentYM,
+                                       isCalculation:isCalculation}}" class="see">
+                                        <i class="icon iconfont icon-bianji blue"></i>
+                                    </router-link>
+                                </span>
+                                <span class="operation" v-if="scope.row.userName != ''">
+                                    <!--当userId为 0 时才能点击删除按钮-->
+                                    <i v-if='scope.row.userId == 0 && !isCalculation' @click='deleteModel(scope.row.id)'
+                                       class="icon iconfont icon-shanchu red"></i>
+                                    <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
+                                </span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column fixed prop="credentialsType" label="证件类型"></el-table-column>
+                        <el-table-column fixed prop="credentialsCode" label="证件号码"></el-table-column>
+                        <el-table-column fixed prop="idNumber" label="纳税人识别号"></el-table-column>
+                        <el-table-column fixed prop="nonResidentsStatus" label="是否为非居民个人" align="center">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.nonResidentsStatus == 1">是</span>
+                                <span v-else-if="scope.row.nonResidentsStatus == 0">否</span>
+                            </template>
+                        </el-table-column>
+
+                        <el-table-column label="本月">
+                            <el-table-column label="收入额计算">
+                                <el-table-column prop="basicWages" label="基本工资"></el-table-column>
+                                <el-table-column prop="overtimeWages" label="加班工资"></el-table-column>
+                                <el-table-column prop="dailyBonus" label="日常奖金"></el-table-column>
+                                <el-table-column prop="subsidy" label="津贴和补贴"></el-table-column>
+                                <el-table-column prop="annualBonus" label="年终奖"></el-table-column>
+                                <el-table-column prop="exemptIncome" label="免税收入"></el-table-column>
+                                <el-table-column prop="leaveDeductMoney" label="事假扣款"></el-table-column>
+                                <el-table-column prop="sickDeduct" label="病假扣款"></el-table-column>
+                                <el-table-column prop="lateDeductMoney" label="迟到早退扣款"></el-table-column>
+                                <el-table-column prop="otherDeduct" label="其他扣款"></el-table-column>
                             </el-table-column>
-                            <el-table-column fixed label="部门">
-                                <template slot-scope="scope">
-                                    <span v-if="scope.row.departmentName">{{scope.row.departmentName}}</span>
-                                    <span v-else-if="scope.row.projectName">{{scope.row.projectName}}</span>
-                                    <span v-if="scope.row.divideFlg == 1">(分摊)</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column fixed prop="" label="操作">
-                                <template slot-scope="scope">
-                                    <span class="operation" v-if="scope.row.userName != ''">
-                                        <router-link :to="{name:'seePayroll',params:{id:scope.row.id,
-                                        userName:scope.row.userName,
-                                        userId:scope.row.userId,
-                                        ym:currentYM,
-                                        isCalculation:isCalculation}}" class="see">
-                                            <i class="icon iconfont icon-bianji blue"></i>
-                                        </router-link>
-                                    </span>
-                                    <span class="operation" v-if="scope.row.userName != ''">
-                                        <!--当userId为 0 时才能点击删除按钮-->
-                                        <i v-if='scope.row.userId == 0 && !isCalculation' @click='deleteModel(scope.row.id)'
-                                            class="icon iconfont icon-shanchu red"></i>
-                                        <i v-else class="icon iconfont icon-shanchu black" style="cursor: auto"></i>
-                                    </span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="shouldWages" label="应发工资" width="100px"></el-table-column>
-                            <el-table-column label="个人代缴保险">
-                                <el-table-column prop="endowmentInsurancePerson" label="养老保险"></el-table-column>
-                                <el-table-column prop="medicalInsurancePerson" label="医疗保险"></el-table-column>
-                                <el-table-column prop="unemploymentInsurancePerson" label="失业保险"></el-table-column>
-                                <el-table-column prop="maternityInsurancePerson" label="生育保险"></el-table-column>
-                                <el-table-column prop="employmentInjuryInsurancePerson" label="工伤保险"></el-table-column>
+                            <el-table-column prop="totalSalary" label="应发合计" width="100px"></el-table-column>
+                            <el-table-column label="应扣个人款项">
+                                <el-table-column prop="endowmentInsurancePerson" label="基本养老保险"></el-table-column>
+                                <el-table-column prop="supplementaryInsurancePerson" label="补充养老保险"></el-table-column>
+                                <el-table-column prop="medicalInsurancePerson" label="基本医疗保险"></el-table-column>
+                                <el-table-column prop="supplementaryMedicalInsurancePerson" label="补充医疗保险"></el-table-column>
+                                <el-table-column prop="unemploymentInsurancePerson" label="失业保险费"></el-table-column>
                                 <el-table-column prop="housingProvidentFundPerson" label="住房公积金"></el-table-column>
-                                <el-table-column prop="insuranceSumPerson" label="五险一金合计"></el-table-column>
                             </el-table-column>
-                            <el-table-column label="公司代缴保险">
-                                <el-table-column prop="endowmentInsuranceCompany" label="养老保险"></el-table-column>
-                                <el-table-column prop="medicalInsuranceCompany" label="医疗保险"></el-table-column>
-                                <el-table-column prop="unemploymentInsuranceCompany" label="失业保险"></el-table-column>
-                                <el-table-column prop="maternityInsuranceCompany" label="生育保险"></el-table-column>
+                            <el-table-column prop="insuranceSumPerson" label="应扣个人款项合计" width="100px"></el-table-column>
+                            <el-table-column label="公司缴纳社保和公积金">
+                                <el-table-column prop="endowmentInsuranceCompany" label="基本养老保险"></el-table-column>
+                                <el-table-column prop="supplementaryInsuranceCompany" label="补充养老保险"></el-table-column>
+                                <el-table-column prop="medicalInsuranceCompany" label="基本医疗保险"></el-table-column>
+                                <el-table-column prop="supplementaryMedicalInsuranceCompany" label="补充医疗保险"></el-table-column>
+                                <el-table-column prop="unemploymentInsuranceCompany" label="失业保险费"></el-table-column>
                                 <el-table-column prop="employmentInjuryInsuranceCompany" label="工伤保险"></el-table-column>
+                                <el-table-column prop="maternityInsuranceCompany" label="生育保险"></el-table-column>
                                 <el-table-column prop="housingProvidentFundCompany" label="住房公积金"></el-table-column>
-                                <el-table-column prop="insuranceSumCompany" label="五险一金合计"></el-table-column>
                             </el-table-column>
-                            <el-table-column prop="taxableIncome" label="应纳所得税额"></el-table-column>
+                            <el-table-column prop="insuranceSumCompany" label="五险一金合计" width="100px"></el-table-column>
+                            <el-table-column label="其他扣款">
+                                <el-table-column prop="commercialHealthInsurance" label="商业健康保险"></el-table-column>
+                                <el-table-column prop="taxDeferredEndowmentInsurance" label="税延养老保险"></el-table-column>
+                                <el-table-column prop="otherDeduction" label="其他"></el-table-column>
+                            </el-table-column>
+                            <el-table-column prop="totalOtherDeduction" label="其他扣除合计" width="100px"></el-table-column>
+                        </el-table-column>
+                        <el-table-column label="本年累计">
+                            <el-table-column prop="accumulatedSalary" label="累计收入额"></el-table-column>
+                            <el-table-column prop="accumulatedFeesDeduction" label="累计减除费用"></el-table-column>
+                            <el-table-column prop="accumulatedSpecialDeduction" label="累计专项扣除"></el-table-column>
+                            <el-table-column label="累计专项附加扣除">
+                                <el-table-column prop="accumulatedChildrenEducation" label="子女教育"></el-table-column>
+                                <el-table-column prop="accumulatedElderSupport" label="赡养老人"></el-table-column>
+                                <el-table-column prop="accumulatedHomeloanInterest" label="住房贷款利息"></el-table-column>
+                                <el-table-column prop="accumulatedRent" label="住房租金"></el-table-column>
+                                <el-table-column prop="accumulatedContinuingEducation" label="继续教育"></el-table-column>
+                            </el-table-column>
+                            <el-table-column prop="accumulatedOtherDeduction" label="累计其他扣除"></el-table-column>
+                        </el-table-column>
+                        <el-table-column prop="deductionRatio" label="减按计税比例"></el-table-column>
+                        <el-table-column prop="allowedDeductionOfDonations" label="准予扣除的捐赠额"></el-table-column>
+
+                        <el-table-column label="税款计算">
+                            <el-table-column label="应纳税所得额">
+                                <el-table-column prop="taxPayableSalary" label="工资薪金"></el-table-column>
+                                <el-table-column prop="taxPayableAnnualBonus" label="年终奖"></el-table-column>
+                            </el-table-column>
+                            <el-table-column label="税率/预扣率">
+                                <el-table-column prop="taxRateSalary" label="工资薪金"></el-table-column>
+                                <el-table-column prop="taxRateAnnualBonus" label="年终奖"></el-table-column>
+                            </el-table-column>
+                            <el-table-column label="速算扣除数">
+                                <el-table-column prop="quickCalculationDeductionSalary" label="工资薪金"></el-table-column>
+                                <el-table-column prop="quickCalculationDeductionAnnualBonus" label="年终奖"></el-table-column>
+                            </el-table-column>
+                            <el-table-column label="应纳税额">
+                                <el-table-column prop="taxOwedSalary" label="工资薪金"></el-table-column>
+                                <el-table-column prop="taxOwedAnnualBonus" label="年终奖"></el-table-column>
+                            </el-table-column>
+
+                            <el-table-column prop="taxCredit" label="减免税额"></el-table-column>
+                            <el-table-column prop="taxPrePaidAndWithheld" label="已扣缴税额"></el-table-column>
                             <el-table-column prop="incomeTax" label="个人所得税"></el-table-column>
-                            <el-table-column prop="actualWages" label="实发工资"></el-table-column>
-                        </el-table>
+                        </el-table-column>
+                        <el-table-column prop="actualWages" label="实发工资"></el-table-column>
+                    </el-table>
 
                     <el-dialog title="修改工资发放日" :visible.sync="dialogFormVisible" width="400px" >
                         <el-select class="provideDay" v-model="provideDay"
@@ -655,37 +724,77 @@
                 params.append('ym', this.indexYM);
                 axios.post(url,params)
                     .then(response=> {
-//                        console.log(response);
+                       console.log(response);
                         let status = response.data.status
                         let msg = response.data.msg
                         if(status == 200){
                             let data = response.data.value;
                             let sumList = data.sumList
                             //判断table列表中，金额如果为空时补填0.00
+                            console.log(sumList);
                             for(let i in sumList){
-                                sumList[i].shouldWages = sumList[i].shouldWages ? sumList[i].shouldWages :'0.00'
+                                console.log(sumList[i].taxPayableAnnualBonus);
+                                sumList[i].basicWages = sumList[i].basicWages ? sumList[i].basicWages :'0.00'
+                                sumList[i].overtimeWages = sumList[i].overtimeWages ? sumList[i].overtimeWages :'0.00'
+                                sumList[i].dailyBonus = sumList[i].dailyBonus ? sumList[i].dailyBonus :'0.00'
+                                sumList[i].subsidy = sumList[i].subsidy ? sumList[i].subsidy :'0.00'
+                                sumList[i].annualBonus = sumList[i].annualBonus ? sumList[i].annualBonus :'0.00'
+                                sumList[i].exemptIncome = sumList[i].exemptIncome ? sumList[i].exemptIncome :'0.00'
+                                sumList[i].leaveDeductMoney = sumList[i].leaveDeductMoney ? sumList[i].leaveDeductMoney :'0.00'
+                                sumList[i].sickDeduct = sumList[i].sickDeduct ? sumList[i].sickDeduct :'0.00'
+                                sumList[i].lateDeductMoney = sumList[i].lateDeductMoney ? sumList[i].lateDeductMoney :'0.00'
+                                sumList[i].otherDeduct = sumList[i].otherDeduct ? sumList[i].otherDeduct :'0.00'
+                                sumList[i].totalSalary = sumList[i].totalSalary ? sumList[i].totalSalary :'0.00'
                                 sumList[i].endowmentInsurancePerson = sumList[i].endowmentInsurancePerson ? sumList[i].endowmentInsurancePerson :'0.00'
+                                sumList[i].supplementaryInsurancePerson = sumList[i].supplementaryInsurancePerson ? sumList[i].supplementaryInsurancePerson :'0.00'
                                 sumList[i].medicalInsurancePerson = sumList[i].medicalInsurancePerson ? sumList[i].medicalInsurancePerson :'0.00'
+                                sumList[i].supplementaryMedicalInsurancePerson = sumList[i].supplementaryMedicalInsurancePerson ? sumList[i].supplementaryMedicalInsurancePerson :'0.00'
                                 sumList[i].unemploymentInsurancePerson = sumList[i].unemploymentInsurancePerson ? sumList[i].unemploymentInsurancePerson :'0.00'
-                                sumList[i].maternityInsurancePerson = sumList[i].maternityInsurancePerson ? sumList[i].maternityInsurancePerson :'0.00'
-                                sumList[i].employmentInjuryInsurancePerson = sumList[i].employmentInjuryInsurancePerson ? sumList[i].employmentInjuryInsurancePerson :'0.00'
                                 sumList[i].housingProvidentFundPerson = sumList[i].housingProvidentFundPerson ? sumList[i].housingProvidentFundPerson :'0.00'
                                 sumList[i].insuranceSumPerson = sumList[i].insuranceSumPerson ? sumList[i].insuranceSumPerson :'0.00'
+
                                 sumList[i].endowmentInsuranceCompany = sumList[i].endowmentInsuranceCompany ? sumList[i].endowmentInsuranceCompany :'0.00'
+                                sumList[i].supplementaryInsuranceCompany = sumList[i].supplementaryInsuranceCompany ? sumList[i].supplementaryInsuranceCompany :'0.00'
                                 sumList[i].medicalInsuranceCompany = sumList[i].medicalInsuranceCompany ? sumList[i].medicalInsuranceCompany :'0.00'
+                                sumList[i].supplementaryMedicalInsuranceCompany = sumList[i].supplementaryMedicalInsuranceCompany ? sumList[i].supplementaryMedicalInsuranceCompany :'0.00'
                                 sumList[i].unemploymentInsuranceCompany = sumList[i].unemploymentInsuranceCompany ? sumList[i].unemploymentInsuranceCompany :'0.00'
-                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
                                 sumList[i].employmentInjuryInsuranceCompany = sumList[i].employmentInjuryInsuranceCompany ? sumList[i].employmentInjuryInsuranceCompany :'0.00'
+                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
                                 sumList[i].housingProvidentFundCompany = sumList[i].housingProvidentFundCompany ? sumList[i].housingProvidentFundCompany :'0.00'
+
                                 sumList[i].insuranceSumCompany = sumList[i].insuranceSumCompany ? sumList[i].insuranceSumCompany :'0.00'
-                                sumList[i].taxableIncome = sumList[i].taxableIncome ? sumList[i].taxableIncome :'0.00'
+                                sumList[i].commercialHealthInsurance = sumList[i].commercialHealthInsurance ? sumList[i].commercialHealthInsurance :'0.00'
+                                sumList[i].taxDeferredEndowmentInsurance = sumList[i].taxDeferredEndowmentInsurance ? sumList[i].taxDeferredEndowmentInsurance :'0.00'
+                                sumList[i].otherDeduction = sumList[i].otherDeduction ? sumList[i].otherDeduction :'0.00'
+                                sumList[i].totalOtherDeduction = sumList[i].totalOtherDeduction ? sumList[i].totalOtherDeduction :'0.00'
+
+                                sumList[i].accumulatedSalary = sumList[i].accumulatedSalary ? sumList[i].accumulatedSalary :'0.00'
+                                sumList[i].accumulatedFeesDeduction = sumList[i].accumulatedFeesDeduction ? sumList[i].accumulatedFeesDeduction :'0.00'
+                                sumList[i].accumulatedSpecialDeduction = sumList[i].accumulatedSpecialDeduction ? sumList[i].accumulatedSpecialDeduction :'0.00'
+                                sumList[i].accumulatedChildrenEducation = sumList[i].accumulatedChildrenEducation ? sumList[i].accumulatedChildrenEducation :'0.00'
+                                sumList[i].accumulatedElderSupport = sumList[i].accumulatedElderSupport ? sumList[i].accumulatedElderSupport :'0.00'
+                                sumList[i].accumulatedHomeloanInterest = sumList[i].accumulatedHomeloanInterest ? sumList[i].accumulatedHomeloanInterest :'0.00'
+                                sumList[i].accumulatedRent = sumList[i].accumulatedRent ? sumList[i].accumulatedRent :'0.00'
+                                sumList[i].accumulatedContinuingEducation = sumList[i].accumulatedContinuingEducation ? sumList[i].accumulatedContinuingEducation :'0.00'
+                                sumList[i].accumulatedOtherDeduction = sumList[i].accumulatedOtherDeduction ? sumList[i].accumulatedOtherDeduction :'0.00'
+                                sumList[i].deductionRatio = sumList[i].deductionRatio ? sumList[i].deductionRatio :'0.00'
+                                sumList[i].allowedDeductionOfDonations = sumList[i].allowedDeductionOfDonations ? sumList[i].allowedDeductionOfDonations :'0.00'
+
+                                sumList[i].taxPayableSalary = sumList[i].taxPayableSalary ? sumList[i].taxPayableSalary :'0.00'
+                                sumList[i].taxPayableAnnualBonus = sumList[i].taxPayableAnnualBonus ? sumList[i].taxPayableAnnualBonus :'0.00'
+                                sumList[i].taxRateSalary = sumList[i].taxRateSalary ? sumList[i].taxRateSalary :'0.00'
+                                sumList[i].taxRateAnnualBonus = sumList[i].taxRateAnnualBonus ? sumList[i].taxRateAnnualBonus :'0.00'
+                                sumList[i].quickCalculationDeductionSalary = sumList[i].quickCalculationDeductionSalary ? sumList[i].quickCalculationDeductionSalary :'0.00'
+                                sumList[i].quickCalculationDeductionAnnualBonus = sumList[i].quickCalculationDeductionAnnualBonus ? sumList[i].quickCalculationDeductionAnnualBonus :'0.00'
+                                sumList[i].taxOwedSalary = sumList[i].taxOwedSalary ? sumList[i].taxOwedSalary :'0.00'
+                                sumList[i].taxOwedAnnualBonus = sumList[i].taxOwedAnnualBonus ? sumList[i].taxOwedAnnualBonus :'0.00'
+                                sumList[i].taxCredit = sumList[i].taxCredit ? sumList[i].taxCredit :'0.00'
+                                sumList[i].taxPrePaidAndWithheld = sumList[i].taxPrePaidAndWithheld ? sumList[i].taxPrePaidAndWithheld :'0.00'
                                 sumList[i].incomeTax = sumList[i].incomeTax ? sumList[i].incomeTax :'0.00'
                                 sumList[i].actualWages = sumList[i].actualWages ? sumList[i].actualWages :'0.00'
-                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
-                                sumList[i].maternityInsuranceCompany = sumList[i].maternityInsuranceCompany ? sumList[i].maternityInsuranceCompany :'0.00'
                             }
-
                             this.tableData3 = sumList;
+
                         }else if(status == 400){
                             this.$message.error(msg)
                             this.tableData3 = [];
@@ -751,9 +860,7 @@
                     }else{
                         this.isCalculation = true
                     }
-
                     this.url = url + '?ym=' + this.indexYM;
-
                     this.axios();
                     this.loading = false
                 })
@@ -765,6 +872,7 @@
 </script>
 <style scoped>
     .w{
+        width:1400px;
         height:100%;
     }
     .top {
@@ -778,10 +886,10 @@
         display: inline-block;
     }
     .content{
-        width: 1120px;
+        width: 1380px;
         height: 100%;
         background-color: #fff;
-        padding: 20px 40px;
+        padding: 20px 10px;
         box-shadow: 0px 2px 7px rgba(0,0,0,0.25);
         overflow-y: auto;
     }

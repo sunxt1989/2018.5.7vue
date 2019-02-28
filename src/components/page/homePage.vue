@@ -485,7 +485,6 @@
 
                     <el-dialog class="dialog cf" title="常用功能选择" :visible.sync="dialogSseTableVisible" showConfirmButton="true"
                                width="1300px" top="50px" center>
-                        <!--<span class="remind">菜单项目最多可选择 <b>17</b>项，您已选择：<b>{{Num}}</b></span>-->
 
                         <div class="items cf" v-if="items2.isShowCostSheet || items2.isShowReimbursementList">
                             <span class="items-tit">报销</span>
@@ -833,25 +832,6 @@
                                 </el-checkbox>
                             </div>
                         </div>
-
-                        <div class="items cf" v-if="accounter_flg == 1 && owner_flg == 1">
-                            <span class="items-tit">进销存</span>
-                            <!--交易方-->
-                            <div class="checkbox">
-                                <el-checkbox v-model="items1.SupplierList" class="homePage-checkbox" @change="checkboxChange">
-                                    <img :src=items[5].src alt="" class="itemImg">
-                                    <span class="name">{{items[5].name}}</span>
-                                </el-checkbox>
-                            </div>
-                            <!--库存商品-->
-                            <div class="checkbox">
-                                <el-checkbox v-model="items1.stockList" class="homePage-checkbox" @change="checkboxChange">
-                                    <img :src=items[6].src alt="" class="itemImg">
-                                    <span class="name">{{items[6].name}}</span>
-                                </el-checkbox>
-                            </div>
-                        </div>
-
                         <div class="items cf" v-if="items2.isShowBookkeepingVoucher">
                             <span class="items-tit">记账凭证</span>
                             <!--记账凭证-->
@@ -1238,7 +1218,7 @@
                 }
             }
         },
-        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type','isBossFlg','owner_flg','accounter_flg','isFinanceFlg']),
+        computed:mapState(['menuArr','auth_json','user_type','current_book_level','account_type','isBossFlg','owner_flg','accounter_flg','isFinanceFlg','stock_flg']),
         methods:{
             //选择菜单配置的时候的change事件
             checkboxChange(e){
@@ -1675,7 +1655,7 @@
                     if (menuArr[i] == '#bookkeepingVoucher' && this.accounter_flg==1) {//记账凭证
                         newMenuArr.push(menuArr[i])
                     }
-                    if (menuArr[i] == '#viewingList' && (this.isBossFlg == 1 || this.isFinanceFlg==1) ) {//查看功能
+                    if (menuArr[i] == '#viewingList' && (this.isBossFlg == 1 || this.isFinanceFlg == 1 || this.stock_flg == 1) ) {//查看功能
                         newMenuArr.push(menuArr[i])
                     }
                 }
@@ -1803,7 +1783,7 @@
                     this.items2.isShowCollection = false;
                 }
 
-                if (this.isBossFlg || this.isFinanceFlg==1) {//查看功能
+                if (this.isBossFlg || this.isFinanceFlg==1 || this.stock_flg == 1) {//查看功能
                     this.items2.isShowViewingList = true;
                 }else{
                     this.items2.isShowViewingList = false;
@@ -1871,7 +1851,7 @@
             let url = addUrl.addUrl('newsList');
             axios.post(url)
                 .then(response=> {
-//                    console.log(response);
+                    console.log(response);
                     let data = response.data.value;
                     let list = data.list
                     for(let i in list){

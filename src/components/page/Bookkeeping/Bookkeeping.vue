@@ -814,6 +814,1468 @@
                         </td>
                         <td><i @click="deleteEffective('9',$event)" class="icon iconfont icon-shanchu red"></i></td>
                     </tr>
+                    <tr v-show="isShowTrArr[10].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[10].abstract" @change="changeAbstract(10)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[10].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[10].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(10)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(10)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[10]" class="subject">
+                                <el-select clearable v-model="auxiliary[10].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[10]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[10]" v-model="cashFlow[10].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[10].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}">{{borrowArr[10][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[10].borrow.includes('-')}" >{{borrowArr[10][10]}}
+                            <input v-model="borrowsArr[10].borrow" @change="borrowChange(10)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-11" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[10].loan.includes('-')}">{{loanArr[10][10]}}
+                            <input v-model="loansArr[10].loan" @change="loanChange(10)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-11" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('10',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[11].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[11].abstract" @change="changeAbstract(11)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[11].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[11].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(11)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(11)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[11]" class="subject">
+                                <el-select clearable v-model="auxiliary[11].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[11]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[11]" v-model="cashFlow[11].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[11].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}">{{borrowArr[11][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[11].borrow.includes('-')}" >{{borrowArr[11][10]}}
+                            <input v-model="borrowsArr[11].borrow" @change="borrowChange(11)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-12" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[11].loan.includes('-')}">{{loanArr[11][10]}}
+                            <input v-model="loansArr[11].loan" @change="loanChange(11)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-12" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('11',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[12].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[12].abstract" @change="changeAbstract(12)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[12].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[12].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(12)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(12)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[12]" class="subject">
+                                <el-select clearable v-model="auxiliary[12].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[12]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[12]" v-model="cashFlow[12].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[12].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}">{{borrowArr[12][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[12].borrow.includes('-')}" >{{borrowArr[12][10]}}
+                            <input v-model="borrowsArr[12].borrow" @change="borrowChange(12)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-13" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[12].loan.includes('-')}">{{loanArr[12][10]}}
+                            <input v-model="loansArr[12].loan" @change="loanChange(12)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-13" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('12',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[13].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[13].abstract" @change="changeAbstract(13)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[13].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[13].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(13)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(13)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[13]" class="subject">
+                                <el-select clearable v-model="auxiliary[13].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[13]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[13]" v-model="cashFlow[13].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[13].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}">{{borrowArr[13][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[13].borrow.includes('-')}" >{{borrowArr[13][10]}}
+                            <input v-model="borrowsArr[13].borrow" @change="borrowChange(13)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-14" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[13].loan.includes('-')}">{{loanArr[13][10]}}
+                            <input v-model="loansArr[13].loan" @change="loanChange(13)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-14" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('13',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[14].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[14].abstract" @change="changeAbstract(14)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[14].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[14].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(14)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(14)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[14]" class="subject">
+                                <el-select clearable v-model="auxiliary[14].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[14]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[14]" v-model="cashFlow[14].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[14].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}">{{borrowArr[14][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[14].borrow.includes('-')}" >{{borrowArr[14][10]}}
+                            <input v-model="borrowsArr[14].borrow" @change="borrowChange(14)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-15" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[14].loan.includes('-')}">{{loanArr[14][10]}}
+                            <input v-model="loansArr[14].loan" @change="loanChange(14)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-15" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('14',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[15].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[15].abstract" @change="changeAbstract(15)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[15].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[15].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(15)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(15)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[15]" class="subject">
+                                <el-select clearable v-model="auxiliary[15].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[15]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[15]" v-model="cashFlow[15].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[15].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}">{{borrowArr[15][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[15].borrow.includes('-')}" >{{borrowArr[15][10]}}
+                            <input v-model="borrowsArr[15].borrow" @change="borrowChange(15)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-16" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[15].loan.includes('-')}">{{loanArr[15][10]}}
+                            <input v-model="loansArr[15].loan" @change="loanChange(15)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-16" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('15',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[16].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[16].abstract" @change="changeAbstract(16)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[16].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[16].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(16)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(16)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[16]" class="subject">
+                                <el-select clearable v-model="auxiliary[16].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[16]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[16]" v-model="cashFlow[16].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[16].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}">{{borrowArr[16][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[16].borrow.includes('-')}" >{{borrowArr[16][10]}}
+                            <input v-model="borrowsArr[16].borrow" @change="borrowChange(16)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-17" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[16].loan.includes('-')}">{{loanArr[16][10]}}
+                            <input v-model="loansArr[16].loan" @change="loanChange(16)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-17" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('16',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[17].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[17].abstract" @change="changeAbstract(17)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[17].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[17].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(17)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(17)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[17]" class="subject">
+                                <el-select clearable v-model="auxiliary[17].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[17]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[17]" v-model="cashFlow[17].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[17].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}">{{borrowArr[17][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[17].borrow.includes('-')}" >{{borrowArr[17][10]}}
+                            <input v-model="borrowsArr[17].borrow" @change="borrowChange(17)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-18" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[17].loan.includes('-')}">{{loanArr[17][10]}}
+                            <input v-model="loansArr[17].loan" @change="loanChange(17)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-18" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('17',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[18].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[18].abstract" @change="changeAbstract(18)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[18].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[18].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(18)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(18)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[18]" class="subject">
+                                <el-select clearable v-model="auxiliary[18].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[18]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[18]" v-model="cashFlow[18].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[18].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}">{{borrowArr[18][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[18].borrow.includes('-')}" >{{borrowArr[18][10]}}
+                            <input v-model="borrowsArr[18].borrow" @change="borrowChange(18)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-19" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[18].loan.includes('-')}">{{loanArr[18][10]}}
+                            <input v-model="loansArr[18].loan" @change="loanChange(18)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-19" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('18',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[19].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[19].abstract" @change="changeAbstract(19)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[19].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[19].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(19)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(19)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[19]" class="subject">
+                                <el-select clearable v-model="auxiliary[19].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[19]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[19]" v-model="cashFlow[19].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[19].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}">{{borrowArr[19][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[19].borrow.includes('-')}" >{{borrowArr[19][10]}}
+                            <input v-model="borrowsArr[19].borrow" @change="borrowChange(19)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-20" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[19].loan.includes('-')}">{{loanArr[19][10]}}
+                            <input v-model="loansArr[19].loan" @change="loanChange(19)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-20" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('19',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[20].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[20].abstract" @change="changeAbstract(20)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[20].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[20].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(20)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(20)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[20]" class="subject">
+                                <el-select clearable v-model="auxiliary[20].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[20]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[20]" v-model="cashFlow[20].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[20].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}">{{borrowArr[20][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[20].borrow.includes('-')}" >{{borrowArr[20][10]}}
+                            <input v-model="borrowsArr[20].borrow" @change="borrowChange(20)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-21" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[20].loan.includes('-')}">{{loanArr[20][10]}}
+                            <input v-model="loansArr[20].loan" @change="loanChange(20)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-21" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('20',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[21].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[21].abstract" @change="changeAbstract(21)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[21].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[21].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(21)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(21)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[21]" class="subject">
+                                <el-select clearable v-model="auxiliary[21].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[21]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[21]" v-model="cashFlow[21].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[21].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}">{{borrowArr[21][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[21].borrow.includes('-')}" >{{borrowArr[21][10]}}
+                            <input v-model="borrowsArr[21].borrow" @change="borrowChange(21)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-22" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[21].loan.includes('-')}">{{loanArr[21][10]}}
+                            <input v-model="loansArr[21].loan" @change="loanChange(21)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-22" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('21',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[22].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[22].abstract" @change="changeAbstract(22)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[22].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[22].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(22)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(22)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[22]" class="subject">
+                                <el-select clearable v-model="auxiliary[22].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[22]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[22]" v-model="cashFlow[22].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[22].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}">{{borrowArr[22][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[22].borrow.includes('-')}" >{{borrowArr[22][10]}}
+                            <input v-model="borrowsArr[22].borrow" @change="borrowChange(22)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-23" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[22].loan.includes('-')}">{{loanArr[22][10]}}
+                            <input v-model="loansArr[22].loan" @change="loanChange(22)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-23" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('22',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+
+                    <tr v-show="isShowTrArr[23].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[23].abstract" @change="changeAbstract(23)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[23].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[23].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(23)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(23)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[23]" class="subject">
+                                <el-select clearable v-model="auxiliary[23].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[23]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[23]" v-model="cashFlow[23].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[23].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}">{{borrowArr[23][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[23].borrow.includes('-')}" >{{borrowArr[23][10]}}
+                            <input v-model="borrowsArr[23].borrow" @change="borrowChange(23)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-24" type="text" pattern="[0-9]" maxlength="23">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[23].loan.includes('-')}">{{loanArr[23][10]}}
+                            <input v-model="loansArr[23].loan" @change="loanChange(23)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-24" type="text" pattern="[0-9]" maxlength="23" >
+                        </td>
+                        <td><i @click="deleteEffective('23',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[24].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[24].abstract" @change="changeAbstract(24)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[24].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[24].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(24)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(24)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[24]" class="subject">
+                                <el-select clearable v-model="auxiliary[24].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[24]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[24]" v-model="cashFlow[24].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[24].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}">{{borrowArr[24][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[24].borrow.includes('-')}" >{{borrowArr[24][10]}}
+                            <input v-model="borrowsArr[24].borrow" @change="borrowChange(24)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-25" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[24].loan.includes('-')}">{{loanArr[24][10]}}
+                            <input v-model="loansArr[24].loan" @change="loanChange(24)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-25" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('24',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[25].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[25].abstract" @change="changeAbstract(25)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[25].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[25].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(25)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(25)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[25]" class="subject">
+                                <el-select clearable v-model="auxiliary[25].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[25]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[25]" v-model="cashFlow[25].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[25].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}">{{borrowArr[25][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[25].borrow.includes('-')}" >{{borrowArr[25][10]}}
+                            <input v-model="borrowsArr[25].borrow" @change="borrowChange(25)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-26" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[25].loan.includes('-')}">{{loanArr[25][10]}}
+                            <input v-model="loansArr[25].loan" @change="loanChange(25)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-26" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('25',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+
+                    <tr v-show="isShowTrArr[26].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[26].abstract" @change="changeAbstract(26)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[26].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[26].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(26)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(26)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[26]" class="subject">
+                                <el-select clearable v-model="auxiliary[26].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[26]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[26]" v-model="cashFlow[26].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[26].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}">{{borrowArr[26][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[26].borrow.includes('-')}" >{{borrowArr[26][10]}}
+                            <input v-model="borrowsArr[26].borrow" @change="borrowChange(26)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-27" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[26].loan.includes('-')}">{{loanArr[26][10]}}
+                            <input v-model="loansArr[26].loan" @change="loanChange(26)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-27" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('26',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[27].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[27].abstract" @change="changeAbstract(27)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[27].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[27].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(27)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(27)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[27]" class="subject">
+                                <el-select clearable v-model="auxiliary[27].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[27]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[27]" v-model="cashFlow[27].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[27].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}">{{borrowArr[27][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[27].borrow.includes('-')}" >{{borrowArr[27][10]}}
+                            <input v-model="borrowsArr[27].borrow" @change="borrowChange(27)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-28" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[27].loan.includes('-')}">{{loanArr[27][10]}}
+                            <input v-model="loansArr[27].loan" @change="loanChange(27)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-28" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('27',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[28].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[28].abstract" @change="changeAbstract(28)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[28].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[28].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(28)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(28)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[28]" class="subject">
+                                <el-select clearable v-model="auxiliary[28].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[28]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[28]" v-model="cashFlow[28].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[28].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}">{{borrowArr[28][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[28].borrow.includes('-')}" >{{borrowArr[28][10]}}
+                            <input v-model="borrowsArr[28].borrow" @change="borrowChange(28)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-29" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[28].loan.includes('-')}">{{loanArr[28][10]}}
+                            <input v-model="loansArr[28].loan" @change="loanChange(28)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-29" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('28',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
+                    <tr v-show="isShowTrArr[29].isShowTr" class="effective">
+                        <td class="firTd">
+                            <textarea v-model="abstractArr[29].abstract" @change="changeAbstract(29)"class="abstract-input" maxlength="50"></textarea>
+                            <i v-show="isTrueArr[29].isTrue" class="icon iconfont icon-31xuanze green"></i>
+                        </td>
+                        <td>
+                            <el-autocomplete
+                                class="chooseSubject"
+                                v-model="subjectArr[29].subject"
+                                :fetch-suggestions="querySearch"
+                                placeholder="请选择或输入会计科目"
+                                :trigger-on-focus="false"
+                                @select="subjectChange(29)">
+                                <template slot-scope="{ item }">
+                                    <div class="name">{{ item.name }}</div>
+                                </template>
+                                <el-button slot="append" icon="el-icon-arrow-down" @click="addClick(29)"></el-button>
+                            </el-autocomplete>
+                            <div v-show="subjectTypeArr[29]" class="subject">
+                                <el-select clearable v-model="auxiliary[29].auxiliary" placeholder="请选择辅助科目">
+                                    <el-option
+                                        v-for="item in auxiliaryArr"
+                                        :key="item.value"
+                                        :label="item.value"
+                                        :value="item.key">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div v-show="isCashFlowArr[29]" class="subject">
+                                <span  class="red tips">*</span>
+                                <el-select v-show="isCashFlowArr[29]" v-model="cashFlow[29].cashFlow" placeholder="请选择现金流量">
+                                    <el-option
+                                        v-for="item in cashFlowArr"
+                                        :key="item.value"
+                                        :label="item.key"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <p class="balance">科目余额：{{balanceArr[29].balance}}元</p>
+                        </td>
+
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][0]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][1]}}</td>
+                        <td class="debit million" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][2]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][3]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][4]}}</td>
+                        <td class="debit thousand" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][5]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][6]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][7]}}</td>
+                        <td class="debit position" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][8]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}">{{borrowArr[29][9]}}</td>
+                        <td class="debit" :class="{red:borrowsArr[29].borrow.includes('-')}" >{{borrowArr[29][10]}}
+                            <input v-model="borrowsArr[29].borrow" @change="borrowChange(29)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="borrow borrowArr-30" type="text" pattern="[0-9]" maxlength="13">
+                        </td>
+
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][0]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][1]}}</td>
+                        <td class="lender million" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][2]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][3]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][4]}}</td>
+                        <td class="lender thousand" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][5]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][6]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][7]}}</td>
+                        <td class="lender position" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][8]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][9]}}</td>
+                        <td class="lender" :class="{red:loansArr[29].loan.includes('-')}">{{loanArr[29][10]}}
+                            <input v-model="loansArr[29].loan" @change="loanChange(29)" @focus="inputFocus($event)" @blur="inputBlur($event)"
+                                   class="loan loanArr-30" type="text" pattern="[0-9]" maxlength="13" >
+                        </td>
+                        <td><i @click="deleteEffective('29',$event)" class="icon iconfont icon-shanchu red"></i></td>
+                    </tr>
                     <tr class="total ">
                         <td colspan="2" class="firTd">
                             合计：
@@ -1039,6 +2501,26 @@
                     {isTrue:false},
                     {isTrue:false},
                     {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
+                    {isTrue:false},
                 ],//条目是否有效
                 isShowTrArr:[
                     {isShowTr:true},
@@ -1051,8 +2533,48 @@
                     {isShowTr:false},
                     {isShowTr:false},
                     {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
+                    {isShowTr:false},
                 ],//是否显示条目
                 abstractArr:[
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
+                    {abstract:''},
                     {abstract:''},
                     {abstract:''},
                     {abstract:''},
@@ -1075,8 +2597,48 @@
                     {subject:''},
                     {subject:''},
                     {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
+                    {subject:''},
                 ],//会计科目
                 balanceArr:[
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
+                    {balance:'0.00'},
                     {balance:'0.00'},
                     {balance:'0.00'},
                     {balance:'0.00'},
@@ -1099,8 +2661,48 @@
                     {borrow:''},
                     {borrow:''},
                     {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
+                    {borrow:''},
                 ],//借方金额
                 loansArr:[
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
+                    {loan:''},
                     {loan:''},
                     {loan:''},
                     {loan:''},
@@ -1123,8 +2725,48 @@
                     ['','','','','','','','','','',''],
                     ['','','','','','','','','','',''],
                     ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
                 ],//借方金额数组
                 loanArr:[
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
+                    ['','','','','','','','','','',''],
                     ['','','','','','','','','','',''],
                     ['','','','','','','','','','',''],
                     ['','','','','','','','','','',''],
@@ -1139,9 +2781,29 @@
                 borrowTotal:'',//借方合计
                 loanTotal:'',//贷方合计
                 totalArr:['','','','','','','','','','','','','','','','','','','','','',''],//合计数组
-                isCashFlowArr:[false,false,false,false,false,false,false,false,false,false],//是否显示现金流量
-                subjectTypeArr:[false,false,false,false,false,false,false,false,false,false],//是否显示辅助科目
+                isCashFlowArr:[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],//是否显示现金流量
+                subjectTypeArr:[false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false],//是否显示辅助科目
                 auxiliary:[
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
+                    {auxiliary:''},
                     {auxiliary:''},
                     {auxiliary:''},
                     {auxiliary:''},
@@ -1154,6 +2816,26 @@
                     {auxiliary:''},
                 ],//辅助科目
                 cashFlow:[
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
+                    {cashFlow:''},
                     {cashFlow:''},
                     {cashFlow:''},
                     {cashFlow:''},
@@ -1356,6 +3038,7 @@
                 }
                 this.changeIsTrue()
             },
+            //贷方金额change事件
             loanChange(n){
                 let loan = this.loansArr[n].loan;//当前行贷款金额
 
@@ -1686,17 +3369,37 @@
                             this.$message.success('记账成功');
                             this.documentDate = ''
                                 this.isTrueArr = [
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                                {isTrue:false},
-                            ]//条目是否有效
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                    {isTrue:false},
+                                ]//条目是否有效
                                 this.isShowTrArr = [
                                     {isShowTr:true},
                                     {isShowTr:true},
@@ -1707,98 +3410,278 @@
                                     {isShowTr:false},
                                     {isShowTr:false},
                                     {isShowTr:false},
-                                    {isShowTr:false}
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
+                                    {isShowTr:false},
                                 ]//是否显示条目
                                 this.abstractArr = [
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
-                                {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
+                                    {abstract:''},
                             ]//摘要
                                 this.subjectArr = [
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
-                                {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
+                                    {subject:''},
                             ]//会计科目
                                 this.balanceArr = [
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
-                                {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
+                                    {balance:'0.00'},
                             ]//科目余额
                                 this.borrowsArr = [
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
-                                {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
+                                    {borrow:''},
                             ]//借方金额
                                 this.loansArr = [
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
-                                {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
+                                    {loan:''},
                             ]//贷方金额
                                 this.borrowArr = [
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
                             ]//借方金额数组
                                 this.loanArr = [
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
-                                ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
+                                    ['','','','','','','','','','',''],
                             ]//贷方金额数组
                                 this.borrowTotal = ''//借方合计
                                 this.loanTotal = ''//贷方合计
                                 this.totalArr = ['','','','','','','','','','','','','','','','','','','','','','']//合计数组
-                                this.isCashFlowArr = [false,false,false,false,false,false,false,false,false,false]//是否显示现金流量
-                                this.subjectTypeArr = [false,false,false,false,false,false,false,false,false,false]//是否显示辅助科目
+                                this.isCashFlowArr = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false]//是否显示现金流量
+                                this.subjectTypeArr = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false]//是否显示辅助科目
                                 this.auxiliary = [
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
+                                    {auxiliary:''},
                                     {auxiliary:''},
                                     {auxiliary:''},
                                     {auxiliary:''},
@@ -1811,6 +3694,26 @@
                                     {auxiliary:''},
                                 ]//辅助科目
                                 this.cashFlow = [
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
+                                    {cashFlow:''},
                                     {cashFlow:''},
                                     {cashFlow:''},
                                     {cashFlow:''},
@@ -2090,7 +3993,7 @@
             params.append('type','0');
             axios.post(url,params)
                 .then(response=> {
-//                        console.log(response);
+                       console.log(response);
                     let data = response.data.value;//列表数据
                     this.restaurants = data.zNodes
                     for(let i in this.restaurants){
@@ -2142,7 +4045,7 @@
         font-size:18px;
     }
     .content{
-        width: 1120px;
+        width: 1220px;
         background-color: #fff;
         padding: 20px 40px;
         text-align: left;

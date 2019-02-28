@@ -90,6 +90,19 @@
                         <span class="tit">{{tradeBankCodeName}}</span>
                         <input class="ipt" type="text" v-model="supplierBankCode" maxlength="20" :readonly="!isChange">
                     </li>
+                    <li class="sm" v-show="employeeFlg == 1" style="position: relative;">
+                        <span class="tit"><span class="red">*</span>{{employeeTitle}}</span>
+                        <el-select class="sel" v-model="employeeName" :disabled="!isChange" placeholder="请选择">
+                            <el-option
+                                v-for="item in employeeList"
+                                :key="item.idString"
+                                :label="item.name"
+                                :value="item.name">
+                            </el-option>
+                        </el-select>
+                        <input v-show="isChange" class="opt" type="text" v-model="employeeName" maxlength="18" placeholder="请选择或输入">
+                    </li>
+
                     <li class="sm" v-show="taxRateFlg==1">
                         <span class="tit"><span class="red">*</span>{{taxRateName}}</span>
                         <el-select class="sel" v-model="taxRate" placeholder="请选择" :disabled="!isChange">
@@ -146,6 +159,11 @@
                 tradeName:'',//交易方名称
                 tradeFlg:0,//是否显示交易方
                 supplierList:[],//交易方列表
+
+                employeeTitle:'',//员工名称标题
+                employeeName:'',//员工名称
+                employeeFlg:0,//是否显示员工名称
+                employeeList:[],//员工列表
 
                 mode:'2',//收付款方式
                 payTypeFlg:0,//是否显示收付款方式
@@ -228,43 +246,6 @@
                     this.departmentList = departmentAndProjectList
                 }
             },
-            scene:function(val){
-                let params = new URLSearchParams();
-                let url = addUrl.addUrl('collectionSetting')
-                params.append('id',val);
-                axios.post(url,params)
-                    .then(response=> {
-//                        console.log(response);
-                        let data = response.data.value.setting;
-                        this.bankCodeName = data.bankCodeName
-                        this.bankCodeFlg = data.bankCodeFlg
-                        this.businessDateName = data.businessDateName
-                        this.businessDateFlg = data.businessDateFlg
-                        this.projectDepartmentName = data.projectDepartmentName
-                        this.projectDepartmentFlg = data.projectDepartmentFlg
-                        this.moneyFlg = data.moneyFlg
-                        this.moneyName = data.moneyName
-                        this.tradeFlg = data.tradeFlg
-                        this.tradeName = data.tradeName
-                        this.payTypeFlg = data.payTypeFlg
-                        this.payTypeName = data.payTypeName
-                        this.tradeBankCodeFlg = data.tradeBankCodeFlg
-                        this.tradeBankCodeName = data.tradeBankCodeName
-                        this.discriptionFlg = data.discriptionFlg
-                        this.discriptionName = data.discriptionName
-                        this.taxRateFlg = data.taxRateFlg
-                        this.taxRateName = data.taxRateName
-                        this.taxMoneyFlg = data.taxMoneyFlg
-                        this.taxMoneyName = data.taxMoneyName
-                        this.payFlg = response.data.value.payFlg
-                        this.loading = false
-                    })
-                    .catch(error=> {
-                        this.loading = false
-//                    console.log(error);
-                        alert('网络错误，不能访问');
-                    });
-            }
         },
         methods: {
             //判断支付方式，如果选择银行支付，银行账户才能使用
@@ -325,6 +306,8 @@
                         this.taxRateName = data.taxRateName
                         this.taxMoneyFlg = data.taxMoneyFlg
                         this.taxMoneyName = data.taxMoneyName
+                        this.employeeFlg = data.employeeFlg
+                        this.employeeTitle = data.employeeName
                         this.payFlg = response.data.value.payFlg
 
                         this.loading = false
@@ -413,6 +396,11 @@
                         this.loading = false;
                         return
                     }
+                    if(this.mode == '2' && this.employeeName == '' && this.employeeFlg == 1 ){
+                        this.$message.error('请选择或输入员工名称');
+                        this.loading = false;
+                        return
+                    }
                     this.isLoading = true;
                     let message = ''
                     if(n == 1){
@@ -464,8 +452,6 @@
                 }else if(n == 2){
                     url = addUrl.addUrl('collectionSubmit')
                 }
-
-
                 let departmentJson = ''
                 for(let i in this.departmentAndProjectList){
                     if(this.departmentAndProjectList[i].id == this.department){
@@ -484,6 +470,7 @@
                 params.append('tradeBankName',this.supplierBankCode);
                 params.append('discription',this.discription);
                 params.append('taxRate',this.taxRate);
+                params.append('employeeName',this.employeeName);
                 params.append('taxMoney',unNumber.unNumber(this.taxAmount));
 
                 axios.post(url,params)
@@ -534,18 +521,20 @@
             params.append('id',this.debitId);
             axios.post(url,params)
                 .then(response=> {
-                    console.log(response);
+//                    console.log(response);
                     let data = response.data.value;
                     let item = data.item
                     this.bankCodeList = data.bankList
                     this.departmentAndProjectList = data.departmentList
                     this.sceneList = data.settingList
                     this.supplierList = data.tradeList
+                    this.employeeList = data.employeeList
                     this.scene = item.sceneIdString
                     this.businessDate = item.businessDateYMD
                     this.department = item.projectDepartmentIdString
                     this.money = number.number(item.money)
                     this.supplier = item.tradeName
+                    this.employeeName = item.employeeName
                     this.mode = String(item.payType)
                     if(this.mode == '2'){
                         this.bankCode = item.bankIdString;
@@ -565,9 +554,8 @@
                     }else{
                         this.isChange = false
                     }
-
                     if(this.isRedFlush) this.isChange = false
-
+                    this.changeScene()
                     this.loading = false
                 })
                 .catch(error=> {

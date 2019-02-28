@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import homePage from '@/components/page/homePage'
-
+//首页
+// @/components/page/homePage'//首页
+//登录，获取公共参数页面
+// @components/common/top-h
 //借款单：
 import loan from '@/components/page/loan/loan'//借款单列表
 import newLoan from '@/components/page/loan/newLoan'//新建借款单

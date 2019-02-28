@@ -848,7 +848,7 @@
                         this.newUnit = newList1[i].unit
                         this.newTaxAmount = newList1[i].taxMoney;
                         this.newMoney = newList1[i].money;
-                        this.newUnitPrice = newList2[i].perPrice
+                        this.newUnitPrice = newList1[i].perPrice
                         this.isI = i;
                     }
                 }

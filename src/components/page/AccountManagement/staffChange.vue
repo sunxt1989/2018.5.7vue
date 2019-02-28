@@ -15,61 +15,71 @@
                         <col width="80%">
                         <tr>
                             <td class="hd">姓名</td>
-                            <td>{{userName}}</td>
+                            <td>
+                                {{userName}}
+                            </td>
+                            <td class="hd">账号</td>
+                            <td>{{phone}}</td>
                         </tr>
                         <tr>
                             <td class="hd">管理员</td>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="managerFlg" size="medium" :disabled="isManagerFlg">
                                     管理员 勾选会替换原来的管理员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td rowspan="7" class="hd">用户角色</td>
-                            <td>
+                            <td rowspan="8" class="hd">用户角色</td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="bossFlg" size="medium" :disabled="isBossFlg">
                                     企业负责人 勾选会替换原来的管理员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="financeFlg" size="medium" :disabled="isFinanceFlg">
                                     财务负责人 勾选会替换原来的管理员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="cashierFlg" size="medium" :disabled="isCashierFlg">
                                     出纳 勾选会替换原来的管理员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="hrFlg" size="medium">
                                     综合负责人</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <el-checkbox class="check" v-model="accounterFlg" size="medium">
-                                    会计</el-checkbox>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="saleFlg" size="medium">
                                     销售专员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td colspan="3">
                                 <el-checkbox class="check" v-model="purchaseFlg" size="medium">
                                     采购专员</el-checkbox>
                             </td>
                         </tr>
                         <tr>
+                            <td colspan="3">
+                                <el-checkbox class="check" v-model="stockFlg" size="medium">
+                                    股东</el-checkbox>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <el-checkbox class="check" v-model="accounterFlg" size="medium">
+                                    会计</el-checkbox>
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="hd">加入时间</td>
-                            <td>{{createTimeYMD}}</td>
+                            <td colspan="3">{{createTimeYMD}}</td>
                         </tr>
                     </table>
                 </div>
@@ -174,6 +184,7 @@
     export default{
         data(){
             return{
+                phone:'',//账号
                 userName:'',//姓名
                 bookUserId:'',//账套员工id
                 createTimeYMD:'',//创建时间
@@ -190,6 +201,7 @@
                 isCashierFlg:false,//出纳标记
 
                 accounterFlg:false,//会计标记
+                stockFlg:false,//股东标记
 
                 hrFlg:false,//综合管理员标记
 
@@ -277,17 +289,21 @@
                 if(val || this.financeFlg || this.accounterFlg){
                     this.chakanAccounting = true;
                     this.caozuoAccounting = true;
-                    this.chakanReport = true;
-                    this.caozuoReport = true;
                     this.chakanAssets = true;
                     this.caozuoAssets = true;
                 }else{
                     this.chakanAccounting = false;
                     this.caozuoAccounting = false;
-                    this.chakanReport = false;
-                    this.caozuoReport = false;
                     this.chakanAssets = false;
                     this.caozuoAssets = false;
+                }
+                //报表状态判断
+                if(val || this.accounterFlg || this.financeFlg || this.stockFlg){
+                    this.chakanReport = true;
+                    this.caozuoReport = true;
+                }else{
+                    this.chakanReport = false;
+                    this.caozuoReport = false;
                 }
                 //银行业务、收付款状态判断
                 if(val || this.financeFlg || this.cashierFlg){
@@ -332,17 +348,21 @@
                 if(val || this.bossFlg || this.accounterFlg){
                     this.chakanAccounting = true;
                     this.caozuoAccounting = true;
-                    this.chakanReport = true;
-                    this.caozuoReport = true;
                     this.chakanAssets = true;
                     this.caozuoAssets = true;
                 }else{
                     this.chakanAccounting = false;
                     this.caozuoAccounting = false;
-                    this.chakanReport = false;
-                    this.caozuoReport = false;
                     this.chakanAssets = false;
                     this.caozuoAssets = false;
+                }
+                //报表状态判断
+                if(val || this.accounterFlg || this.bossFlg || this.stockFlg){
+                    this.chakanReport = true;
+                    this.caozuoReport = true;
+                }else{
+                    this.chakanReport = false;
+                    this.caozuoReport = false;
                 }
                 //银行业务、收付款状态判断
                 if(val || this.bossFlg || this.cashierFlg){
@@ -424,21 +444,35 @@
                     this.chakanAssets = false;
                     this.caozuoAssets = false;
                 }
-                //账务处理、资产、报表状态判断
+                //账务处理、资产、状态判断
                 if(val || this.bossFlg || this.financeFlg){
                     this.chakanAccounting = true;
                     this.caozuoAccounting = true;
-                    this.chakanReport = true;
-                    this.caozuoReport = true;
                     this.chakanAssets = true;
                     this.caozuoAssets = true;
                 }else{
                     this.chakanAccounting = false;
                     this.caozuoAccounting = false;
-                    this.chakanReport = false;
-                    this.caozuoReport = false;
                     this.chakanAssets = false;
                     this.caozuoAssets = false;
+                }
+                //报表状态判断
+                if(val || this.financeFlg || this.bossFlg || this.stockFlg){
+                    this.chakanReport = true;
+                    this.caozuoReport = true;
+                }else{
+                    this.chakanReport = false;
+                    this.caozuoReport = false;
+                }
+            },
+//            股东change事件（）
+            stockFlg:function(val){
+                if(val || this.financeFlg || this.bossFlg || this.accounterFlg){
+                    this.chakanReport = true;
+                    this.caozuoReport = true;
+                }else{
+                    this.chakanReport = false;
+                    this.caozuoReport = false;
                 }
             }
         },
@@ -578,6 +612,7 @@
                 params.append('purchaseFlg',this.purchaseFlg);
                 params.append('saleFlg',this.saleFlg);
                 params.append('accounterFlg',this.accounterFlg);
+                params.append('stockFlg',this.stockFlg);
                 params.append('departments',departmentsArr.join(';'));
                 params.append('menus',menus);
 
@@ -626,6 +661,7 @@
                             let current_book_ym = String(data.current_book_ym).substring(0,6)//当前账期
                             let auth_json = data.book_user.auth_json;//判断身份列表
                             let accounter_flg = data.book_user.accounter_flg;//是否是会计
+                            let stock_flg = data.book_user.stock_flg;//是否是股东
                             let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
@@ -654,6 +690,7 @@
                             obj.account_type = account_type
                             obj.name = name
                             obj.accounter_flg = accounter_flg
+                            obj.stock_flg = stock_flg
 //                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
@@ -713,6 +750,8 @@
                     let purchaseFlg = bookUser.purchaseFlg //采购专员标记
                     let saleFlg = bookUser.saleFlg //销售专员标记
                     let accounterFlg = bookUser.accounterFlg //销售专员标记
+                    let stockFlg = bookUser.stockFlg //销售专员标记
+                    this.phone = data.phone
 
                     if(managerFlg == 1){
                         this.managerFlg = true;
@@ -741,6 +780,9 @@
                     }
                     if(accounterFlg == 1){
                         this.accounterFlg = true;
+                    }
+                    if(stockFlg ==1){
+                        this.stockFlg = true;
                     }
                     //departmentList 部分
                     this.departmentOption = data.departmentList

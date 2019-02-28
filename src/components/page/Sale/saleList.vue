@@ -45,6 +45,7 @@
                             <span v-if="scope.row.type == 5">劳务</span>
                             <span v-if="scope.row.type == 6">软件</span>
                             <span v-if="scope.row.type == 7">设计服务</span>
+                            <span v-if="scope.row.type == 8">现代商业服务</span>
                             <span v-if="scope.row.type == 99">其他</span>
                         </template>
                     </el-table-column>

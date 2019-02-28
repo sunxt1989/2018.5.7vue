@@ -325,6 +325,7 @@
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
                             let accounter_flg = data.book_user.accounter_flg;//是否是会计
+                            let stock_flg = data.book_user.stock_flg;//是否是股东
                             let menu_json = (data.book_user.menu_json == '') ? ['#loan','#bookkeeping'] : (data.book_user.menu_json).split(',');//默认配置桌面功能显示借款单，记账
 
                             let current_account_standard = data.current_account_standard //会计准则判定 1：小企业 2：企业
@@ -354,6 +355,7 @@
                             obj.isMonthlyKnots = isMonthlyKnots
                             obj.isAnnualKnots = isAnnualKnots
                             obj.accounter_flg = accounter_flg
+                            obj.stock_flg = stock_flg
                             this.$store.commit('add',obj);
                             this.$router.push('/');
                         }

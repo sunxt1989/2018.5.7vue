@@ -65,6 +65,20 @@
                             <span slot="label" class="mon">12月</span>
                         </el-tab-pane>
                     </el-tabs>
+                    <el-tabs class="tabs" v-show="choice == '3'" v-model="quarterName" @tab-click="quarterClick">
+                        <el-tab-pane name="1">
+                            <span slot="label" class="mon">第一季度</span>
+                        </el-tab-pane>
+                        <el-tab-pane name="2">
+                            <span slot="label" class="mon">第二季度</span>
+                        </el-tab-pane>
+                        <el-tab-pane name="3">
+                            <span slot="label" class="mon">第三季度</span>
+                        </el-tab-pane>
+                        <el-tab-pane name="4">
+                            <span slot="label" class="mon">第四季度</span>
+                        </el-tab-pane>
+                    </el-tabs>
                     <el-tabs class="tabs" v-show="choice == '12'">
                         <el-tab-pane name="01">
                             <span slot="label" class="mon mon-none">1月</span>
@@ -100,8 +114,10 @@
                 url2:'',//导出PDF
                 ymName: '',
                 year:'',
+                quarterName:'',
                 choiceOptions:[//1：月报表，12：季报表
                     {value:'1',label:'月报表'},
+                    {value:'3',label:'季报表'},
                     {value:'12',label:'年报表'},
                 ],
                 thisPeriod:'',//本期名称
@@ -121,11 +137,24 @@
                 this.indexYM = String(this.year) + String(this.ymName)
                 this.axios()
             },
+            //季度change事件
+            quarterClick(){
+                let quarterName = this.quarterName;
+                if(quarterName < 4){
+                    var maxYm = String(this.year) + '0'+String(this.quarterName * 3);
+                }else{
+                    var maxYm = String(this.year) + String(this.quarterName * 3);
+                }
+                this.thisPeriod = (this.current_account_standard == 1) ? '本年累计金额' : '本期金额';
+                this.lastPeriod = (this.current_account_standard == 1) ? '本月金额' : '上期金额';
+                this.axios()
+            },
 
             axios(){
                 this.loading = true
                 let url1 = addUrl.addUrl('LRBeportExcel');
                 let url2 = addUrl.addUrl('LRBeportPDF');
+//                let url2 =  'http://192.168.2.191:8080/web/vue/report/incomeStatement/print/list.html'
                 let params = new URLSearchParams();
                 let url = addUrl.addUrl('LRBeportList');
 //                let url =  'http://192.168.2.191:8080/web/vue/report/incomeStatement/get/list.html'
@@ -144,8 +173,8 @@
                             this.$message.error(msg)
                             this.tableData3 = [];
                         }
-                        this.url1 = url1 + '?ym=' + this.indexYM + '&showType=1'+ '&currentQuarter=' + this.quarterName
-                        this.url2 = url2 + '?ym=' + this.indexYM + '&showType=1'+ '&currentQuarter=' + this.quarterName
+                        this.url1 = url1 + '?ym=' + this.indexYM + '&showType='+ this.choice + '&currentQuarter=' + this.quarterName
+                        this.url2 = url2 + '?ym=' + this.indexYM + '&showType='+ this.choice + '&currentQuarter=' + this.quarterName
                         this.loading = false
                     })
                     .catch(()=>{

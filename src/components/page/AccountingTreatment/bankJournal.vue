@@ -114,6 +114,7 @@
                         if(status == 200){
                             let data = response.data.value;//列表数据
                             this.tableData = data.dataList
+                            this.year = this.startTime.substring(0,4) + '年'
                             this.loading = false;
                         }else if(status == 400){
                             this.$message.error(msg);

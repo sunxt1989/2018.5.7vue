@@ -326,7 +326,8 @@
                     {value:'4',label:'技术咨询'},
                     {value:'5',label:'劳务'},
                     {value:'6',label:'软件'},
-                    {value:'7',label:'设计服务'}
+                    {value:'7',label:'设计服务'},
+                    {value:'8',label:'现代商业服务'},
                 ],
                 taxFlg:'1',//发票类别
                 options2:[//发票类别列表

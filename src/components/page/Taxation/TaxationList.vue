@@ -426,10 +426,11 @@
                         this.t11HandleFlag = data.t11HandleFlag
 
                         if(this.companyScaless == 1){
-                            this.t7DJZ == number.number(this.mianzhengAmount)
+                            this.t7DJZ = number.number(this.mianzhengAmount)
                         }else{
                             this.t7DJZ = number.number(data.t7DJZ)
                         }
+                        console.log(this.t7DJZ);
                         this.t7YJZ = number.number(data.t7YJZ)
                         this.t7YJN = number.number(data.t7YJN)
 
@@ -459,6 +460,7 @@
                         this.lirunzonge = data.lirunzonge;
                         this.jianmiansuodeshuie = data.jianmiansuodeshuie;
                         this.shijiyijiaonasuodeshuie = data.shijiyijiaonasuodeshuie;
+
 
                         if(data.addedTaxPeroidType == 1){
                             this.addedTaxPeroidType = '月'

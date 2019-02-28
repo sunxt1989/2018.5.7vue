@@ -30,7 +30,7 @@
                                 <router-link :to="{name:'staffChange',params:{debitId:scope.row.userIdString}}" class="see">
                                     <i class="icon iconfont icon-shuru blue"></i>
                                 </router-link>
-                                <!--<i v-if="scope.row.managerFlg != 1" @click='deleteModel(scope.row.idStr)' class="icon iconfont icon-shanchu red"></i>-->
+                                <i v-if="scope.row.managerFlg != 1" @click='deleteModel(scope.row.idStr)' class="icon iconfont icon-shanchu red"></i>
                             </span>
                         </template>
                     </el-table-column>

@@ -89,6 +89,18 @@
                         <span class="tit">{{tradeBankCodeName}}</span>
                         <input class="ipt" type="text" v-model="supplierBankCode" maxlength="20">
                     </li>
+                    <li class="sm" v-show="employeeFlg == 1" style="position: relative;">
+                        <span class="tit"><span class="red">*</span>{{employeeTitle}}</span>
+                        <el-select class="sel" v-model="employeeName" placeholder="请选择">
+                            <el-option
+                                v-for="item in employeeList"
+                                :key="item.value"
+                                :label="item.name"
+                                :value="item.name">
+                            </el-option>
+                        </el-select>
+                        <input class="opt" type="text" v-model="employeeName" maxlength="18" placeholder="请选择或输入">
+                    </li>
                     <li class="sm" v-show="taxRateFlg==1">
                         <span class="tit"><span class="red">*</span>{{taxRateName}}</span>
                         <el-select class="sel" v-model="taxRate" placeholder="请选择" >
@@ -145,6 +157,11 @@
                 tradeName:'',//交易方名称
                 tradeFlg:0,//是否显示交易方
                 supplierList:[],//交易方列表
+
+                employeeTitle:'',//员工名称标题
+                employeeName:'',//员工名称
+                employeeFlg:0,//是否显示员工名称
+                employeeList:[],//员工列表
 
                 mode:'2',//收付款方式
                 payTypeFlg:'',//是否显示收付款方式
@@ -223,7 +240,6 @@
                 }else if(val == 3){
                     this.departmentList = departmentAndProjectList
                 }
-
             }
         },
         methods: {
@@ -285,7 +301,10 @@
                         this.taxRateName = data.taxRateName
                         this.taxMoneyFlg = data.taxMoneyFlg
                         this.taxMoneyName = data.taxMoneyName
+                        this.employeeFlg = data.employeeFlg
+                        this.employeeTitle = data.employeeName
                         this.payFlg = response.data.value.payFlg
+
                         this.loading = false
                     })
                     .catch(error=> {
@@ -371,6 +390,11 @@
                         this.loading = false;
                         return
                     }
+                    if(this.mode == '2' && this.employeeName == '' && this.employeeFlg == 1 ){
+                        this.$message.error('请选择或输入员工名称');
+                        this.loading = false;
+                        return
+                    }
                     this.isLoading = true;
                     let message = '';
                     if(n == 1){
@@ -439,6 +463,7 @@
                 params.append('tradeBankName',this.supplierBankCode);
                 params.append('discription',this.discription);
                 params.append('taxRate',this.taxRate);
+                params.append('employeeName',this.employeeName);
                 params.append('taxMoney',unNumber.unNumber(this.taxAmount));
 
                 axios.post(url,params)
@@ -493,6 +518,7 @@
                     this.departmentAndProjectList = data.departmentList
                     this.sceneList = data.settingList
                     this.supplierList = data.tradeList
+                    this.employeeList = data.employeeList
                     this.loading = false
                 })
                 .catch(error=> {

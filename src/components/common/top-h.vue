@@ -105,7 +105,7 @@
 //                let url = 'http://192.168.2.190:8881/web/vue/user/get/info/all.html'
                 axios.post(url)
                     .then(response=> {
-                        console.log(response);
+//                        console.log(response);
                         let data = response.data.value;
                         if(data.current_initial_status == 0){ //当前账套初始状态 0未初始 则跳转到初始化页面
                             let url2 = addUrl.addUrl('initialize')
@@ -122,6 +122,7 @@
                             let auth_json = data.book_user.auth_json;//判断身份列表
                             let owner_flg = data.book_user.owner_flg;//代记账会计以外所有人
                             let accounter_flg = data.book_user.accounter_flg;//是否是会计
+                            let stock_flg = data.book_user.stock_flg;//是否是股东
                             let isBossFlg = (data.book_user.boss_flg == 1)? true : false //是否是企业负责人
                             let isFinanceFlg = (data.book_user.finance_flg == 1)? true : false //是否是财务负责人
                             let isCashierFlg = (data.book_user.cashier_flg == 1)? true : false //是否是出纳
@@ -155,6 +156,7 @@
                             obj.isAnnualKnots = isAnnualKnots
                             obj.owner_flg = owner_flg
                             obj.accounter_flg = accounter_flg
+                            obj.stock_flg = stock_flg
 //                            console.log(obj);
                             this.$store.commit('add',obj);
                             this.account = current_book_ym.substring(0,4) + '年'+ current_book_ym.substring(4,6) + '月';//当前账期
@@ -172,7 +174,7 @@
                         this.loading = false
                         alert('请您重新登录')
                         let url = addUrl.addUrl('logout')
-                        alert(url);
+//                        alert(url);
                         window.location.href = url
                     });
             },

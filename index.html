@@ -14,24 +14,43 @@
 <script>
     let browser = {
         versions: function () {
-            var u = navigator.userAgent, app = navigator.appVersion;
+            var u = navigator.userAgent.toLowerCase(), app = navigator.appVersion;
+            console.log(u);
             return {   //移动终端浏览器版本信息
-                trident: u.indexOf('Trident') > -1, //IE内核
-                presto: u.indexOf('Presto') > -1, //opera内核
-                webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-                gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
-                mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
-                ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
-                android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
-                iPhone: u.indexOf('iPhone') > -1, //是否为iPhone或者QQHD浏览器
-                iPad: u.indexOf('iPad') > -1, //是否iPad
-                webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
+                trident: u.indexOf('trident') > -1, //IE内核
+                presto: u.indexOf('presto') > -1, //opera内核
+                webKit: u.indexOf('applewebkit') > -1, //苹果、谷歌内核
+                gecko: u.indexOf('gecko') > -1 && u.indexOf('khtml') == -1, //火狐内核
+                mobile: !!u.match(/applewebkit.*mobile.*/), //是否为移动终端
+                ios: !!u.match(/\(i[^;]+;( u;)? cpu.+mac os x/), //ios终端
+                android: u.indexOf('android') > -1 || u.indexOf('linux') > -1, //android终端或uc浏览器
+                iPhone: u.indexOf('iphone') > -1, //是否为iPhone或者QQHD浏览器
+                iPad: u.indexOf('ipad') > -1, //是否iPad
+                webApp: u.indexOf('safari') == -1 ,//是否web应该程序，没有头部与底部
+                se: u.indexOf('se 2.x') > -1,//是否搜狗浏览器
+                qqbrowser: u.indexOf('qqbrowser') > -1,//是否QQ浏览器
+                maxthon: u.indexOf('maxthon') > -1,//是否傲游浏览器
+                lbbrowser: u.indexOf('lbbrowser') > -1,//是否猎豹浏览器
+                bidubrowser: u.indexOf('bidubrowser') > -1,//是否百度浏览器
+                is360 : _mime("type", "application/vnd.chromium.remoting-viewer")
             };
         }(),
         language: (navigator.browserLanguage || navigator.language).toLowerCase()
     }
-    console.log(browser);
+    //测试mime
+    function _mime(option, value) {
+        var mimeTypes = navigator.mimeTypes;
+        for (var mt in mimeTypes) {
+            if (mimeTypes[mt][option] == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+//    console.log(browser);
     if(browser.versions.trident){
+        alert('为了更好的体验，建议您使用chrome、火狐、Microsoft Edge等浏览器，目前本网站暂不支持IE浏览器')
+    }else if(browser.versions.webKit && (browser.versions.se || browser.versions.maxthon || browser.versions.qqbrowser || browser.versions.is360 || browser.versions.bidubrowser || browser.versions.lbbrowser)){
         alert('为了更好的体验，建议您使用chrome、火狐、Microsoft Edge等浏览器，目前本网站暂不支持IE浏览器')
     }
 </script>

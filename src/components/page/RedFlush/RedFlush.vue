@@ -8,7 +8,7 @@
             <div class="w">
                 <div class="content cf">
                     <el-tabs v-model="activeName" type="card" @tab-click="handleClick" >
-                        <el-tab-pane v-if="current_book_level != 3" label="还款红冲" name="1">
+                        <el-tab-pane  label="还款红冲" name="1">
                             <el-table class="single" :data="tableData1">
                                 <el-table-column align="center" prop="userName" label="还款人"></el-table-column>
                                 <el-table-column align="center" prop="debitDateYMD" label="日期"></el-table-column>
@@ -35,7 +35,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="借款红冲" name="2">
+                        <el-tab-pane  label="借款红冲" name="2">
                             <el-table class="single" :data="tableData2">
                                 <el-table-column align="center" prop="userName" label="借款人"></el-table-column>
                                 <el-table-column align="center" prop="departmentName" label="借款部门"></el-table-column>
@@ -64,7 +64,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="报销红冲" name="3">
+                        <el-tab-pane  label="报销红冲" name="3">
                                <el-table class="single" :data="tableData3">
                                 <el-table-column align="center" prop="originalTypeName" label="类别"></el-table-column>
                                 <el-table-column align="center" prop="simpleAccountDate" label="日期"></el-table-column>
@@ -92,7 +92,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="采购红冲" name="4">
+                        <el-tab-pane  label="采购红冲" name="4">
                             <el-table class="single" :data="tableData4">
                                 <el-table-column align="center" prop="departmentName" label="部门"></el-table-column>
                                 <el-table-column align="center" prop="supplierName" label="供应商"></el-table-column>
@@ -147,7 +147,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="采购付款红冲" name="5">
+                        <el-tab-pane  label="采购付款红冲" name="5">
                                <el-table class="single" :data="tableData5">
                                 <el-table-column align="center" prop="supplierName" label="供应商"></el-table-column>
                                 <el-table-column align="center" prop="simpleSendDate" label="付款日期"></el-table-column>
@@ -174,7 +174,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="销售红冲" name="6">
+                        <el-tab-pane  label="销售红冲" name="6">
                             <el-table class="single" :data="tableData6">
                                 <el-table-column align="center" prop="departmentName" label="部门"></el-table-column>
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
@@ -227,7 +227,7 @@
                                 </el-table-column>
                             </el-table>
                         </el-tab-pane>
-                        <el-tab-pane v-if="current_book_level != 3" label="销售收款红冲" name="7">
+                        <el-tab-pane  label="销售收款红冲" name="7">
                                <el-table class="single" :data="tableData7">
                                 <el-table-column align="center" prop="customName" label="客户"></el-table-column>
                                 <el-table-column align="center" prop="simpleReceiveDate" label="收款日期"></el-table-column>
